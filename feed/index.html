@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/EloquentArduino/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/EloquentArduino/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Fri, 13 Dec 2019 10:25:41 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 15 Dec 2019 11:40:43 +0000</lastBuildDate>
 	<language>it-IT</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -24,8 +24,7 @@
 		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/</link>
 				<pubDate>Sun, 08 Dec 2019 17:31:16 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[MicroML]]></category>
-		<category><![CDATA[Programming]]></category>
+				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=224</guid>
@@ -35,9 +34,9 @@
 								<content:encoded><![CDATA[<p>In this post we'll locate ourself in space using nearby WiFi access points and machine learning. The task of detecting where you are when GPS or satellite localization is not an option is called <a href="https://en.wikipedia.org/wiki/Indoor_positioning_system">indoor positioning</a>: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely available, but the same project could be re-purposed to use Bluetooth, if there are enough devices in your location.<br />
 The inference will occur on a microcontroller thanks to the <a href="/2019/11/introducing-microml/" target="_blank">MicroML framework.</a> For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32.  </p>
 <p><span id="more-224"></span></p>
-<p>We'll follow the next steps to produce the desired result:</p>
+<p>The steps for a successful Machine learning project on Arduino are the following:</p>
 <ol>
-
+  <li>define the features</li>
   <li>record sample data: run a few scans for each location to be predicted and record the RSSI (signal strength) of each visible network</li>
  <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
  <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
@@ -132,7 +131,7 @@ void printFeatures() {
 <p>Grab some recordings just staying in a location for a few seconds and save the serial output to a file; then move to the next location and repeat: 10-15 samples for each location will suffice.</p>
 <p>If you do a good job, you should end with distinguible features, as show in the plot below.</p>
 <p><img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.svg" alt="Decision boundaries of 2 PCA components from Wifi indoor positioning features" /></p>
-<div class="whatchout">
+<div class="watchout">
 RSSIs may be a little noisy, mostly on the boundaries where weak networks may appear and disappear with a very low RSSI: this was not a problem for me, but if you're getting bad results you may filter out those low values.</p>
 <pre><code class="language-cpp">
 // replace
@@ -167,29 +166,100 @@ void classify() {
 ]]></content:encoded>
 										</item>
 		<item>
+		<title>Pin</title>
+		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/pin/</link>
+				<pubDate>Fri, 06 Dec 2019 16:15:13 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Eloquent library]]></category>
+		<category><![CDATA[eloquent]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=167</guid>
+				<description><![CDATA[<p>Pin is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like digitalWrite(led, HIGH) and start writing led.turnOn() instead. Pin is actually an abstract class, so you won't use it directly, but through its specialized implementations: DigitalIn DigitalOut AnalogIn AnalogOut If you don't [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/pin/">Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p><code>Pin</code> is a class for pin manipulation: you can <code>read</code>, <code>write</code>, <code>turnOn</code>, <code>turnOff</code>, <code>toggle</code> and a lot more. Please, stop writing horrible code like <code>digitalWrite(led, HIGH)</code> and start writing <code>led.turnOn()</code> instead. </p>
+<p><span id="more-167"></span></p>
+<p><code>Pin</code> is actually an abstract class, so you won't use it directly, but through its specialized implementations:</p>
+<ol>
+<li>DigitalIn</li>
+<li>DigitalOut</li>
+<li>AnalogIn</li>
+<li>AnalogOut</li>
+</ol>
+<p>If you don't believe a whole class is worthwhile to work with pins, I'll show a few use cases to illustrate my point.</p>
+<h3>Use case #1: active low LED</h3>
+<p>The ESP8266 has a builtin LED you can control, but it is an <em>active low</em> one: it will turn on when you write <code>LOW</code>. In this case, <code>digitalWrite(BUILTIN_LED, LOW)</code> can be misleading regarding your actual intentions. It doesn't look intuitive,  it doesn't look <em>eloquent</em>!. <code>builtinLed.turnOn()</code> does, however. All you need to get it working correctly is calling <code>builtinLed.activeLow()</code> once in your setup.</p>
+<h3>Use case #2: toggle</h3>
+<p>If you need to toggle the current state of a digital output, you need an helper variable to keep track of the state and remember to <strong>always</strong> update that variable when you write to the output. With a class, the state is tightly bound to the instance, so you have a <a href="https://en.wikipedia.org/wiki/Single_source_of_truth">single source of truth</a>: <code>turnOn()</code>, <code>turnOff()</code> and <code>toggle()</code> will take care of updating the inner state accordingly.</p>
+<pre><code class="language-cpp">// BEFORE
+#define LED 1
+
+bool ledState = true;
+
+loop() {
+    digitalWrite(LED, ledState);
+    ledState = !ledState
+}</code></pre>
+<pre><code class="language-cpp">// AFTER
+DigitalOut led(1);
+
+void loop() {
+    led.toggle();
+}</code></pre>
+<h3>Use case #3: analog delta</h3>
+<p>What if you have an analog input and want to know if its valued changed by at least X from your latest reading? You would need an helper variable again. Now imagine if you have 5 analog inputs you want to track: you'll end up with 10 variables and of course you have again to <strong>always</strong> keep both in sync. <code>AnalogIn</code>, conveniently, provides a <code>delta()</code> method that gives you the change from the previous reading and will always be in sync. Awesome!</p>
+<pre><code class="language-cpp">// BEFORE
+#define INPUT1 A1
+#define INPUT2 A2
+
+uint16_t current1, prev1;
+uint16_t current2, prev2;
+
+void loop() {
+    prev1 = current1;
+    current1 = analogRead(INPUT1);
+    prev2 = current2;
+    current2 = analogRead(INPUT2);
+
+    if (abs(current1 - prev1) &gt; THRESHOLD)
+        ...</code></pre>
+<pre><code class="language-cpp">// AFTER
+AnalogIn input1(A1), input2(A2);
+
+void loop() {
+    input1.read();
+    input2.read();
+
+    if (input1.absDelta() &gt; THRESHOLD)
+        ...
+}</code></pre>
+<p>@todo continue</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/pin/">Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
 		<title>Await</title>
 		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/await/</link>
 				<pubDate>Thu, 05 Dec 2019 18:50:59 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Eloquent library]]></category>
-		<category><![CDATA[Programming]]></category>
 		<category><![CDATA[eloquent]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=211</guid>
-				<description><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. Most often, you see example code of this kind: Serial.print(&#34;Attempting to connect to WiFi&#34;); [&#8230;]</p>
+				<description><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The await construct lets you put an upper bound to the time you're willing [&#8230;]</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/await/">Await</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral.<br />
-Most often, you see example code of this kind:</p>
+								<content:encoded><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The <code>await</code> construct lets you put an upper bound to the time you're willing to wait.</p>
+<p><span id="more-211"></span></p>
+<p>Most often, you see example code of this kind:</p>
 <pre><code class="language-cpp">Serial.print(&quot;Attempting to connect to WiFi&quot;);
 
 while (WiFi.status() != WL_CONNECTED) {
     Serial.print(&quot;.&quot;);
     delay(500);
 }</code></pre>
-<p>If the connection doesn't succeed, you're stuck in the loop. A proper way for handling such situations is with a timeout that gets you out of the loop with an error status so you can handle the failure.<br />
+<p>If the connection doesn't succeed (maybe the AP is out of range or is down), you're stuck in an endless wait. A proper way for handling such situations is with a timeout that gets you out of the loop with an error status so you can handle the failure.<br />
 <code>await</code> is exactly this: a construct to await for a condition to become true until a timeout expires, returning true or false as a response.</p>
-<p><span id="more-211"></span></p>
 <h3>Definition</h3>
 <pre><code class="language-cpp">#define await(condition, timeout) await_with_interval(condition, timeout, 10)
 #define await_with_interval(condition, timeout, interval) \
@@ -201,23 +271,25 @@ while (WiFi.status() != WL_CONNECTED) {
     } \
   return false; })()</code></pre>
 <h3>How to use</h3>
-<p><code>await</code> needs two arguments:</p>
+<p><code>await</code> needs at least two arguments:</p>
 <ol>
 <li>the condition to await for</li>
 <li>the timeout, in milliseconds</li>
 </ol>
-<pre><code class="language-cpp"> // These are for greater code clarity
- #define Seconds *1000
- #define Millis </code></pre>
+<pre><code>// these are for greater code readability
+#define Millis 
+#define Second  *1000
+#define Seconds *1000
+</code></pre>
 <pre><code class="language-cpp">bool wifiConnected = await(WiFi.status() == WL_CONNECTED, 10 Seconds)</code></pre>
-<p>The code above will await 10 seconds for the wifi to connect: on failure, <code>wifiConnected</code> will be false and you can gently fail. You can use it for any kind of check, like waiting for <code>Serial</code>.</p>
-<pre><code class="language-cpp">bool serialAvailable = await(Serial, 5 Seconds)
+<p>The code above will wait 10 seconds for the wifi to connect: on failure, <code>wifiConnected</code> will be false and you can gently fail. You can use it for any kind of check, like waiting for <code>Serial</code>.</p>
+<pre><code class="language-cpp">bool serialReady = await(Serial, 5 Seconds)
 bool serialHasCharacters = await(Serial.available(), 5 Seconds)</code></pre>
 <p>The default interval between checks is 10 milliseconds: if you need a custom delay interval you can use the more verbose <code>await_with_interval</code>:</p>
 <pre><code class="language-cpp">// await WiFi for 10 seconds, check if connected every 500 millis
 bool wifiConnected = await_with_interval(WiFi.status() == WL_CONNECTED, 10 Seconds, 500 Millis)</code></pre>
 <h3>How it works</h3>
-<p>The <code>await</code> macro created an <a href="http://www.cplusplus.com/articles/2LywvCM9/">inline function</a> that loops while the timeout expires. At every loop it checks if the condition is true: if that's the case, it returns true. The inline function construct is needed to get a return value, so you can assign it to a variable or embed directly inside an <code>if</code> test. The following gives you an idea of what's happening, though not exactly accurate.</p>
+<p>The <code>await</code> macro creates an <a href="http://www.cplusplus.com/articles/2LywvCM9/">inline function</a> that loops until the timeout expires. At every loop it checks if the condition is true: if that's the case, it returns true. The inline function construct is needed to get a return value, so you can assign it to a variable or embed directly inside an <code>if</code> test. The following code sample gives you an idea of what's happening.</p>
 <pre><code class="language-cpp">bool wifiConnected = await(WiFi.status() == WL_CONNECTED, 10 Seconds)
 
 // conceptually translates to
@@ -228,7 +300,8 @@ bool inline_function() {
     while (millis() - start &lt;= 10000) {
       if (WiFi.status() == WL_CONNECTED)
         return true;
-      delay(interval);
+
+      delay(10);
     }
 
    return false;
@@ -244,169 +317,63 @@ bool wifiConnected = inline_function();</code></pre>
 				<pubDate>Thu, 05 Dec 2019 18:42:45 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Eloquent library]]></category>
-		<category><![CDATA[Programming]]></category>
 		<category><![CDATA[eloquent]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=209</guid>
-				<description><![CDATA[<p>Sometimes you may need to execute a piece of code at regular intervals. There are a couple of Timer libraries out there that allows you to do this and a lot more. If you need to start, stop, pause your timer, go use them, they're really powerful. But if you need something simpler, you may [&#8230;]</p>
+				<description><![CDATA[<p>The every construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically. [&#8230;]</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/every/">Every</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p>Sometimes you may need to execute a piece of code at regular intervals. There are a couple of Timer libraries out there that allows you to do this and a lot more. If you need to start, stop, pause your timer, go use them, they're really powerful. But if you need something simpler, you may consider using the <code>every</code> construct: it takes a time interval as argument and will execute the following code block at regular interval.</p>
+								<content:encoded><![CDATA[<p>The <code>every</code> construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically.</p>
 <p><span id="more-209"></span></p>
 <h3>Definition</h3>
 <pre><code class="language-cpp">#define every(interval) \
     static uint32_t __every__##interval = millis(); \
     if (millis() - __every__##interval &gt;= interval &amp;&amp; (__every__##interval = millis()))</code></pre>
 <h3>How to use</h3>
-<pre><code class="language-cpp">int interval = 1000;
+<pre><code>// these are for greater code readability
+#define Millis 
+#define Second  *1000
+#define Seconds *1000
+</code></pre>
+<pre><code class="language-cpp">int interval = 1 Second;
 
 void setup() {
     Serial.begin(115200);
 }
 
 void loop() {
-    every(1000) {
-        Serial.println(&quot;Every 1 second&quot;);
+    every(1 Second) {
+        Serial.println(&quot;This line is printed every 1 second&quot;);
     }
 
-    every(2000) {
-        Serial.println(&quot;Every 2 seconds&quot;);
+    every(2 Seconds) {
+        Serial.println(&quot;This line is printed every 2 seconds&quot;);
     }
 
     every(interval) {
-        Serial.println(&quot;You can have variable intervals too&quot;);
-        interval += 1000;
+        interval += 1 Second;
+        Serial.print(&quot;You can have variable intervals too! &quot;);
+        Serial.print(&quot;This line will be printed again in &quot;);
+        Serial.print(interval / 1000);
+        Serial.println(&quot; seconds&quot;);
     }
 }</code></pre>
 <h3>Caveats</h3>
-<p><code>every</code> is a macro and it has some limitations:</p>
+<p><code>every</code> is just a macro definition and is not a proper timer, so it has some limitations:</p>
 <ol>
-<li>you can't stop or pause it</li>
-<li>you can't use several <code>every</code> with the same argument</li>
+<li>you can't stop, pause or resume it: once set, it will run forever</li>
 <li>its argument must be the suffix of a valid identifier</li>
+<li>you can't use several <code>every</code> with the exact same argument: you have to put all the code that needs to happen at the same interval in the same block</li>
 </ol>
-<p>Let me clarify 2. and 3.: the macro generates a variable named like <code>__every__##argument</code>: it means that <code>every(1000)</code> generates a variable <code>uint32_t __every__1000</code>, <code>every(interval)</code> generates <code>uint32_t __every__interval</code> and so on, so you can't call <code>every(10 * 1000)</code>, since it would generate <code>uint32_t __every__10 * 1000</code>, which would rise a syntax error.</p>
+<p>Let me clarify on #2: the macro works by generating a variable named like <code>__every__##argument</code></p>
+<pre><code class="language-cpp">every(1) ==&gt; uint32_t __every__1;
+every(2) ==&gt; uint32_t __every__2;
+every(a_given_interval) ==&gt; uint32_t __every__a_given_interval;
+every(an invalid interval) ==&gt; uint32_t __every__an invalid interval; // Syntax error</code></pre>
+<p>So, every integer literal and any variable are all valid arguments. Any expression is forbidden.<br />
+This also exaplains #3: if you use two <code>every</code> with the same argument, two variables with the exact name will be created and it will rise a compile-time error.</p>
 <p>If you can live with this limitations, <code>every</code> only needs the space of an <code>uint32_t</code> to work.</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/every/">Every</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
-		<title>Morse alphabet identification using Arduino and MicroML</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/morse-alphabet-identification-with-arduino-and-microml/</link>
-				<pubDate>Thu, 05 Dec 2019 17:07:38 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[MicroML]]></category>
-		<category><![CDATA[Programming]]></category>
-		<category><![CDATA[microml]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=194</guid>
-				<description><![CDATA[<p>In this post we're going to apply machine learning to the identification of the letters from the Morse alphabet. If you don't know how this code works, essentially it encodes all the letters with 2 symbols: dot (•) and dash (‒). For our task we'll use a simple push button as input and a fixed [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/morse-alphabet-identification-with-arduino-and-microml/">Morse alphabet identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p>In this post we're going to apply machine learning to the identification of the letters from the <a href="https://en.wikipedia.org/wiki/Morse_code">Morse alphabet</a>. If you don't know how this code works, essentially it encodes all the letters with 2 symbols: dot (•) and dash (‒). For our task we'll use a simple push button as input and a fixed number of samples (30 in the example) taken at a fixed interval (100 ms in the example) starting from the first detection of the button press. This means you have 3 seconds to &quot;type&quot; the letter and on the Serial monitor you will see a sequence of 0s and 1s, representing if the button was pressed or not; the inference procedure will translate this sequence into a letter. Let's see how!</p>
-<p><span id="more-194"></span></p>
-<p>We'll follow the next steps to produce the desired result:</p>
-<ol>
-
-  <li>record sample data: repeat each letter a few times and save the values from the serial monitor to a file, one for each letter. If you've never typed morse code (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</li>
- <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
- <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
-</ol>
-<h3>1. Record sample data</h3>
-<p>To the bare minimum, we'll need a push button and two wires: one to ground and the other to a digital pin. Since in the example we'll make the button an <code>INPUT_PULLUP</code>, we'll read 0 when the button is pressed and 1 when not.  All we need to do is detect a press and dump 30 samples of the digital pin:</p>
-<pre><code class="language-cpp">#define IN 4
-#define NUM_SAMPLES 30
-#define INTERVAL 100
-
-void setup() {
-  Serial.begin(115200);
-  pinMode(IN, INPUT_PULLUP);
-}
-
-void loop() {
-  if (digitalRead(IN) == 0)
-    record();
-
-  delay(10);
-}
-
-void record() {
-  for (int i = 0; i &lt; NUM_SAMPLES; i++) {
-    Serial.print(digitalRead(IN));
-    Serial.print(&#039;,&#039;);
-    delay(INTERVAL);
-  }
-
-  Serial.println();
-}</code></pre>
-<p>You may end with duplicate recordings: don't worry, that's not a problem. I'll paste my recordings for a few letters, as a reference.</p>
-<pre><code>// A (•‒)
-0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1
-
-// D (‒••)
-0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,0,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,1,1
-
-// E (•)
-0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-// S (•••)
-0,0,0,1,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-// T (‒)
-0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
-<p>If you did a good job, you should end with quite distinguible features, as show in the plot below.</p>
-<p><img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/morse-pca.svg" alt="PCA of Morse letters" /></p>
-<h3>2. Train and export the SVM classifier</h3>
-<p>Refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn">tutorial</a></p>
-<h3>3. Run the inference</h3>
-<p>To run the inference we fill an array with the 30 recordings and call <code>predict()</code>.</p>
-<pre><code class="language-cpp">#include &quot;model.h&quot;
-
-void loop() {
-  if (digitalRead(IN) == 0)
-    classify();
-
-  delay(10);
-}
-
-void classify() {
-  double features[NUM_SAMPLES] = {0};
-
-  for (int i = 0; i &lt; NUM_SAMPLES; i++) {
-    features[i] = digitalRead(IN);
-    delay(INTERVAL);
-  }
-
-  Serial.print(&quot;Morse letter: &quot;);
-  Serial.println(classIdxToName(predict(features)));
-  delay(2000);
-}</code></pre>
-<p>And that's it: Morse code recognition through machine learning on your Arduino board!</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/morse-alphabet-identification-with-arduino-and-microml/">Morse alphabet identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
@@ -414,7 +381,7 @@ void classify() {
 		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/gesture-identification-using-arduino-and-microml/</link>
 				<pubDate>Sun, 01 Dec 2019 13:25:46 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Programming]]></category>
+				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=35</guid>
@@ -423,9 +390,9 @@ void classify() {
 ]]></description>
 								<content:encoded><![CDATA[<p>In this post we're going to replicate the tutorial found on the <a href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html">Tensorflow blog </a>where an Arduino BLE 33 Nano Sense is used to classify IMU readings into gestures. We’re going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and 2 kb of RAM. In this project the features are going to be 30 IMU accelerometer readings, taken starting from when a movement is detected. You can decide the use all the 6 axis from the IMU (accelerometer + gyroscope), or only 3 of them (either accelerometer or gyroscope): it will depend on the gestures you want to recognize and the amount of program space you have. Of course 3 dimesionsions will lead to a smaller model, at the cost of some loss in accuracy; do some tests and pick the one that best fits your needs. </p>
 <p><span id="more-35"></span></p>
-<p>We'll follow the next steps to produce the desired result:</p>
+<p>The steps for a successful Machine learning project on Arduino are the following:</p>
 <ol>
-
+  <li>define the features</li>
   <li>record sample data: repeat each gesture a few times and save the values from the serial monitor to a file, one for each gesture</li>
  <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
  <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
@@ -556,38 +523,169 @@ void classify() {
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>Fruit Identification using Arduino and MicroML</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/fruit-identification-using-arduino-and-microml/</link>
-				<pubDate>Sun, 01 Dec 2019 10:35:29 +0000</pubDate>
+		<title>Arduino Machine learning project #2: Morse alphabet identification</title>
+		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-morse-alphabet-identification/</link>
+				<pubDate>Sun, 01 Dec 2019 12:07:38 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Programming]]></category>
+				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=6</guid>
-				<description><![CDATA[<p>In this post we're going to replicate the tutorial found on the Tensorflow blog where an Arduino BLE 33 Nano Sense is used to classify RGB components into colors. We're going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and 2 [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/fruit-identification-using-arduino-and-microml/">Fruit Identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=194</guid>
+				<description><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to identify the letters from the Morse alphabet. If you don't know how this code works, essentially it encodes all the letters with 2 symbols: dot (•) and dash (‒). We're going to target an Arduino Nano board (old generation), equipped with 32 kb [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-morse-alphabet-identification/">Arduino Machine learning project #2: Morse alphabet identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p>In this post we're going to replicate the tutorial found on the <a href="https://blog.tensorflow.org/2019/11/fruit-identification-using-arduino-and-tensorflow.html">Tensorflow blog</a> where an Arduino BLE 33 Nano Sense is used to classify RGB components into colors. We're going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and 2 kb of RAM. I tested the code on an Attiny 44 too (4 Kb of flash memory and 256 bytes of RAM) and it worked fine. As described on the Tensorflow blog, we're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which fruit we're pointing it at. This means our features are going to be of 3-dimensional, which leads to a really simple model: if you craft your sampling with care, you'll end up with few support vectors (I ended up with 9 support vectors to detect 3 distint colors).</p>
-<p><span id="more-6"></span></p>
-<p>We'll follow the next steps to produce the desired result:</p>
+								<content:encoded><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to identify the letters from the <a href="https://en.wikipedia.org/wiki/Morse_code">Morse alphabet</a>. If you don't know how this code works, essentially it encodes all the letters with 2 symbols: dot (•) and dash (‒). We're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
+<p><span id="more-194"></span></p>
+<p>The steps for a successful Machine learning project on Arduino are the following:</p>
 <ol>
-
-  <li>record sample data: put some colored objects in front of your sensor and save the readings to a file, one for each fruit</li>
+  <li>define the features</li>
+  <li>record sample data: repeat each letter a few times and save the values from the serial monitor to a file, one for each letter. If you've never typed morse code (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</li>
  <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
  <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
 </ol>
-<h3>1. Record sample data</h3>
-<p>We'll use the raw RGB sensor readings as features, so we just need to write some code to access the sensor. This part will vary based on the specific chip you have: I'll report the code for a TCS 230/3200. </p>
+<h3>1. Features definition</h3>
+<p>For our task we'll use a simple push button as input and a fixed number of samples taken at a fixed interval (100 ms), starting from the first detection of the button press. I chose to record 30 samples for each letter, but you can easily customize the value as per your needs. With 30 samples at 100 ms frequency, we'll have 3 seconds to &quot;type&quot; the letter and on the Serial monitor will appear a sequence of 0s and 1s, representing if the button was pressed or not; the inference procedure will translate this sequence into a letter.<br />
+As a reference, here are a couple example of what we'll be working with.</p>
+<pre><code class="language-cpp">// A (•‒)
+0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
 
-<pre><code class="language-cpp">/*********
-  @taken_from https://randomnerdtutorials.com/arduino-color-sensor-tcs230-tcs3200/
-*********/
+// D (‒••)
+0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1
 
+// E (•)
+0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
+<h3>2. Record sample data</h3>
+<p>To the bare minimum, we'll need a push button and two wires: one to ground and the other to a digital pin. Since in the example we'll make the button an <code>INPUT_PULLUP</code>, we'll read 0 when the button is pressed and 1 when not.  All we need to do is detect a press and record the following 30 samples of the digital pin:</p>
+<pre><code class="language-cpp">#define IN 4
+#define NUM_SAMPLES 30
+#define INTERVAL 100
 
+double features[NUM_SAMPLES];
 
-#define S2 2
+void setup() {
+  Serial.begin(115200);
+  pinMode(IN, INPUT_PULLUP);
+}
+
+void loop() {
+  if (digitalRead(IN) == 0) {
+    recordButtonStatus();
+    printFeatures();
+    delay(1000);
+  }
+
+  delay(10);
+}
+
+void recordButtonStatus() {
+  for (int i = 0; i &lt; NUM_SAMPLES; i++) {
+    features[i] = digitalRead(IN);
+    delay(INTERVAL);
+  } 
+}</code></pre>
+<pre><code class="language-cpp">
+void printFeatures() {
+    const uint16_t numFeatures = sizeof(features) / sizeof(double);
+    
+    for (int i = 0; i < numFeatures; i++) {
+        Serial.print(features[i]);
+        Serial.print(i == numFeatures - 1 ? '\n' : ',');
+    }
+}
+</code></pre>
+<p>You may end with duplicate recordings: don't worry, that's not a problem. I'll paste my recordings for a few letters, as a reference.</p>
+<pre><code>// A (•‒)
+0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1
+
+// D (‒••)
+0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,0,0,0,1,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,1,1
+
+// E (•)
+0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+
+// S (•••)
+0,0,0,1,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,1,1,1,1,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,1,1,1,1,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+
+// T (‒)
+0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
+<p>If you did a good job, you should end with quite distinguible features, as show in the plot below.</p>
+<p><img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg" alt="Decision boundaries of 2 PCA components from Morse alphabet identification features" /></p>
+<h3>2. Train and export the SVM classifier</h3>
+<p>Refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn">tutorial</a></p>
+<h3>3. Run the inference</h3>
+<pre><code class="language-cpp">#include &quot;model.h&quot;
+
+void loop() {
+  if (digitalRead(IN) == 0) {
+    recordButtonStatus();
+    Serial.print(&quot;Detected letter: &quot;);
+    Serial.println(classIdxToName(predict(features)));
+    delay(1000);
+  }
+
+  delay(10);
+}</code></pre>
+<p>That’s it: you deployed machine learning in 2 Kb! Type some letter using the push button and see the identified value printed on the serial monitor.</p>
+<hr />
+<p>View the project on <a href="https://github.com/eloquentarduino/EloquentArduino/tree/master/examples/MicromlMorseIdentificationExample">Github</a></p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-morse-alphabet-identification/">Arduino Machine learning project #2: Morse alphabet identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Arduino Machine learning project #1: Color identification</title>
+		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-color-identification/</link>
+				<pubDate>Sun, 01 Dec 2019 10:35:29 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[microml]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=6</guid>
+				<description><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to use an RGB sensor to identify the object in front of it based on its color. This is a remake of the project found on the Tensorflow blog where an Arduino BLE 33 Nano Sense is used to classify RGB components into colors. [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-color-identification/">Arduino Machine learning project #1: Color identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to use an RGB sensor to identify the object in front of it based on its color. This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/fruit-identification-using-arduino-and-tensorflow.html">Tensorflow blog</a> where an Arduino BLE 33 Nano Sense is used to classify RGB components into colors. We're going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
+<p><span id="more-6"></span></p>
+<p>The steps for a successful Machine learning project on Arduino are the following:</p>
+<ol>
+  <li>define the features</li>
+  <li>record sample data: put some colored objects in front of your sensor and save the readings to a file, one for each object</li>
+ <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
+ <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
+</ol>
+<h2>1. Features definition</h2>
+<p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be of 3-dimensional, which leads to a really simple model: if you craft your sampling with care, you should be able to fit the code even on an Attiny chip (I will show it how at the end of this article).</p>
+<hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Farduino-machine-learning-project-color-identification%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Condividi il Tweet</a><br /><hr />
+<h2>2. Record sample data</h2>
+<p>We don't need any processing to get from the sensor readings to the feature vector, so the code will be straight-forward: read each component from the sensor and assign it to the features array. This part will vary based on the specific chip you have: I'll report the code for a TCS 230/3200. </p>
+<pre><code class="language-cpp">#define S2 2
 #define S3 3
 #define sensorOut 4
+
+double features[3];
 
 void setup() {
   Serial.begin(115200);
@@ -597,11 +695,8 @@ void setup() {
 }
 
 void loop() {
-  int red   = readComponent(LOW, LOW);
-  int green = readComponent(HIGH, HIGH);
-  int blue  = readComponent(LOW, HIGH);
-
-  record(red, green, blue);
+  readRGB();
+  printFeatures();
   delay(100);
 }
 
@@ -613,133 +708,61 @@ int readComponent(bool s2, bool s3) {
   return pulseIn(sensorOut, LOW);
 }
 
-void record(int r, int g, int b) {
-  Serial.print(r);
-  Serial.print(&#039;\t&#039;);
-  Serial.print(g);
-  Serial.print(&#039;\t&#039;);
-  Serial.print(b);
-  Serial.println();
+void readRGB() {
+  features[0] = readComponent(LOW, LOW);
+  features[1] = readComponent(HIGH, HIGH);
+  features[2] = readComponent(LOW, HIGH);
 }</code></pre>
-<p>Open the Serial monitor and put some colored objects in front of the sensor: move the object a bit and rotate it, so the samples will include different shades of the color. Don’t forget to sample the “no color” too: don’t put anything in front of the sensor and let it record for a while. Save the recording for each color in a file. If you sampled colors far apart from each other you should end with a well separated model, like in the image below.<br />
-<img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/fruit-identification-pca.svg" alt="2 components PCA for fruit colors" /></p>
-<h3>2. Train and export the SVM classifier</h3>
+<pre><code class="language-cpp">
+void printFeatures() {
+    const uint16_t numFeatures = sizeof(features) / sizeof(double);
+    
+    for (int i = 0; i < numFeatures; i++) {
+        Serial.print(features[i]);
+        Serial.print(i == numFeatures - 1 ? '\n' : ',');
+    }
+}
+</code></pre>
+<p>Open the Serial monitor and put some colored objects in front of the sensor: move the object a bit and rotate it, so the samples will include different shades of the color; save the recording for each color in a file.</p>
+<div class="watchout">
+Don’t forget to sample the “empty color” too: don’t put anything in front of the sensor and let it record for a while.
+</div>
+<p>If you do a good job, you should end with distinguible features, as show in the plot below.</p>
+<p><img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/fruit-identification-pca.svg" alt="2 components PCA for fruit colors" /></p>
+<h2>3. Train and export the SVM classifier</h2>
 <p>Refere to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" title="tutorial">tutorial</a></p>
-<h3>3. Run the inference</h3>
-<p>Now to run the inference process we need to pack the 3 components in an array and call <code>predict</code> from the generated <code>model.h</code>file. </p>
+<h2>4. Run the inference</h2>
 <pre><code class="language-cpp">#include model.h
 
-// same as before...
-
 void loop() {
-  int red   = readComponent(LOW, LOW);
-  int green = readComponent(HIGH, HIGH);
-  int blue  = readComponent(LOW, HIGH);
-
-  classify(red, green, blue);
-}
-
-void classify(int r, int g, int b) {
-  double features[3] = { r, g, b };
-  uint8_t classIdx = predict(features);
-  const char *className = classIdxToName(classIdx);
-
-  Serial.println(className);
+  readRGB();
+  Serial.println(classIdxToName(predict(features)));
   delay(1000);
 }</code></pre>
-<p>That’s it: you deployed machine learning in 2 Kb. Given the simplicity of the task, you should easily achieve near 100% accuracy for different colors (I had some troubles distinguishing orange from yellow because of the bad illumination). Just be sure to replicate the exact same setup both during training and classification.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/fruit-identification-using-arduino-and-microml/">Fruit Identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>That’s it: you deployed machine learning in 2 Kb! Put some colored object in front of the sensor and see the identified object name printed on the serial monitor.</p>
+<div class="watchout">Do you remember the "empty color"? It needs to be recorded so you will get "empty" when no object is present, otherwise you'll get unexpected predictions</div>
+<p>Given the simplicity of the task, you should easily achieve near 100% accuracy for different colors (I had some troubles distinguishing orange from yellow because of the bad illumination). Just be sure to replicate the exact same setup both during training and classification.</p>
+<p>@todo Attiny compilation<br />
+@todo Github link</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-color-identification/">Arduino Machine learning project #1: Color identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>IO::Pin</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/11/iopin/</link>
-				<pubDate>Mon, 25 Nov 2019 16:15:13 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Programming]]></category>
-		<category><![CDATA[eloquent]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=167</guid>
-				<description><![CDATA[<p>Pin is an abstract class for pin manipulation. You won't use it directly, but through its specialized implementations: DigitalIn DigitalOut AnalogIn AnalogOut These classes will let you stop writing horrible code like digitalWrite(led, HIGH) and do led.turnOn() instead, for example. You may be asking if a whole class to save a few keystrokes is whortwhile. [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/iopin/">IO::Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p><code>Pin</code> is an abstract class for pin manipulation. You won't use it directly, but through its specialized implementations:</p>
-<ol>
-<li>DigitalIn</li>
-<li>DigitalOut</li>
-<li>AnalogIn</li>
-<li>AnalogOut</li>
-</ol>
-<p>These classes will let you stop writing horrible code like <code>digitalWrite(led, HIGH)</code> and do <code>led.turnOn()</code> instead, for example. You may be asking if a whole class to save a few keystrokes is whortwhile. I strongly believe it is! I'll show a few use cases to illustrate my point.</p>
-<p><span id="more-167"></span></p>
-<h3>Use case #1: active low LED</h3>
-<p>One emblematic example is that of the builtin led on the ESP8266: it is active low, so you write <code>digitalWrite(BUILTIN_LED, LOW)</code> to actually turn it on. Does it look intuitive? Does it look <em>eloquent</em>? Not really. <code>builtinLed.turnOn()</code> does, however. All you need to get it working is calling <code>builtinLed.activeLow()</code> in your setup.</p>
-<h3>Use case #2: toggle</h3>
-<p>If you need to toggle the current state of a digital output, you need an helper variable to keep track of the state and remember to <strong>always</strong> update that variable when you write to the output. With a class, the state is tightly bound to the instance, so you have a <a href="https://en.wikipedia.org/wiki/Single_source_of_truth">single source of truth</a>: <code>turnOn()</code>, <code>turnOff()</code> and <code>toggle()</code> will take care of updating the inner state accordingly.</p>
-<pre><code class="language-cpp">// BEFORE
-#define LED 1
-
-bool ledState = true;
-
-loop() {
-    digitalWrite(LED, ledState);
-    ledState = !ledState
-}
-
-// AFTER
-DigitalOut led(1);
-
-void loop() {
-    led.toggle();
-}</code></pre>
-<h3>Use case #3: analog delta</h3>
-<p>What if you have an analog input and want to know if its valued changed by at least X from your latest reading? You would need an helper variable again. Now imagine if you have 5 analog inputs you want to track: you'll end up with 10 variables and of course you have again to <strong>always</strong> keep both in sync. <code>AnalogIn</code>, conveniently, provides a <code>delta()</code> method that gives you the change from the previous reading and will always be in sync. Awesome!</p>
-<pre><code class="language-cpp">// BEFORE
-#define INPUT1 A1
-#define INPUT2 A2
-
-uint16_t current1, prev1;
-uint16_t current2, prev2;
-
-void loop() {
-    prev1 = current1;
-    current1 = analogRead(INPUT1);
-    prev2 = current2;
-    current2 = analogRead(INPUT2);
-
-    if (abs(current1 - prev1) &gt; THRESHOLD)
-        ...
-
-// AFTER
-AnalogIn input1(A1), input2(A2);
-
-void loop() {
-    input1.read();
-    input2.read();
-
-    if (input1.absDelta() &gt; THRESHOLD)
-        ...
-}</code></pre>
-<p>Does it feel more <em>natural</em>?</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/iopin/">IO::Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
-		<title>How to train a classifier in scikit-learn</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/11/how-to-train-a-classifier-in-scikit-learn/</link>
+		<title>How to train a classifier in scikit-learn and export to C code</title>
+		<link>https://eloquentarduino.github.io/EloquentArduino/2019/11/how-to-train-a-classifier/</link>
 				<pubDate>Mon, 11 Nov 2019 21:10:51 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Programming]]></category>
+				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=104</guid>
-				<description><![CDATA[<p>This is a sidenote on how I train my classifiers for Arduino projects. Since this is a repetitive task, you can save a short snippet of Python code on your PC and use it whenever you need to train a classifier from Arduino data. It really is a general-purpose piece of code that reads the [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/how-to-train-a-classifier-in-scikit-learn/">How to train a classifier in scikit-learn</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+				<description><![CDATA[<p>This is a sidenote on how I train my classifiers for Arduino machine learning projects. Since this is a repetitive task, you can save a short snippet of Python code on your PC and use it whenever you need to train a classifier from Arduino data. It really is a general-purpose piece of code that [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/how-to-train-a-classifier/">How to train a classifier in scikit-learn and export to C code</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p>This is a sidenote on how I train my classifiers for Arduino projects. Since this is a repetitive task, you can save a short snippet of Python code on your PC and use it whenever you need to train a classifier from Arduino data. It really is a general-purpose piece of code that reads the files from a folder and generates a features matrix from them; the useful bit, so to say, is that it generates a classmap to translate class indexes to readable names.</p>
+								<content:encoded><![CDATA[<p>This is a sidenote on how I train my classifiers for Arduino machine learning projects. Since this is a repetitive task, you can save a short snippet of Python code on your PC and use it whenever you need to train a classifier from Arduino data. It really is a general-purpose piece of code that reads the files from a folder and generates a features matrix from them; the useful bit, so to say, is that it generates a classmap to translate class indexes to readable names.</p>
 <p><span id="more-104"></span></p>
 <h3>Setup</h3>
-<p>!!!The code assumes you've saved your samples in a folder, one class per file, one sample per line.</p>
+<div class="watchout">The code assumes you've saved your samples in a folder, one class per file, one sample per line.</div>
 <pre><code class="language-python">import numpy as np
 from glob import glob
 from os.path import basename
@@ -755,7 +778,7 @@ def load_features(folder):
         samples = np.hstack((samples, labels))
         dataset = samples if dataset is None else np.vstack((dataset, samples))
     return dataset, classmap</code></pre>
-<h3>Use</h3>
+<h3>How to use</h3>
 <p>Include the snippet in your scikit-learn project and use it to train your SVM classifier.</p>
 <pre><code class="language-python">from sklearn.svm import SVC
 
@@ -770,23 +793,23 @@ classifier = SVC(kernel=&#039;linear&#039;).fit(X, y)</code></pre>
 c_code = port(classifier)
 print(c_code)</code></pre>
 <p>This is the code you need to import in your Arduino project.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/how-to-train-a-classifier-in-scikit-learn/">How to train a classifier in scikit-learn</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/how-to-train-a-classifier/">How to train a classifier in scikit-learn and export to C code</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>Introducing MicroML</title>
+		<title>Introducing MicroML: Machine learning on Arduino, ESP and 8-bit MCUs</title>
 		<link>https://eloquentarduino.github.io/EloquentArduino/2019/11/introducing-microml/</link>
 				<pubDate>Sun, 10 Nov 2019 19:18:40 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Programming]]></category>
+				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=76</guid>
-				<description><![CDATA[<p>MicroML is an attempt to bring Machine Learning algorithms to microcontrollers. It originated when I first saw a blog about Tensorflow Lite for microcontrollers and thought there should exist leaner alternatives to neural networks to run inference on such resource constrained devices as are microcontrollers. Quoting from the Tensoflow blog, talking about Tensorflow Lite for [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/introducing-microml/">Introducing MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+				<description><![CDATA[<p>MicroML is a project to bring Machine learning algorithms to microcontrollers. It was born as an alternative to Tensorflow for Microcontrollers, which is solely dedicated to Artificial Neural Networks: here you will find leaner alternatives to neural networks to run inference on such resource constrained devices as 8-bit microcontrollers are. Quoting from the Tensoflow blog: [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/introducing-microml/">Introducing MicroML: Machine learning on Arduino, ESP and 8-bit MCUs</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p><a href="https://github.com/agrimagsrl/micromlgen">MicroML</a> is an attempt to bring Machine Learning algorithms to microcontrollers. It originated when I first saw a blog about Tensorflow Lite for microcontrollers and thought there should exist leaner alternatives to neural networks to run inference on such resource constrained devices as are microcontrollers.<br />
-Quoting from the Tensoflow blog, talking about Tensorflow Lite for microcontrollers: <code>The core runtime fits in 16 KB on an Arm Cortex M3</code> (that's just the runtime, without any actual operator!). What about my beloved Arduino Nano (old generation) and its 2 Kb of RAM? <strong>Should I give up on ML? No way!</strong></p>
+								<content:encoded><![CDATA[<p><a href="https://github.com/agrimagsrl/micromlgen">MicroML</a> is a project to bring Machine learning algorithms to microcontrollers. It was born as an alternative to Tensorflow for Microcontrollers, which is solely dedicated to Artificial Neural Networks: here you will find leaner alternatives to neural networks to run inference on such resource constrained devices as 8-bit microcontrollers are.<br />
+Quoting from the Tensoflow blog: <em>The core runtime fits in 16 KB on an Arm Cortex M3</em> (that's just the runtime, without any actual operator!). What about my beloved Arduino Nano (old generation)? MicroML motto is more like <code>There&#039;s no fixed runtime, and it could even fit in 2kb of RAM</code>.</p>
 <p><span id="more-76"></span></p>
 <p>I opted for <a href="https://en.wikipedia.org/wiki/Support-vector_machine">Support Vector Machines</a> as a good candidate algorithm, since support vectors should lead to a space efficient implementation (RAM is often the most limiting factor). The basic idea is that you train a classifier in Python with <a href="https://scikit-learn.org/">scikit-learn</a> and generate C code from it.<br />
 <a href="https://github.com/nok/sklearn-porter">sklearn-porter</a> is an existing project that can output C code, though it's not optimized for microcontrollers, so you'll hit a wall on memory because it needs to declare all the support vectors in memory (to have an idea, the <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html">breast cancer dataset</a> produces a 57x30 matrix of doubles, totalling 6840 bytes just for the support vectors).</p>
@@ -904,7 +927,7 @@ int predict(double *x) {
 <p>If you didn't attended a course on Machine Learning this code may seem a bit obscure: you don't need to worry about this. All you need to use it is call the <code>predict</code> function with the features vector as argument: it will return the predicted class index.</p>
 <hr />
 <p>In the next posts I'll show you some examples of machine mearning in action, so stay tuned!</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/introducing-microml/">Introducing MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/introducing-microml/">Introducing MicroML: Machine learning on Arduino, ESP and 8-bit MCUs</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
@@ -912,7 +935,7 @@ int predict(double *x) {
 		<link>https://eloquentarduino.github.io/EloquentArduino/2019/11/introducing-eloquent-arduino/</link>
 				<pubDate>Sun, 03 Nov 2019 16:05:46 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Programming]]></category>
+				<category><![CDATA[Eloquent library]]></category>
 		<category><![CDATA[eloquent]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=164</guid>
