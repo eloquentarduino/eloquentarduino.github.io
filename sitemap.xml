@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="//eloquentarduino.github.io/EloquentArduino/wp-content/plugins/wordpress-seo/css/main-sitemap.xsl"?>
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="//eloquentarduino.github.io/wp-content/plugins/wordpress-seo/css/main-sitemap.xsl"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<sitemap>
-		<loc>https://eloquentarduino.github.io/EloquentArduino/post-sitemap.xml</loc>
+		<loc>https://eloquentarduino.github.io/post-sitemap.xml</loc>
 		<lastmod>2019-12-15T21:31:40+01:00</lastmod>
 	</sitemap>
 	<sitemap>
-		<loc>https://eloquentarduino.github.io/EloquentArduino/category-sitemap.xml</loc>
+		<loc>https://eloquentarduino.github.io/category-sitemap.xml</loc>
 		<lastmod>2019-12-15T21:31:40+01:00</lastmod>
 	</sitemap>
 	<sitemap>
-		<loc>https://eloquentarduino.github.io/EloquentArduino/post_tag-sitemap.xml</loc>
+		<loc>https://eloquentarduino.github.io/post_tag-sitemap.xml</loc>
 		<lastmod>2019-12-15T21:31:40+01:00</lastmod>
 	</sitemap>
 </sitemapindex>

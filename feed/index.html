@@ -9,8 +9,8 @@
 
 <channel>
 	<title>Eloquent Arduino Blog</title>
-	<atom:link href="https://eloquentarduino.github.io/EloquentArduino/feed/" rel="self" type="application/rss+xml" />
-	<link>http://eloquentarduino.github.io/EloquentArduino/</link>
+	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
+	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
 	<lastBuildDate>Sun, 15 Dec 2019 20:31:40 +0000</lastBuildDate>
 	<language>en-US</language>
@@ -21,15 +21,15 @@
 	<generator>https://wordpress.org/?v=5.3.1</generator>
 	<item>
 		<title>Indoor positioning using Arduino and SVM Machine Learning</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/</link>
+		<link>https://eloquentarduino.github.io/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/</link>
 				<pubDate>Sun, 08 Dec 2019 17:31:16 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=224</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=224</guid>
 				<description><![CDATA[<p>In this post we'll locate ourself in space using nearby WiFi access points and machine learning. The task of detecting where you are when GPS or satellite localization is not an option is called indoor positioning: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/">Indoor positioning using Arduino and SVM Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/">Indoor positioning using Arduino and SVM Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this post we'll locate ourself in space using nearby WiFi access points and machine learning. The task of detecting where you are when GPS or satellite localization is not an option is called <a href="https://en.wikipedia.org/wiki/Indoor_positioning_system">indoor positioning</a>: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely available, but the same project could be re-purposed to use Bluetooth, if there are enough devices in your location.<br />
 The inference will occur on a microcontroller thanks to the <a href="/2019/11/introducing-microml/" target="_blank">MicroML framework.</a> For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32.  </p>
@@ -130,7 +130,7 @@ void printFeatures() {
 </code></pre>
 <p>Grab some recordings just staying in a location for a few seconds and save the serial output to a file; then move to the next location and repeat: 10-15 samples for each location will suffice.</p>
 <p>If you do a good job, you should end with distinguible features, as show in the plot below.</p>
-<p><img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.svg" alt="Decision boundaries of 2 PCA components from Wifi indoor positioning features" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.svg" alt="Decision boundaries of 2 PCA components from Wifi indoor positioning features" /></p>
 <div class="watchout">
 RSSIs may be a little noisy, mostly on the boundaries where weak networks may appear and disappear with a very low RSSI: this was not a problem for me, but if you're getting bad results you may filter out those low values.</p>
 <pre><code class="language-cpp">
@@ -162,20 +162,20 @@ void classify() {
 <p>Move around your house/office/whatever and see your location printed on the serial monitor!</p>
 <hr />
 <p>View the project <a href="https://github.com/agrimagsrl/EloquentArduino/blob/master/examples/MicromlWifiIndoorPositioningExample/MicromlWifiIndoorPositioningExample.ino">on Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/">Indoor positioning using Arduino and SVM Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/">Indoor positioning using Arduino and SVM Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
 		<title>Pin</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/pin/</link>
+		<link>https://eloquentarduino.github.io/2019/12/pin/</link>
 				<pubDate>Fri, 06 Dec 2019 16:15:13 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Eloquent library]]></category>
 		<category><![CDATA[eloquent]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=167</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=167</guid>
 				<description><![CDATA[<p>Pin is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like digitalWrite(led, HIGH) and start writing led.turnOn() instead. Pin is actually an abstract class, so you won't use it directly, but through its specialized implementations: DigitalIn DigitalOut AnalogIn AnalogOut If you don't [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/pin/">Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/pin/">Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p><code>Pin</code> is a class for pin manipulation: you can <code>read</code>, <code>write</code>, <code>turnOn</code>, <code>turnOff</code>, <code>toggle</code> and a lot more. Please, stop writing horrible code like <code>digitalWrite(led, HIGH)</code> and start writing <code>led.turnOn()</code> instead. </p>
 <p><span id="more-167"></span></p>
@@ -234,20 +234,20 @@ void loop() {
         ...
 }</code></pre>
 <p>@todo continue</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/pin/">Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/pin/">Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
 		<title>Await</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/await/</link>
+		<link>https://eloquentarduino.github.io/2019/12/await/</link>
 				<pubDate>Thu, 05 Dec 2019 18:50:59 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Eloquent library]]></category>
 		<category><![CDATA[eloquent]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=211</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=211</guid>
 				<description><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The await construct lets you put an upper bound to the time you're willing [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/await/">Await</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/await/">Await</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The <code>await</code> construct lets you put an upper bound to the time you're willing to wait.</p>
 <p><span id="more-211"></span></p>
@@ -308,20 +308,20 @@ bool inline_function() {
 }
 
 bool wifiConnected = inline_function();</code></pre>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/await/">Await</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/await/">Await</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
 		<title>Every</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/every/</link>
+		<link>https://eloquentarduino.github.io/2019/12/every/</link>
 				<pubDate>Thu, 05 Dec 2019 18:42:45 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Eloquent library]]></category>
 		<category><![CDATA[eloquent]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=209</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=209</guid>
 				<description><![CDATA[<p>The every construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically. [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/every/">Every</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/every/">Every</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>The <code>every</code> construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically.</p>
 <p><span id="more-209"></span></p>
@@ -373,20 +373,20 @@ every(an invalid interval) ==&gt; uint32_t __every__an invalid interval; // Synt
 <p>So, every integer literal and any variable are all valid arguments. Any expression is forbidden.<br />
 This also exaplains #3: if you use two <code>every</code> with the same argument, two variables with the exact name will be created and it will rise a compile-time error.</p>
 <p>If you can live with this limitations, <code>every</code> only needs the space of an <code>uint32_t</code> to work.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/every/">Every</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/every/">Every</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
 		<title>Gesture Identification using Arduino and MicroML</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/gesture-identification-using-arduino-and-microml/</link>
+		<link>https://eloquentarduino.github.io/2019/12/gesture-identification-using-arduino-and-microml/</link>
 				<pubDate>Sun, 01 Dec 2019 13:25:46 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=35</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=35</guid>
 				<description><![CDATA[<p>In this post we're going to replicate the tutorial found on the Tensorflow blog where an Arduino BLE 33 Nano Sense is used to classify IMU readings into gestures. We’re going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and 2 [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/gesture-identification-using-arduino-and-microml/">Gesture Identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/gesture-identification-using-arduino-and-microml/">Gesture Identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this post we're going to replicate the tutorial found on the <a href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html">Tensorflow blog </a>where an Arduino BLE 33 Nano Sense is used to classify IMU readings into gestures. We’re going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and 2 kb of RAM. In this project the features are going to be 30 IMU accelerometer readings, taken starting from when a movement is detected. You can decide the use all the 6 axis from the IMU (accelerometer + gyroscope), or only 3 of them (either accelerometer or gyroscope): it will depend on the gestures you want to recognize and the amount of program space you have. Of course 3 dimesionsions will lead to a smaller model, at the cost of some loss in accuracy; do some tests and pick the one that best fits your needs. </p>
 <p><span id="more-35"></span></p>
@@ -484,7 +484,7 @@ void record() {
   delay(2000);
 }</code></pre>
 <p>Record 10-15 samples for each geasture and save them to a file, one for each gesture. If you did a good job, you should end with quite distinguible features, as show in the plot below.<br />
-<img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/gesture-identification-pca.svg" alt="2 components PCA for fruit colors" /></p>
+<img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/gesture-identification-pca.svg" alt="2 components PCA for fruit colors" /></p>
 <h3>2. Train and export the SVM classifier</h3>
 <p>Refere to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" title="Tutorial">tutorial</a></p>
 <h3>3. Run the inference</h3>
@@ -519,20 +519,20 @@ void classify() {
   delay(2000);
 }</code></pre>
 <p>And that's it: gesture identification through machine learning on your Arduino board!</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/gesture-identification-using-arduino-and-microml/">Gesture Identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/gesture-identification-using-arduino-and-microml/">Gesture Identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
 		<title>Arduino Machine learning project #3: Morse alphabet identification</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-morse-alphabet-identification/</link>
+		<link>https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-morse-alphabet-identification/</link>
 				<pubDate>Sun, 01 Dec 2019 12:07:38 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=194</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=194</guid>
 				<description><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to identify the letters from the Morse alphabet. If you don't know how this code works, essentially it encodes all the letters with 2 symbols: dot (•) and dash (‒). We're going to target an Arduino Nano board (old generation), equipped with 32 kb [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-morse-alphabet-identification/">Arduino Machine learning project #3: Morse alphabet identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-morse-alphabet-identification/">Arduino Machine learning project #3: Morse alphabet identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to identify the letters from the <a href="https://en.wikipedia.org/wiki/Morse_code">Morse alphabet</a>. If you don't know how this code works, essentially it encodes all the letters with 2 symbols: dot (•) and dash (‒). We're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-194"></span></p>
@@ -633,7 +633,7 @@ void printFeatures() {
 0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
 <p>If you did a good job, you should end with quite distinguible features, as show in the plot below.</p>
-<p><img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg" alt="Decision boundaries of 2 PCA components from Morse alphabet identification features" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg" alt="Decision boundaries of 2 PCA components from Morse alphabet identification features" /></p>
 <h3>2. Train and export the SVM classifier</h3>
 <p>Refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn">tutorial</a></p>
 <h3>3. Run the inference</h3>
@@ -652,20 +652,20 @@ void loop() {
 <p>That’s it: you deployed machine learning in 2 Kb! Type some letter using the push button and see the identified value printed on the serial monitor.</p>
 <hr />
 <p>View the project on <a href="https://github.com/eloquentarduino/EloquentArduino/tree/master/examples/MicromlMorseIdentificationExample">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-morse-alphabet-identification/">Arduino Machine learning project #3: Morse alphabet identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-morse-alphabet-identification/">Arduino Machine learning project #3: Morse alphabet identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
 		<title>Arduino Machine learning project #2: Color identification</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-color-identification/</link>
+		<link>https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-color-identification/</link>
 				<pubDate>Sun, 01 Dec 2019 10:35:29 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=6</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=6</guid>
 				<description><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to use an RGB sensor to identify the object in front of it based on its color. This is a remake of the project found on the Tensorflow blog where an Arduino BLE 33 Nano Sense is used to classify RGB components into colors. [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-color-identification/">Arduino Machine learning project #2: Color identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-color-identification/">Arduino Machine learning project #2: Color identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to use an RGB sensor to identify the object in front of it based on its color. This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/fruit-identification-using-arduino-and-tensorflow.html">Tensorflow blog</a> where an Arduino BLE 33 Nano Sense is used to classify RGB components into colors. We're going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-6"></span></p>
@@ -728,7 +728,7 @@ void printFeatures() {
 Don’t forget to sample the “empty color” too: don’t put anything in front of the sensor and let it record for a while.
 </div>
 <p>If you do a good job, you should end with distinguible features, as show in the plot below.</p>
-<p><img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/fruit-identification-pca.svg" alt="2 components PCA for fruit colors" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/fruit-identification-pca.svg" alt="2 components PCA for fruit colors" /></p>
 <h2>3. Train and export the SVM classifier</h2>
 <p>Refere to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" title="tutorial">tutorial</a></p>
 <h2>4. Run the inference</h2>
@@ -744,20 +744,20 @@ void loop() {
 <p>Given the simplicity of the task, you should easily achieve near 100% accuracy for different colors (I had some troubles distinguishing orange from yellow because of the bad illumination). Just be sure to replicate the exact same setup both during training and classification.</p>
 <p>@todo Attiny compilation<br />
 @todo Github link</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-color-identification/">Arduino Machine learning project #2: Color identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-color-identification/">Arduino Machine learning project #2: Color identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
 		<title>Arduino Machine learning project #1: Iris classification</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-1-iris-classification/</link>
+		<link>https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/</link>
 				<pubDate>Sun, 01 Dec 2019 09:02:02 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=409</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=409</guid>
 				<description><![CDATA[<p>In this first tutorial we're going to implement the &#34;Hello world&#34; of Machine learning: classifying the Iris dataset on an Arduino board. The Iris dataset is a well known dataset in the Machine learning world and is often used in introductory tutorials about classification. In this tutorial we're going to run the classification directly on [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-1-iris-classification/">Arduino Machine learning project #1: Iris classification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/">Arduino Machine learning project #1: Iris classification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this first tutorial we're going to implement the &quot;Hello world&quot; of Machine learning: classifying the Iris dataset on an Arduino board. The <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set">Iris dataset</a> is a well known dataset in the Machine learning world and is often used in introductory tutorials about classification. In this tutorial we're going to run the classification directly on a Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-409"></span></p>
@@ -770,11 +770,11 @@ void loop() {
 </ol>
 <h3>1. Features definition</h3>
 <p>There are 4 features in this dataset: sepal length, sepal width, petal length, petal width; and 3 classes: Setosa, Versicolor, Virginica.</p>
-<p><img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/iris-278x300.png" alt="Iris features illustrated" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/iris-278x300.png" alt="Iris features illustrated" /></p>
 <h3>2. Sample data</h3>
 <p>You may download the dataset <a href="https://gist.github.com/netj/8836201">here</a>.<br />
 A contour plot of this dataset is depicted in the image below.</p>
-<p><img src="https://eloquentarduino.github.io/EloquentArduino/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Iris-features.svg" alt="Decision boundaries of 2 PCA components of Iris features" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Iris-features.svg" alt="Decision boundaries of 2 PCA components of Iris features" /></p>
 <h3>2. Train and export the SVM classifier</h3>
 <p>Refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn">tutorial</a></p>
 <h3>3. Run the inference</h3>
@@ -807,20 +807,20 @@ void loop() {
 <p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 8390 bytes (27%) of program space and 614 bytes (29%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>&quot;Can I run machine learning on Arduino?&quot;</em> is definetly <strong>YES</strong>.</p>
 <hr />
 <p>View the project on <a href="https://github.com/eloquentarduino/EloquentArduino/tree/master/examples/MicromlIrisExample">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/12/arduino-machine-learning-project-1-iris-classification/">Arduino Machine learning project #1: Iris classification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/">Arduino Machine learning project #1: Iris classification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
 		<title>How to create a classifier for Arduino Machine learning projects</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/</link>
+		<link>https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/</link>
 				<pubDate>Mon, 11 Nov 2019 21:10:51 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=104</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=104</guid>
 				<description><![CDATA[<p>In this post I'll show you how I train my classifiers in scikit-learn and export them for Arduino machine learning projects. Since this is a repetitive task, you can save a short snippet of Python code on your PC and use it whenever you need to train a classifier from Arduino data. It really is [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">How to create a classifier for Arduino Machine learning projects</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">How to create a classifier for Arduino Machine learning projects</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this post I'll show you how I train my classifiers in scikit-learn and export them for Arduino machine learning projects. Since this is a repetitive task, you can save a short snippet of Python code on your PC and use it whenever you need to train a classifier from Arduino data. It really is a general-purpose piece of code that reads the files from a folder and generates a features matrix from them; the useful bit, so to say, is that it generates a classmap to translate class indexes to readable names.</p>
 <p><span id="more-104"></span></p>
@@ -868,20 +868,20 @@ void classify() {
     Serial.print(&quot;Predicted class: &quot;);
     Serial.println(classIdxToName(predict(features)));
 }</code></pre>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">How to create a classifier for Arduino Machine learning projects</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">How to create a classifier for Arduino Machine learning projects</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
 		<title>You can run Machine learning on Arduino. And ESP8266. And ESP32. And many more&#8230;</title>
-		<link>https://eloquentarduino.github.io/EloquentArduino/2019/11/you-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more/</link>
+		<link>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more/</link>
 				<pubDate>Sun, 10 Nov 2019 19:18:40 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
-		<guid isPermaLink="false">https://eloquentarduino.github.io/EloquentArduino/?p=76</guid>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=76</guid>
 				<description><![CDATA[<p>A lot of forum threads ask about the possibility to run Machine learning on Arduino. The answers mostly follow in one of these 3 categories: Arduino is too resource-constrained to handle Machine learning Come up with a naive implementation of a Multi Layer Perceptron (recently) Sure! You can use Tensorflow Lite for Microcontrollers No single [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/you-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more/">You can run Machine learning on Arduino. And ESP8266. And ESP32. And many more&#8230;</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more/">You can run Machine learning on Arduino. And ESP8266. And ESP32. And many more&#8230;</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p><a href="https://www.quora.com/I-want-to-make-a-robot-with-an-Arduino-that-uses-basic-machine-learning-where-can-I-start">A</a> <a href="https://robotics.stackexchange.com/questions/568/is-it-possible-to-run-a-neural-network-on-a-microcontroller">lot</a> <a href="https://www.reddit.com/r/robotics/comments/bnmm75/arduino_for_machine_learning/">of</a> <a href="https://www.quora.com/How-do-I-use-machine-learning-with-Arduino">forum</a> <a href="https://forum.arduino.cc/index.php?topic=63981.0">threads</a> ask about the possibility to run Machine learning on Arduino.<br />
 The answers mostly follow in one of these 3 categories:</p>
@@ -937,7 +937,7 @@ void classify() {
 }</code></pre>
 <hr />
 <p>I'm starting a series of tutorials about hands-on projects to put Machine learning in use, so stay tuned!</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/EloquentArduino/2019/11/you-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more/">You can run Machine learning on Arduino. And ESP8266. And ESP32. And many more&#8230;</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/EloquentArduino/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more/">You can run Machine learning on Arduino. And ESP8266. And ESP32. And many more&#8230;</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 	</channel>
