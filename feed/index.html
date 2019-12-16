@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 15 Dec 2019 20:31:40 +0000</lastBuildDate>
+	<lastBuildDate>Mon, 16 Dec 2019 19:19:47 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -34,7 +34,7 @@
 								<content:encoded><![CDATA[<p>In this post we'll locate ourself in space using nearby WiFi access points and machine learning. The task of detecting where you are when GPS or satellite localization is not an option is called <a href="https://en.wikipedia.org/wiki/Indoor_positioning_system">indoor positioning</a>: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely available, but the same project could be re-purposed to use Bluetooth, if there are enough devices in your location.<br />
 The inference will occur on a microcontroller thanks to the <a href="/2019/11/introducing-microml/" target="_blank">MicroML framework.</a> For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32.  </p>
 <p><span id="more-224"></span></p>
-<p>The steps for a successful Machine learning project on Arduino are the following:</p>
+<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
 <ol>
   <li>define the features</li>
   <li>record sample data: run a few scans for each location to be predicted and record the RSSI (signal strength) of each visible network</li>
@@ -143,9 +143,22 @@ features[networkIndex] = WiFi.RSSI(i);
 features[networkIndex] = WiFi.RSSI(i) > MIN_RSSI ? WiFi.RSSI(i) : 0;
 </code></pre>
 </div>
-<h3>2. Train and export the SVM classifier</h3>
+<h3>3. Train and export the SVM classifier</h3>
 
-<p>Refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
+<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
+
+<p>
+<pre><code class="language-python">from sklearn.svm import SVC
+from micromlgen import port
+
+# put your samples in the dataset folder
+# one class per file
+# one feature vector per line, in CSV format
+features, classmap = load_features('dataset/')
+X, y = features[:, :-1], features[:, -1]
+classifier = SVC(kernel='linear').fit(X, y)
+c_code = port(classifier, classmap=classmap)
+print(c_code)</code></pre>
 <h3>3. Run the inference</h3>
 <pre><code class="language-cpp">#include &quot;model.h&quot;
 
@@ -390,7 +403,7 @@ This also exaplains #3: if you use two <code>every</code> with the same argument
 ]]></description>
 								<content:encoded><![CDATA[<p>In this post we're going to replicate the tutorial found on the <a href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html">Tensorflow blog </a>where an Arduino BLE 33 Nano Sense is used to classify IMU readings into gestures. We’re going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and 2 kb of RAM. In this project the features are going to be 30 IMU accelerometer readings, taken starting from when a movement is detected. You can decide the use all the 6 axis from the IMU (accelerometer + gyroscope), or only 3 of them (either accelerometer or gyroscope): it will depend on the gestures you want to recognize and the amount of program space you have. Of course 3 dimesionsions will lead to a smaller model, at the cost of some loss in accuracy; do some tests and pick the one that best fits your needs. </p>
 <p><span id="more-35"></span></p>
-<p>The steps for a successful Machine learning project on Arduino are the following:</p>
+<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
 <ol>
   <li>define the features</li>
   <li>record sample data: repeat each gesture a few times and save the values from the serial monitor to a file, one for each gesture</li>
@@ -536,7 +549,7 @@ void classify() {
 ]]></description>
 								<content:encoded><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to identify the letters from the <a href="https://en.wikipedia.org/wiki/Morse_code">Morse alphabet</a>. If you don't know how this code works, essentially it encodes all the letters with 2 symbols: dot (•) and dash (‒). We're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-194"></span></p>
-<p>The steps for a successful Machine learning project on Arduino are the following:</p>
+<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
 <ol>
   <li>define the features</li>
   <li>record sample data: repeat each letter a few times and save the values from the serial monitor to a file, one for each letter. If you've never typed morse code (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</li>
@@ -669,7 +682,7 @@ void loop() {
 ]]></description>
 								<content:encoded><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to use an RGB sensor to identify the object in front of it based on its color. This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/fruit-identification-using-arduino-and-tensorflow.html">Tensorflow blog</a> where an Arduino BLE 33 Nano Sense is used to classify RGB components into colors. We're going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-6"></span></p>
-<p>The steps for a successful Machine learning project on Arduino are the following:</p>
+<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
 <ol>
   <li>define the features</li>
   <li>record sample data: put some colored objects in front of your sensor and save the readings to a file, one for each object</li>
@@ -748,7 +761,7 @@ void loop() {
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>Arduino Machine learning project #1: Iris classification</title>
+		<title>How to do Iris classification machine learning on Arduino</title>
 		<link>https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/</link>
 				<pubDate>Sun, 01 Dec 2019 09:02:02 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
@@ -756,28 +769,113 @@ void loop() {
 		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=409</guid>
-				<description><![CDATA[<p>In this first tutorial we're going to implement the &#34;Hello world&#34; of Machine learning: classifying the Iris dataset on an Arduino board. The Iris dataset is a well known dataset in the Machine learning world and is often used in introductory tutorials about classification. In this tutorial we're going to run the classification directly on [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/">Arduino Machine learning project #1: Iris classification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+				<description><![CDATA[<p>In this first tutorial from the series Arduino Machine learning we're going to implement the &#34;Hello world&#34; of Machine learning projects: classifying the Iris dataset on an Arduino board. The Iris dataset is a well known one in the Machine learning world and is often used in introductory tutorials about classification. In this tutorial we're [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/">How to do Iris classification machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p>In this first tutorial we're going to implement the &quot;Hello world&quot; of Machine learning: classifying the Iris dataset on an Arduino board. The <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set">Iris dataset</a> is a well known dataset in the Machine learning world and is often used in introductory tutorials about classification. In this tutorial we're going to run the classification directly on a Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
+								<content:encoded><![CDATA[<p>In this first tutorial from the series <em><a href="/category/programming/arduino-machine-learning/">Arduino Machine learning</a></em> we're going to implement the &quot;Hello world&quot; of Machine learning projects: classifying the Iris dataset on an Arduino board. The <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set">Iris dataset</a> is a well known one in the Machine learning world and is often used in introductory tutorials about classification.<br />
+In this tutorial we're going to run the classification directly on a Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM: that's the only thing you will need!</p>
 <p><span id="more-409"></span></p>
-<p>The steps for a successful Machine learning project on Arduino are the following:</p>
+<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
 <ol>
   <li>define the features</li>
-  <li>record sample data: we're not doing any recording here; we'll use the publicly available dataset</li>
+  <li>record sample data: we'll use the publicly available dataset</li>
  <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
  <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
 </ol>
 <h3>1. Features definition</h3>
-<p>There are 4 features in this dataset: sepal length, sepal width, petal length, petal width; and 3 classes: Setosa, Versicolor, Virginica.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/iris-278x300.png" alt="Iris features illustrated" /></p>
+<p>There are 4 features in this dataset: sepal length, sepal width, petal length, petal width; and 3 classes: Setosa, Versicolor, Virginica. You can see in the picture below how they relate to the actual flower.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/iris-278x300.png" alt="Iris features illustrated @ credits to https://gallery.azure.ai/Experiment/Classify-Iris-Dataset-using-Decision-Forest-1" /></p>
 <h3>2. Sample data</h3>
 <p>You may download the dataset <a href="https://gist.github.com/netj/8836201">here</a>.<br />
-A contour plot of this dataset is depicted in the image below.</p>
+An excerpt of the dataset is reported in the following table.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">sepal.length</th>
+<th style="text-align: center;">sepal.width</th>
+<th style="text-align: center;">petal.length</th>
+<th style="text-align: center;">petal.width</th>
+<th style="text-align: center;">variety</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">5.1</td>
+<td style="text-align: center;">3.5</td>
+<td style="text-align: center;">1.4</td>
+<td style="text-align: center;">0.2</td>
+<td style="text-align: center;">Setosa</td>
+</tr>
+<tr>
+<td style="text-align: center;">4.9</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">1.4</td>
+<td style="text-align: center;">0.2</td>
+<td style="text-align: center;">Setosa</td>
+</tr>
+<tr>
+<td style="text-align: center;">4.6</td>
+<td style="text-align: center;">3.1</td>
+<td style="text-align: center;">1.5</td>
+<td style="text-align: center;">0.2</td>
+<td style="text-align: center;">Setosa</td>
+</tr>
+<tr>
+<td style="text-align: center;">5.8</td>
+<td style="text-align: center;">2.6</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">1.2</td>
+<td style="text-align: center;">Versicolor</td>
+</tr>
+<tr>
+<td style="text-align: center;">5.6</td>
+<td style="text-align: center;">2.7</td>
+<td style="text-align: center;">4.2</td>
+<td style="text-align: center;">1.3</td>
+<td style="text-align: center;">Versicolor</td>
+</tr>
+<tr>
+<td style="text-align: center;">6.3</td>
+<td style="text-align: center;">2.5</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">1.9</td>
+<td style="text-align: center;">Virginica</td>
+</tr>
+<tr>
+<td style="text-align: center;">6.5</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">5.2</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">Virginica</td>
+</tr>
+<tr>
+<td style="text-align: center;">5.9</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">5.1</td>
+<td style="text-align: center;">1.8</td>
+<td style="text-align: center;">Virginica</td>
+</tr>
+</tbody>
+</table>
+<p>A contour plot of this dataset is depicted in the image below.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Iris-features.svg" alt="Decision boundaries of 2 PCA components of Iris features" /></p>
-<h3>2. Train and export the SVM classifier</h3>
-<p>Refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn">tutorial</a></p>
-<h3>3. Run the inference</h3>
+<h3>3. Train and export the SVM classifier</h3>
+
+<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
+
+<p>
+<pre><code class="language-python">from sklearn.svm import SVC
+from micromlgen import port
+
+# put your samples in the dataset folder
+# one class per file
+# one feature vector per line, in CSV format
+features, classmap = load_features('dataset/')
+X, y = features[:, :-1], features[:, -1]
+classifier = SVC(kernel='linear').fit(X, y)
+c_code = port(classifier, classmap=classmap)
+print(c_code)</code></pre>
+<h3>4. Run the inference</h3>
 <p>We will be running the inferences from the features entered via Serial monitor: you type 4 float values representing the 4 features and get back the predicted Iris species.</p>
 <pre><code class="language-cpp">#include &quot;iris.h&quot;
 
@@ -802,16 +900,18 @@ void loop() {
 
     delay(10);
 }</code></pre>
-<p>That’s it: you deployed machine learning in 2 Kb! Type some values from the Iris dataset and watch the detected species printed on the serial monitor.</p>
+<p>If you open the Serial monitor you should see something like the next picture as you type in the features from different species.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Iris-serial-300x110.png" alt="Iris classification serial output" /></p>
+<p>That’s it: you deployed machine learning in 2 Kb!</p>
 <h4>Some figures</h4>
-<p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 8390 bytes (27%) of program space and 614 bytes (29%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>&quot;Can I run machine learning on Arduino?&quot;</em> is definetly <strong>YES</strong>.</p>
+<p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 7446 bytes (24%) of program space and 302 bytes (14%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>&quot;Can I run machine learning on Arduino?&quot;</em> is definetly <strong>YES</strong>.</p>
 <hr />
 <p>View the project on <a href="https://github.com/eloquentarduino/EloquentArduino/tree/master/examples/MicromlIrisExample">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/">Arduino Machine learning project #1: Iris classification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/">How to do Iris classification machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>How to create a classifier for Arduino Machine learning projects</title>
+		<title>This is how I create my Arduino Machine learning classifiers in 4 easy steps</title>
 		<link>https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/</link>
 				<pubDate>Mon, 11 Nov 2019 21:10:51 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
@@ -820,7 +920,7 @@ void loop() {
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=104</guid>
 				<description><![CDATA[<p>In this post I'll show you how I train my classifiers in scikit-learn and export them for Arduino machine learning projects. Since this is a repetitive task, you can save a short snippet of Python code on your PC and use it whenever you need to train a classifier from Arduino data. It really is [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">How to create a classifier for Arduino Machine learning projects</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">This is how I create my Arduino Machine learning classifiers in 4 easy steps</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this post I'll show you how I train my classifiers in scikit-learn and export them for Arduino machine learning projects. Since this is a repetitive task, you can save a short snippet of Python code on your PC and use it whenever you need to train a classifier from Arduino data. It really is a general-purpose piece of code that reads the files from a folder and generates a features matrix from them; the useful bit, so to say, is that it generates a classmap to translate class indexes to readable names.</p>
 <p><span id="more-104"></span></p>
@@ -868,7 +968,7 @@ void classify() {
     Serial.print(&quot;Predicted class: &quot;);
     Serial.println(classIdxToName(predict(features)));
 }</code></pre>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">How to create a classifier for Arduino Machine learning projects</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">This is how I create my Arduino Machine learning classifiers in 4 easy steps</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
