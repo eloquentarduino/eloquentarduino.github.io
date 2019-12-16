@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Mon, 16 Dec 2019 19:19:47 +0000</lastBuildDate>
+	<lastBuildDate>Mon, 16 Dec 2019 21:03:55 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -34,7 +34,7 @@
 								<content:encoded><![CDATA[<p>In this post we'll locate ourself in space using nearby WiFi access points and machine learning. The task of detecting where you are when GPS or satellite localization is not an option is called <a href="https://en.wikipedia.org/wiki/Indoor_positioning_system">indoor positioning</a>: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely available, but the same project could be re-purposed to use Bluetooth, if there are enough devices in your location.<br />
 The inference will occur on a microcontroller thanks to the <a href="/2019/11/introducing-microml/" target="_blank">MicroML framework.</a> For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32.  </p>
 <p><span id="more-224"></span></p>
-<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
+<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
   <li>define the features</li>
   <li>record sample data: run a few scans for each location to be predicted and record the RSSI (signal strength) of each visible network</li>
@@ -159,6 +159,8 @@ X, y = features[:, :-1], features[:, -1]
 classifier = SVC(kernel='linear').fit(X, y)
 c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
+
+<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
 <h3>3. Run the inference</h3>
 <pre><code class="language-cpp">#include &quot;model.h&quot;
 
@@ -403,7 +405,7 @@ This also exaplains #3: if you use two <code>every</code> with the same argument
 ]]></description>
 								<content:encoded><![CDATA[<p>In this post we're going to replicate the tutorial found on the <a href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html">Tensorflow blog </a>where an Arduino BLE 33 Nano Sense is used to classify IMU readings into gestures. We’re going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and 2 kb of RAM. In this project the features are going to be 30 IMU accelerometer readings, taken starting from when a movement is detected. You can decide the use all the 6 axis from the IMU (accelerometer + gyroscope), or only 3 of them (either accelerometer or gyroscope): it will depend on the gestures you want to recognize and the amount of program space you have. Of course 3 dimesionsions will lead to a smaller model, at the cost of some loss in accuracy; do some tests and pick the one that best fits your needs. </p>
 <p><span id="more-35"></span></p>
-<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
+<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
   <li>define the features</li>
   <li>record sample data: repeat each gesture a few times and save the values from the serial monitor to a file, one for each gesture</li>
@@ -536,28 +538,32 @@ void classify() {
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>Arduino Machine learning project #3: Morse alphabet identification</title>
-		<link>https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-morse-alphabet-identification/</link>
+		<title>How to do Morse alphabet identification through machine learning on Arduino</title>
+		<link>https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/</link>
 				<pubDate>Sun, 01 Dec 2019 12:07:38 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=194</guid>
-				<description><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to identify the letters from the Morse alphabet. If you don't know how this code works, essentially it encodes all the letters with 2 symbols: dot (•) and dash (‒). We're going to target an Arduino Nano board (old generation), equipped with 32 kb [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-morse-alphabet-identification/">Arduino Machine learning project #3: Morse alphabet identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+				<description><![CDATA[<p>In this Arduno Machine learning project we're going to identify the letters from the Morse alphabet. In practice, we'll translate dots (•) and dashes (‒) &#34;typed&#34; with a push button into meaningful characters. In this tutorial we're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/">How to do Morse alphabet identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to identify the letters from the <a href="https://en.wikipedia.org/wiki/Morse_code">Morse alphabet</a>. If you don't know how this code works, essentially it encodes all the letters with 2 symbols: dot (•) and dash (‒). We're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
+								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to identify the letters from the <a href="https://en.wikipedia.org/wiki/Morse_code">Morse alphabet</a>.<br />
+In practice, we'll translate dots (•) and dashes (‒)  &quot;typed&quot; with a push button into meaningful characters.<br />
+In this tutorial we're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-194"></span></p>
-<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
+<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
   <li>define the features</li>
-  <li>record sample data: repeat each letter a few times and save the values from the serial monitor to a file, one for each letter. If you've never typed morse code (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</li>
+  <li>record sample data: repeat each letter a few times and save the values from the serial monitor to a file, one for each letter.</li>
  <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
  <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
 </ol>
+<div class="watchout"> If you've never typed morse code before (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</div>
 <h3>1. Features definition</h3>
-<p>For our task we'll use a simple push button as input and a fixed number of samples taken at a fixed interval (100 ms), starting from the first detection of the button press. I chose to record 30 samples for each letter, but you can easily customize the value as per your needs. With 30 samples at 100 ms frequency, we'll have 3 seconds to &quot;type&quot; the letter and on the Serial monitor will appear a sequence of 0s and 1s, representing if the button was pressed or not; the inference procedure will translate this sequence into a letter.<br />
+<p>For our task we'll use a simple push button as input and a fixed number of samples taken at a fixed interval (100 ms), starting from the first detection of the button press. I chose to record 30 samples for each letter, but you can easily customize the value as per your needs. </p>
+<p>With 30 samples at 100 ms frequency, we'll have 3 seconds to &quot;type&quot; the letter and on the Serial monitor will appear a sequence of 0s and 1s, representing if the button was pressed or not; the inference procedure will translate this sequence into a letter.<br />
 As a reference, here are a couple example of what we'll be working with.</p>
 <pre><code class="language-cpp">// A (•‒)
 0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
@@ -568,7 +574,8 @@ As a reference, here are a couple example of what we'll be working with.</p>
 // E (•)
 0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
 <h3>2. Record sample data</h3>
-<p>To the bare minimum, we'll need a push button and two wires: one to ground and the other to a digital pin. Since in the example we'll make the button an <code>INPUT_PULLUP</code>, we'll read 0 when the button is pressed and 1 when not.  All we need to do is detect a press and record the following 30 samples of the digital pin:</p>
+<p>To the bare minimum, we'll need a push button and two wires: one to ground and the other to a digital pin. Since in the example we'll make the button an <code>INPUT_PULLUP</code>, we'll read 0 when the button is pressed and 1 when not.  </p>
+<p>All we need to do is detect a press and record the following 30 samples of the digital pin:</p>
 <pre><code class="language-cpp">#define IN 4
 #define NUM_SAMPLES 30
 #define INTERVAL 100
@@ -606,6 +613,8 @@ void printFeatures() {
     }
 }
 </code></pre>
+<p>Open the Serial monitor and type a few times each letter: try to introduce some variations each time, for example waiting some more milliseconds before releasing the dash.</p>
+<p>Save the recordings for each letter in a file named after the letter, so you will get meaningful results later on.</p>
 <p>You may end with duplicate recordings: don't worry, that's not a problem. I'll paste my recordings for a few letters, as a reference.</p>
 <pre><code>// A (•‒)
 0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
@@ -645,10 +654,26 @@ void printFeatures() {
 0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
-<p>If you did a good job, you should end with quite distinguible features, as show in the plot below.</p>
+<p>If you do a good job, you should end with quite distinguible features, as show in the plot below.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg" alt="Decision boundaries of 2 PCA components from Morse alphabet identification features" /></p>
-<h3>2. Train and export the SVM classifier</h3>
-<p>Refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn">tutorial</a></p>
+<h3>3. Train and export the SVM classifier</h3>
+
+<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
+
+<p>
+<pre><code class="language-python">from sklearn.svm import SVC
+from micromlgen import port
+
+# put your samples in the dataset folder
+# one class per file
+# one feature vector per line, in CSV format
+features, classmap = load_features('dataset/')
+X, y = features[:, :-1], features[:, -1]
+classifier = SVC(kernel='linear').fit(X, y)
+c_code = port(classifier, classmap=classmap)
+print(c_code)</code></pre>
+
+<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
 <h3>3. Run the inference</h3>
 <pre><code class="language-cpp">#include &quot;model.h&quot;
 
@@ -662,36 +687,41 @@ void loop() {
 
   delay(10);
 }</code></pre>
-<p>That’s it: you deployed machine learning in 2 Kb! Type some letter using the push button and see the identified value printed on the serial monitor.</p>
+<p>Type some letter using the push button and see the identified value printed on the serial monitor.</p>
+<p>That’s it: you deployed machine learning in 2 Kb! </p>
+<p><h4>Project figures</h4>
+<p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 12546 bytes (40%) of program space and 366 bytes (17%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>Can I run machine learning on Arduino?</em> is <strong>definetly YES</strong>.<br />
+<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p></p>
 <hr />
-<p>View the project on <a href="https://github.com/eloquentarduino/EloquentArduino/tree/master/examples/MicromlMorseIdentificationExample">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-morse-alphabet-identification/">Arduino Machine learning project #3: Morse alphabet identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>View the project on <a href="https://github.com/eloquentarduino/EloquentArduino/tree/master/examples/MicromlMorseIdentificationExample/MicromlMorseIdentificationExample.ino">Github</a></p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/">How to do Morse alphabet identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>Arduino Machine learning project #2: Color identification</title>
-		<link>https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-color-identification/</link>
+		<title>How to do color identification through machine learning on Arduino</title>
+		<link>https://eloquentarduino.github.io/2019/12/how-to-do-color-identification-on-arduino/</link>
 				<pubDate>Sun, 01 Dec 2019 10:35:29 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=6</guid>
-				<description><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to use an RGB sensor to identify the object in front of it based on its color. This is a remake of the project found on the Tensorflow blog where an Arduino BLE 33 Nano Sense is used to classify RGB components into colors. [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-color-identification/">Arduino Machine learning project #2: Color identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+				<description><![CDATA[<p>In this Arduno Machine learning project we're going to use an RGB sensor to identify objects based on their color. This is a remake of the project found on the Tensorflow blog. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-color-identification-on-arduino/">How to do color identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p>In this project about Machine learning on Arduino boards we're going to use an RGB sensor to identify the object in front of it based on its color. This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/fruit-identification-using-arduino-and-tensorflow.html">Tensorflow blog</a> where an Arduino BLE 33 Nano Sense is used to classify RGB components into colors. We're going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
+								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to use an RGB sensor to identify objects based on their color.<br />
+This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/fruit-identification-using-arduino-and-tensorflow.html">Tensorflow blog</a>. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-6"></span></p>
-<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
+<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
   <li>define the features</li>
-  <li>record sample data: put some colored objects in front of your sensor and save the readings to a file, one for each object</li>
+  <li>record sample data: put some colored objects in front of your sensor and save the readings</li>
  <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
  <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
 </ol>
 <h2>1. Features definition</h2>
-<p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be of 3-dimensional, which leads to a really simple model: if you craft your sampling with care, you should be able to fit the code even on an Attiny chip (I will show it how at the end of this article).</p>
-<hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Farduino-machine-learning-project-color-identification%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be of 3-dimensional, which leads to a really simple model with very high accuracy.</p>
+<hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-color-identification-on-arduino%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <h2>2. Record sample data</h2>
 <p>We don't need any processing to get from the sensor readings to the feature vector, so the code will be straight-forward: read each component from the sensor and assign it to the features array. This part will vary based on the specific chip you have: I'll report the code for a TCS 230/3200. </p>
 <pre><code class="language-cpp">#define S2 2
@@ -736,14 +766,31 @@ void printFeatures() {
     }
 }
 </code></pre>
-<p>Open the Serial monitor and put some colored objects in front of the sensor: move the object a bit and rotate it, so the samples will include different shades of the color; save the recording for each color in a file.</p>
+<p>Open the Serial monitor and put some colored objects in front of the sensor: move the object a bit and rotate it, so the samples will include different shades of the color.</p>
+<p>Save the recordings for each color in a file named after the color, so you will get meaningful results later on.</p>
 <div class="watchout">
 Don’t forget to sample the “empty color” too: don’t put anything in front of the sensor and let it record for a while.
 </div>
-<p>If you do a good job, you should end with distinguible features, as show in the plot below.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/fruit-identification-pca.svg" alt="2 components PCA for fruit colors" /></p>
-<h2>3. Train and export the SVM classifier</h2>
-<p>Refere to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" title="tutorial">tutorial</a></p>
+<p>If you do a good job, you should end with distinguible features, as show in the contour plot below.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-the-colors-features.svg" alt="Decision boundaries of 2 PCA components from the colors features" /></p>
+<h3>3. Train and export the SVM classifier</h3>
+
+<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
+
+<p>
+<pre><code class="language-python">from sklearn.svm import SVC
+from micromlgen import port
+
+# put your samples in the dataset folder
+# one class per file
+# one feature vector per line, in CSV format
+features, classmap = load_features('dataset/')
+X, y = features[:, :-1], features[:, -1]
+classifier = SVC(kernel='linear').fit(X, y)
+c_code = port(classifier, classmap=classmap)
+print(c_code)</code></pre>
+
+<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
 <h2>4. Run the inference</h2>
 <pre><code class="language-cpp">#include model.h
 
@@ -752,17 +799,20 @@ void loop() {
   Serial.println(classIdxToName(predict(features)));
   delay(1000);
 }</code></pre>
-<p>That’s it: you deployed machine learning in 2 Kb! Put some colored object in front of the sensor and see the identified object name printed on the serial monitor.</p>
+<p>Put some colored object in front of the sensor and see the identified object name printed on the serial monitor.</p>
 <div class="watchout">Do you remember the "empty color"? It needs to be recorded so you will get "empty" when no object is present, otherwise you'll get unexpected predictions</div>
 <p>Given the simplicity of the task, you should easily achieve near 100% accuracy for different colors (I had some troubles distinguishing orange from yellow because of the bad illumination). Just be sure to replicate the exact same setup both during training and classification.</p>
-<p>@todo Attiny compilation<br />
-@todo Github link</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-color-identification/">Arduino Machine learning project #2: Color identification</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>That’s it: you deployed machine learning in 2 Kb! </p>
+<h2><h4>Project figures</h4>
+<p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 5570 bytes (18%) of program space and 266 bytes (12%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>Can I run machine learning on Arduino?</em> is <strong>definetly YES</strong>.<br />
+<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p></h2>
+<p>View the full project on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlColorIdentificationExample/MicromlColorIdentificationExample.ino">Github</a></p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-color-identification-on-arduino/">How to do color identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>How to do Iris classification machine learning on Arduino</title>
-		<link>https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/</link>
+		<title>How to do Iris classification through machine learning on Arduino</title>
+		<link>https://eloquentarduino.github.io/2019/12/how-to-do-iris-classification-on-arduino/</link>
 				<pubDate>Sun, 01 Dec 2019 09:02:02 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
@@ -770,12 +820,12 @@ void loop() {
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=409</guid>
 				<description><![CDATA[<p>In this first tutorial from the series Arduino Machine learning we're going to implement the &#34;Hello world&#34; of Machine learning projects: classifying the Iris dataset on an Arduino board. The Iris dataset is a well known one in the Machine learning world and is often used in introductory tutorials about classification. In this tutorial we're [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/">How to do Iris classification machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-iris-classification-on-arduino/">How to do Iris classification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this first tutorial from the series <em><a href="/category/programming/arduino-machine-learning/">Arduino Machine learning</a></em> we're going to implement the &quot;Hello world&quot; of Machine learning projects: classifying the Iris dataset on an Arduino board. The <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set">Iris dataset</a> is a well known one in the Machine learning world and is often used in introductory tutorials about classification.<br />
 In this tutorial we're going to run the classification directly on a Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM: that's the only thing you will need!</p>
 <p><span id="more-409"></span></p>
-<p>Let's dive into the steps for a successful Machine learning project on Arduino:</p>
+<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
   <li>define the features</li>
   <li>record sample data: we'll use the publicly available dataset</li>
@@ -875,6 +925,8 @@ X, y = features[:, :-1], features[:, -1]
 classifier = SVC(kernel='linear').fit(X, y)
 c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
+
+<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
 <h3>4. Run the inference</h3>
 <p>We will be running the inferences from the features entered via Serial monitor: you type 4 float values representing the 4 features and get back the predicted Iris species.</p>
 <pre><code class="language-cpp">#include &quot;iris.h&quot;
@@ -901,13 +953,14 @@ void loop() {
     delay(10);
 }</code></pre>
 <p>If you open the Serial monitor you should see something like the next picture as you type in the features from different species.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Iris-serial-300x110.png" alt="Iris classification serial output" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Iris-serial.png" alt="Iris classification serial output" /></p>
 <p>That’s it: you deployed machine learning in 2 Kb!</p>
-<h4>Some figures</h4>
-<p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 7446 bytes (24%) of program space and 302 bytes (14%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>&quot;Can I run machine learning on Arduino?&quot;</em> is definetly <strong>YES</strong>.</p>
+<p><h4>Project figures</h4>
+<p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 7446 bytes (24%) of program space and 302 bytes (14%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>Can I run machine learning on Arduino?</em> is <strong>definetly YES</strong>.<br />
+<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p></p>
 <hr />
-<p>View the project on <a href="https://github.com/eloquentarduino/EloquentArduino/tree/master/examples/MicromlIrisExample">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-machine-learning-project-1-iris-classification/">How to do Iris classification machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>View the project on <a href="https://github.com/eloquentarduino/EloquentArduino/tree/master/examples/MicromlIrisExample/MicromlIrisExample.ino">Github</a></p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-iris-classification-on-arduino/">How to do Iris classification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
