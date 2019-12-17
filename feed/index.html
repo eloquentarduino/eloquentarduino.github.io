@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Mon, 16 Dec 2019 22:03:25 +0000</lastBuildDate>
+	<lastBuildDate>Tue, 17 Dec 2019 16:44:29 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -181,18 +181,18 @@ void classify() {
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>Pin</title>
-		<link>https://eloquentarduino.github.io/2019/12/pin/</link>
+		<title>Eloquent pin management: the Pin class</title>
+		<link>https://eloquentarduino.github.io/2019/12/arduino-pin-class/</link>
 				<pubDate>Fri, 06 Dec 2019 16:15:13 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Eloquent library]]></category>
 		<category><![CDATA[eloquent]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=167</guid>
-				<description><![CDATA[<p>Pin is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like digitalWrite(led, HIGH) and start writing led.turnOn() instead. Pin is actually an abstract class, so you won't use it directly, but through its specialized implementations: DigitalIn DigitalOut AnalogIn AnalogOut If you don't [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/pin/">Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+				<description><![CDATA[<p>Pin is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like digitalWrite(led, HIGH) and start writing led.turnOn() instead. Pin is actually an abstract class, so you won't use it directly, but through its specialized implementations: DigitalIn DigitalOut AnalogIn AnalogOut Import the library [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-pin-class/">Eloquent pin management: the Pin class</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p><code>Pin</code> is a class for pin manipulation: you can <code>read</code>, <code>write</code>, <code>turnOn</code>, <code>turnOff</code>, <code>toggle</code> and a lot more. Please, stop writing horrible code like <code>digitalWrite(led, HIGH)</code> and start writing <code>led.turnOn()</code> instead. </p>
+								<content:encoded><![CDATA[<p><code>Pin</code> is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like <code>digitalWrite(led, HIGH)</code> and start writing <code>led.turnOn()</code> instead. </p>
 <p><span id="more-167"></span></p>
 <p><code>Pin</code> is actually an abstract class, so you won't use it directly, but through its specialized implementations:</p>
 <ol>
@@ -201,11 +201,132 @@ void classify() {
 <li>AnalogIn</li>
 <li>AnalogOut</li>
 </ol>
+<h2>Import the library</h2>
+<div class="watchout">To follow this tutorial along you need to first <a href="/2019/12/how-to-install-the-eloquent-library/" target="_blank">install the Eloquent library</a></div>
+<pre><code class="language-cpp">#import &lt;eIO.h&gt;
+
+using namespace Eloquent::Pin;</code></pre>
+<p>If the namespace stuff is new to you, here I'll briefly say that it is used to avoid name collisions among different libraries. This seems to be an alien topic in the Arduino world and I can't really explain why.</p>
+<p>99% of the libraries out there deal with this problem in one of two modes:</p>
+<ol>
+<li>ignoring it altogether, so you have an <code>MPU6050.h</code> library, which elects itself as the only one implementation possible to access the MPU6050 accelerometer in the world</li>
+<li>prefixing each library file, so you get the <code>Adafruit_Si7021</code> class</li>
+</ol>
+<hr /><p><em>The case for Adafruit_Si7021 should not exist in my opinion: use the damn namespaces!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Farduino-pin-class%2F&#038;text=The%20case%20for%20Adafruit_Si7021%20should%20not%20exist%20in%20my%20opinion%3A%20use%20the%20damn%20namespaces%21&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>With namespaces, it would become:</p>
+<pre><code class="language-cpp">using namespace Adafruit;
+
+Si7021 si;</code></pre>
+<h2>How to use</h2>
+<p>First of all, all the 4 implementations accept a single constructor argument: the pin number.</p>
+<pre><code class="language-cpp"> DigitalOut led(BUILTIN_LED);
+ DigitalIn pushButton(10);
+ AnalogIn potentiometer(A0);
+ AnalogOut pwmLed(8);</code></pre>
+<p>Then it is good practice to init your pins in the setup.</p>
+<pre><code class="language-cpp"> void setup() {
+    led.begin();
+    pushButton.begin();
+    potentiometer.begin();
+    pwmLed.begin();
+ }</code></pre>
+<p>All the 4 classes let you ask for the pin current value via the <code>value()</code> method:</p>
+<pre><code class="language-cpp"> void test() {
+    // DigitalIn returns the last read value, as 0/1
+    digitalIn.value();
+
+    // AnalogIn returns the last read value, in the range [0, 1024]
+    analogIn.value();
+
+    // DigitalOut returns the last written value, as 0/1
+    digitalOut.value();
+
+    // AnaloglOut returns the last written value, in the range [0, 255]
+    analogOut.value();
+ }</code></pre>
+<p>At this point each class will provide its specialized methods.</p>
+<h4>DigitalIn</h4>
+<pre><code class="language-cpp">void test() {
+    // configure pin as INPUT_PULLUP
+    pin.pullup();
+
+    // configure pin as Active Low 
+    // that is, pin is ON when digitalRead() is LOW
+    pin.activeLow();
+
+    // read and update pin value
+    pin.read();
+
+    // test if pin is on (doesn&#039;t read the pin)
+    pin.isOn();
+
+    // test if pin is off (doesn&#039;t read the pin)
+    pin.isOff();
+
+    // test if pin value changed from last reading
+    pin.changed();
+}</code></pre>
+<h4>DigitalOut</h4>
+<pre><code class="language-cpp">void test() {
+    // set pin as Active Low
+    // that is, turnOn writes LOW
+    pin.activeLow();
+
+    // turn pin on
+    pin.turnOn();
+
+    // turn pin off
+    pin.turnOff();
+
+    // toggle
+    pin.toggle();
+
+    // blink N times at intervals of X milliseconds
+    pin.blink(N, X);
+}</code></pre>
+<h4>AnalogIn</h4>
+<pre><code class="language-cpp">void test() {
+    // read current pin value
+    pin.read();
+
+    // get pin previous value
+    pin.prev();
+
+    // get difference between current value and previous
+    pin.delta();
+
+    // get absolute value of delta()
+    pin.absDelta();
+}</code></pre>
+<h4>AnalogOut</h4>
+<pre><code class="language-cpp">void test() {
+    // write value X to pin
+    pin.write(X);
+}</code></pre>
+<hr />
 <p>If you don't believe a whole class is worthwhile to work with pins, I'll show a few use cases to illustrate my point.</p>
-<h3>Use case #1: active low LED</h3>
-<p>The ESP8266 has a builtin LED you can control, but it is an <em>active low</em> one: it will turn on when you write <code>LOW</code>. In this case, <code>digitalWrite(BUILTIN_LED, LOW)</code> can be misleading regarding your actual intentions. It doesn't look intuitive,  it doesn't look <em>eloquent</em>!. <code>builtinLed.turnOn()</code> does, however. All you need to get it working correctly is calling <code>builtinLed.activeLow()</code> once in your setup.</p>
-<h3>Use case #2: toggle</h3>
-<p>If you need to toggle the current state of a digital output, you need an helper variable to keep track of the state and remember to <strong>always</strong> update that variable when you write to the output. With a class, the state is tightly bound to the instance, so you have a <a href="https://en.wikipedia.org/wiki/Single_source_of_truth">single source of truth</a>: <code>turnOn()</code>, <code>turnOff()</code> and <code>toggle()</code> will take care of updating the inner state accordingly.</p>
+<h4>Use case #1: active low LED</h4>
+<p>The ESP8266 has a builtin LED you can control, but it is an <em>active low</em> one: it will turn on when you write <code>LOW</code>. In this case, <code>digitalWrite(BUILTIN_LED, LOW)</code> can be misleading regarding your actual intentions. </p>
+<p>It doesn't look intuitive,  it doesn't look <em>eloquent</em>! <code>builtinLed.turnOn()</code> does, however. All you need to get it working correctly is calling <code>builtinLed.activeLow()</code> once in your setup.</p>
+<pre><code class="language-cpp">// BEFORE
+void loop() {
+    // to turn the builtin LED on
+    digitalWrite(led, LOW);
+}</code></pre>
+<pre><code class="language-cpp">// AFTER
+DigitalOut buildtinLed;
+
+void setup() {
+    builtinLed.activeLow();
+}
+
+void loop() {
+    // to turn the builtin LED on
+    builtinLed.turnOn();
+}</code></pre>
+<h4>Use case #2: toggle</h4>
+<p>If you need to toggle the current state of a digital output, you need an helper variable to keep track of the state and remember to <strong>always</strong> update that variable when you write to the output.<br />
+With a class, the state is tightly bound to the instance, so you have a <a href="https://en.wikipedia.org/wiki/Single_source_of_truth">single source of truth</a>: <code>turnOn()</code>, <code>turnOff()</code> and <code>toggle()</code> will take care of updating the inner state accordingly.</p>
 <pre><code class="language-cpp">// BEFORE
 #define LED 1
 
@@ -221,8 +342,10 @@ DigitalOut led(1);
 void loop() {
     led.toggle();
 }</code></pre>
-<h3>Use case #3: analog delta</h3>
-<p>What if you have an analog input and want to know if its valued changed by at least X from your latest reading? You would need an helper variable again. Now imagine if you have 5 analog inputs you want to track: you'll end up with 10 variables and of course you have again to <strong>always</strong> keep both in sync. <code>AnalogIn</code>, conveniently, provides a <code>delta()</code> method that gives you the change from the previous reading and will always be in sync. Awesome!</p>
+<h4>Use case #3: analog delta</h4>
+<p>What if you have an analog input and want to know if its valued changed by at least X from your latest reading? You would need an helper variable again. </p>
+<p>Now imagine if you have 5 analog inputs you want to track: you'll end up with 10 variables and of course you have again to <strong>always</strong> keep both in sync.<br />
+<code>AnalogIn</code> conveniently provides <code>delta()</code> and <code>absDelta()</code> methods that give you the change from the previous reading and will always be in sync. Awesome!</p>
 <pre><code class="language-cpp">// BEFORE
 #define INPUT1 A1
 #define INPUT2 A2
@@ -248,8 +371,8 @@ void loop() {
     if (input1.absDelta() &gt; THRESHOLD)
         ...
 }</code></pre>
-<p>@todo continue</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/pin/">Pin</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-pin-class/">Eloquent pin management: the Pin class</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
@@ -393,6 +516,34 @@ every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
 <p>If you use two <code>every</code> with the exact same argument, two variables with the exact same name will be created and it will rise a compile-time error.</p>
 <p>If you can live with this limitations, <code>every</code> only needs the space of an <code>uint32_t</code> to work.</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/">Eloquent non-blocking code: the Every construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>How to install the Eloquent library</title>
+		<link>https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/</link>
+				<pubDate>Thu, 05 Dec 2019 16:18:48 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Eloquent library]]></category>
+		<category><![CDATA[eloq]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=554</guid>
+				<description><![CDATA[<p>In this short tutorial I'll show you how you can install the Eloquent library to take advange of all the good things it provides to you. It really is super simple, since the Eloquent library is no different from any other library you already installed on your computer, but I'll repeat the steps for clarity. [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/">How to install the Eloquent library</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>In this short tutorial I'll show you how you can install the <a href="/2019/11/how-to-write-clean-arduino-code-introducing-the-eloquent-library/">Eloquent library</a> to take advange of all the good things it provides to you.</p>
+<p>It really is super simple, since the Eloquent library is no different from any other library you already installed on your computer, but I'll repeat the steps for clarity.</p>
+<p><span id="more-554"></span></p>
+<h2>1. Download the zip from Github</h2>
+<p>The whole library is hosted on Github, so head over to <a href="https://github.com/eloquentarduino/EloquentArduino">the repo</a> and click <em>Clone or download</em> &gt; <em>Download ZIP</em>.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Repo.png" alt="Download zip from Github repository" /></p>
+<h2>2. Extract the zip to you library directory</h2>
+<p>Once downloaded, you should extract the zip into your Arduino libraries folder. The path will vary based on your OS and installation, but I expect you to know where it is.</p>
+<h2>3. Strip the -master suffix</h2>
+<p>When downloaded from Github, your zip and your folder will be named <code>EloquentArduino-master</code>: rename the folder to just <code>EloquentArduino</code>, without the master suffix.</p>
+<h2>4. Done</h2>
+<p>If you follwed the steps correctly, the library is ready to be used.</p>
+<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/">How to install the Eloquent library</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
@@ -1028,76 +1179,6 @@ void classify() {
     Serial.println(classIdxToName(predict(features)));
 }</code></pre>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">This is how I create my Arduino Machine learning classifiers in 4 easy steps</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
-		<title>You can run Machine learning on Arduino. And any other MCU out there too!</title>
-		<link>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/</link>
-				<pubDate>Sun, 10 Nov 2019 19:18:40 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[microml]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=76</guid>
-				<description><![CDATA[<p>A lot of forum threads ask about the possibility to run Machine learning on Arduino. The answers mostly follow in one of these 3 categories: Arduino is too resource-constrained to handle Machine learning Come up with a naive implementation of a Multi Layer Perceptron (recently) Sure! You can use Tensorflow Lite for Microcontrollers No single [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/">You can run Machine learning on Arduino. And any other MCU out there too!</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p><a href="https://www.quora.com/I-want-to-make-a-robot-with-an-Arduino-that-uses-basic-machine-learning-where-can-I-start">A</a> <a href="https://robotics.stackexchange.com/questions/568/is-it-possible-to-run-a-neural-network-on-a-microcontroller">lot</a> <a href="https://www.reddit.com/r/robotics/comments/bnmm75/arduino_for_machine_learning/">of</a> <a href="https://www.quora.com/How-do-I-use-machine-learning-with-Arduino">forum</a> <a href="https://forum.arduino.cc/index.php?topic=63981.0">threads</a> ask about the possibility to run Machine learning on Arduino.<br />
-The answers mostly follow in one of these 3 categories:</p>
-<ol>
-<li>Arduino is too resource-constrained to handle Machine learning</li>
-<li>Come up with a naive implementation of a <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">Multi Layer Perceptron</a></li>
-<li>(recently) Sure! You can use <a href="https://www.tensorflow.org/lite/microcontrollers">Tensorflow Lite for Microcontrollers</a></li>
-</ol>
-<p>No single answer I read talked about the other 100s alghoritms that fall under the Machine learning umbrella. <strong>No. Single. One.</strong> Let me explain what I think is wrong with this.</p>
-<p><span id="more-76"></span></p>
-<p>First of all I'd like to state one absolutely important thing:</p>
-<hr /><p><em>Artificial intelligence ≠ Machine learning ≠ Neural networks. This should be clear</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino%2F&#038;text=Artificial%20intelligence%20%E2%89%A0%20Machine%20learning%20%E2%89%A0%20Neural%20networks.%20This%20should%20be%20clear&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>I admit most of those questions seemed to come from principiants. Also the answers, though, most often lack any sound knowledge about the topic.</p>
-<hr /><p><em>You can run classification and regression on Arduino boards, even the less powerful ones: just don&#039;t use Neural networks. It&#039;s that simple.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino%2F&#038;text=You%20can%20run%20classification%20and%20regression%20on%20Arduino%20boards%2C%20even%20the%20less%20powerful%20ones%3A%20just%20don%27t%20use%20Neural%20networks.%20It%27s%20that%20simple.&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<h2>Introducing MicroML generator</h2>
-<p>So I do you <em>actually</em> run machine learning on such constrained devices?</p>
-<p>Here you are: <a href="https://github.com/eloquentarduino/micromlgen">MicroML</a> is a project to bring Machine learning algorithms to microcontrollers. It was born as an alternative to Tensorflow for Microcontrollers, which is solely dedicated to Artificial Neural Networks: here you will find leaner alternatives to neural networks to run inference <strong>even on 8-bit microcontrollers</strong>.</p>
-<p>Quoting from the Tensoflow blog: <em>The core runtime fits in 16 KB on an Arm Cortex M3</em> (that's just the runtime, without any actual operator!). MicroML, on the other hand, lets you deploy models that fit in <strong>under 2 Kb of RAM</strong>.</p>
-<p>At the current state, it can convert <a href="https://en.wikipedia.org/wiki/Support-vector_machine">Support Vector Machines</a> to optimized C code you can deploy on any MCU of you choice: Arduino (Uno, Nano, Micro...), ESP8266, ESP32, Particle Photon, Sparkfun Edge, Adafruit Feather, you name it.</p>
-<p>Why Support Vector Machines? Because they're really good at classifying highly-dimensional features and are quite easy to optimize for RAM-constrained environments.</p>
-<h2>How to port a classifier</h2>
-<p>First of all, you need to train a classifier. You have to use the Python's library <a href="https://scikit-learn.org/stable/">scikit-learn</a> — which you're probably already using considering its widespread adoption. Then you need to install the MicroML package.</p>
-<pre><code class="language-python">pip install micromlgen</code></pre>
-<p>Finally, you <code>port</code> your trained classifier to optimized C code.</p>
-<pre><code class="language-python">from micromlgen import port
-from sklearn.svm import SVC
-from sklearn.datasets import load_iris
-
-if __name__ == &#039;__main__&#039;:
-    iris = load_iris()
-    X = iris.data
-    y = iris.target
-    clf = SVC(kernel=&#039;linear&#039;).fit(X, y)
-    print(port(clf))</code></pre>
-<p>That's it: you now have all you need to do classification in your Arduino projects.</p>
-<h2>Existing alternatives</h2>
-<p>There exists some alternatives to this library, but they suffer from some limitations:</p>
-<ol>
-<li><a href="https://github.com/nok/sklearn-porter">sklearn-porter</a> can output C code (among the others), but it's not optimized for microcontrollers. You'll hit a wall on RAM because it needs to declare all the support vectors in memory (to have an idea, the <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html">breast cancer dataset</a> produces a 57x30 matrix of doubles, totalling 6840 bytes just for the support vectors).</li>
-<li>I found one once, but can't find it again </li>
-</ol>
-<p>My effort was to find an implementation that needed the least amount possible of memory: this was possible sacrificing the program space, but that's less often a problem since RAM is usually the most limiting factor. If your model fills up the program space you can revert to <code>sklearn-porter</code> (if you have enough RAM, of course).</p>
-<h2>Use in Arduino project</h2>
-<p>There are two methods you will need to call to run the predictions in your project:</p>
-<ol>
-<li><code>predict(double features[])</code>: it runs the actual prediction and returns a number representing the predicted class</li>
-<li><code>classIdxToName(uint8_t classIdx)</code>: converts the class index to a readable string, based on the classmap generated from your files</li>
-</ol>
-<pre><code class="language-cpp">#include &quot;model.h&quot;
-
-void classify() {
-    Serial.print(&quot;Predicted class: &quot;);
-    Serial.println(classIdxToName(predict(features)));
-}</code></pre>
-<hr />
-<p>I'm starting a series of tutorials about hands-on projects to put Machine learning in use: you can follow the <strong>Related posts</strong> links to follow along, so keep reading!</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/">You can run Machine learning on Arduino. And any other MCU out there too!</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 	</channel>
