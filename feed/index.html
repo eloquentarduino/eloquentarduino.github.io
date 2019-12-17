@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Mon, 16 Dec 2019 21:03:55 +0000</lastBuildDate>
+	<lastBuildDate>Mon, 16 Dec 2019 22:03:25 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -253,8 +253,8 @@ void loop() {
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>Await</title>
-		<link>https://eloquentarduino.github.io/2019/12/await/</link>
+		<title>Eloquent bounded waiting: the await construct</title>
+		<link>https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/</link>
 				<pubDate>Thu, 05 Dec 2019 18:50:59 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Eloquent library]]></category>
@@ -262,7 +262,7 @@ void loop() {
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=211</guid>
 				<description><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The await construct lets you put an upper bound to the time you're willing [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/await/">Await</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/">Eloquent bounded waiting: the await construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The <code>await</code> construct lets you put an upper bound to the time you're willing to wait.</p>
 <p><span id="more-211"></span></p>
@@ -297,7 +297,8 @@ while (WiFi.status() != WL_CONNECTED) {
 #define Seconds *1000
 </code></pre>
 <pre><code class="language-cpp">bool wifiConnected = await(WiFi.status() == WL_CONNECTED, 10 Seconds)</code></pre>
-<p>The code above will wait 10 seconds for the wifi to connect: on failure, <code>wifiConnected</code> will be false and you can gently fail. You can use it for any kind of check, like waiting for <code>Serial</code>.</p>
+<p>The code above will wait 10 seconds for the wifi to connect: on failure, <code>wifiConnected</code> will be false and you can gently fail. </p>
+<p>You can use it for any kind of check, like waiting for <code>Serial</code>.</p>
 <pre><code class="language-cpp">bool serialReady = await(Serial, 5 Seconds)
 bool serialHasCharacters = await(Serial.available(), 5 Seconds)</code></pre>
 <p>The default interval between checks is 10 milliseconds: if you need a custom delay interval you can use the more verbose <code>await_with_interval</code>:</p>
@@ -323,12 +324,12 @@ bool inline_function() {
 }
 
 bool wifiConnected = inline_function();</code></pre>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/await/">Await</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/">Eloquent bounded waiting: the await construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>Every</title>
-		<link>https://eloquentarduino.github.io/2019/12/every/</link>
+		<title>Eloquent non-blocking code: the Every construct</title>
+		<link>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</link>
 				<pubDate>Thu, 05 Dec 2019 18:42:45 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Eloquent library]]></category>
@@ -336,7 +337,7 @@ bool wifiConnected = inline_function();</code></pre>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=209</guid>
 				<description><![CDATA[<p>The every construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically. [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/every/">Every</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/">Eloquent non-blocking code: the Every construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>The <code>every</code> construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically.</p>
 <p><span id="more-209"></span></p>
@@ -357,11 +358,11 @@ void setup() {
 }
 
 void loop() {
-    every(1 Second) {
+    every(1000 Millis) {
         Serial.println(&quot;This line is printed every 1 second&quot;);
     }
 
-    every(2 Seconds) {
+    every(2000 Millis) {
         Serial.println(&quot;This line is printed every 2 seconds&quot;);
     }
 
@@ -380,15 +381,18 @@ void loop() {
 <li>its argument must be the suffix of a valid identifier</li>
 <li>you can't use several <code>every</code> with the exact same argument: you have to put all the code that needs to happen at the same interval in the same block</li>
 </ol>
-<p>Let me clarify on #2: the macro works by generating a variable named like <code>__every__##argument</code></p>
+<h4>Caveat #2</h4>
+<p>The macro works by generating a variable named like <code>__every__##argument</code></p>
 <pre><code class="language-cpp">every(1) ==&gt; uint32_t __every__1;
 every(2) ==&gt; uint32_t __every__2;
 every(a_given_interval) ==&gt; uint32_t __every__a_given_interval;
-every(an invalid interval) ==&gt; uint32_t __every__an invalid interval; // Syntax error</code></pre>
-<p>So, every integer literal and any variable are all valid arguments. Any expression is forbidden.<br />
-This also exaplains #3: if you use two <code>every</code> with the same argument, two variables with the exact name will be created and it will rise a compile-time error.</p>
+every(an invalid interval) ==&gt; uint32_t __every__an invalid interval; // Syntax error
+every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
+<p>So every integer literal and any variable are all valid arguments. Any expression is forbidden.</p>
+<h4>Caveat #3</h4>
+<p>If you use two <code>every</code> with the exact same argument, two variables with the exact same name will be created and it will rise a compile-time error.</p>
 <p>If you can live with this limitations, <code>every</code> only needs the space of an <code>uint32_t</code> to work.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/every/">Every</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/">Eloquent non-blocking code: the Every construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
@@ -553,6 +557,7 @@ void classify() {
 In practice, we'll translate dots (•) and dashes (‒)  &quot;typed&quot; with a push button into meaningful characters.<br />
 In this tutorial we're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-194"></span></p>
+<p><img src="https://i.ytimg.com/vi/L6gxfX4GrbI/maxresdefault.jpg" alt="credits to https://www.youtube.com/watch?v=L6gxfX4GrbI" /></p>
 <p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
   <li>define the features</li>
@@ -560,7 +565,6 @@ In this tutorial we're going to target an Arduino Nano board (old generation), e
  <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
  <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
 </ol>
-<div class="watchout"> If you've never typed morse code before (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</div>
 <h3>1. Features definition</h3>
 <p>For our task we'll use a simple push button as input and a fixed number of samples taken at a fixed interval (100 ms), starting from the first detection of the button press. I chose to record 30 samples for each letter, but you can easily customize the value as per your needs. </p>
 <p>With 30 samples at 100 ms frequency, we'll have 3 seconds to &quot;type&quot; the letter and on the Serial monitor will appear a sequence of 0s and 1s, representing if the button was pressed or not; the inference procedure will translate this sequence into a letter.<br />
@@ -575,6 +579,7 @@ As a reference, here are a couple example of what we'll be working with.</p>
 0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
 <h3>2. Record sample data</h3>
 <p>To the bare minimum, we'll need a push button and two wires: one to ground and the other to a digital pin. Since in the example we'll make the button an <code>INPUT_PULLUP</code>, we'll read 0 when the button is pressed and 1 when not.  </p>
+<p><img src="https://www.arduino.cc/en/uploads/Tutorial/PullUp_bbd.png" alt="credits to https://www.arduino.cc/en/Tutorial/DigitalInputPullup" /></p>
 <p>All we need to do is detect a press and record the following 30 samples of the digital pin:</p>
 <pre><code class="language-cpp">#define IN 4
 #define NUM_SAMPLES 30
@@ -614,6 +619,7 @@ void printFeatures() {
 }
 </code></pre>
 <p>Open the Serial monitor and type a few times each letter: try to introduce some variations each time, for example waiting some more milliseconds before releasing the dash.</p>
+<div class="watchout"> If you've never typed morse code before (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</div>
 <p>Save the recordings for each letter in a file named after the letter, so you will get meaningful results later on.</p>
 <p>You may end with duplicate recordings: don't worry, that's not a problem. I'll paste my recordings for a few letters, as a reference.</p>
 <pre><code>// A (•‒)
@@ -1025,8 +1031,8 @@ void classify() {
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>You can run Machine learning on Arduino. And ESP8266. And ESP32. And many more&#8230;</title>
-		<link>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more/</link>
+		<title>You can run Machine learning on Arduino. And any other MCU out there too!</title>
+		<link>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/</link>
 				<pubDate>Sun, 10 Nov 2019 19:18:40 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
@@ -1034,24 +1040,25 @@ void classify() {
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=76</guid>
 				<description><![CDATA[<p>A lot of forum threads ask about the possibility to run Machine learning on Arduino. The answers mostly follow in one of these 3 categories: Arduino is too resource-constrained to handle Machine learning Come up with a naive implementation of a Multi Layer Perceptron (recently) Sure! You can use Tensorflow Lite for Microcontrollers No single [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more/">You can run Machine learning on Arduino. And ESP8266. And ESP32. And many more&#8230;</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/">You can run Machine learning on Arduino. And any other MCU out there too!</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p><a href="https://www.quora.com/I-want-to-make-a-robot-with-an-Arduino-that-uses-basic-machine-learning-where-can-I-start">A</a> <a href="https://robotics.stackexchange.com/questions/568/is-it-possible-to-run-a-neural-network-on-a-microcontroller">lot</a> <a href="https://www.reddit.com/r/robotics/comments/bnmm75/arduino_for_machine_learning/">of</a> <a href="https://www.quora.com/How-do-I-use-machine-learning-with-Arduino">forum</a> <a href="https://forum.arduino.cc/index.php?topic=63981.0">threads</a> ask about the possibility to run Machine learning on Arduino.<br />
 The answers mostly follow in one of these 3 categories:</p>
 <ol>
 <li>Arduino is too resource-constrained to handle Machine learning</li>
 <li>Come up with a naive implementation of a <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">Multi Layer Perceptron</a></li>
-<li>(recently) Sure! You can use Tensorflow Lite for Microcontrollers</li>
+<li>(recently) Sure! You can use <a href="https://www.tensorflow.org/lite/microcontrollers">Tensorflow Lite for Microcontrollers</a></li>
 </ol>
 <p>No single answer I read talked about the other 100s alghoritms that fall under the Machine learning umbrella. <strong>No. Single. One.</strong> Let me explain what I think is wrong with this.</p>
 <p><span id="more-76"></span></p>
-<p>First of all I'd like to state one absolutely important thing: <strong>Artificial intelligence ≠ Machine learning ≠ Neural networks.</strong>. This should be clear.</p>
-<hr /><p><em>Artificial intelligence ≠ Machine learning ≠ Neural networks. This should be clear</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more%2F&#038;text=Artificial%20intelligence%20%E2%89%A0%20Machine%20learning%20%E2%89%A0%20Neural%20networks.%20This%20should%20be%20clear&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>I admit most of those questions seemed to come from principiants who are not well informed. Also the answers, though, most often lack any sound knowledge about the topic. You <strong>can</strong> run classification and regression on Arduino boards, even the less powerful ones: just don't use Neural networks. It's that simple.</p>
-<hr /><p><em>You can run classification and regression on Arduino boards, even the less powerful ones: just don&#039;t use Neural networks. It&#039;s that simple.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more%2F&#038;text=You%20can%20run%20classification%20and%20regression%20on%20Arduino%20boards%2C%20even%20the%20less%20powerful%20ones%3A%20just%20don%27t%20use%20Neural%20networks.%20It%27s%20that%20simple.&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>First of all I'd like to state one absolutely important thing:</p>
+<hr /><p><em>Artificial intelligence ≠ Machine learning ≠ Neural networks. This should be clear</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino%2F&#038;text=Artificial%20intelligence%20%E2%89%A0%20Machine%20learning%20%E2%89%A0%20Neural%20networks.%20This%20should%20be%20clear&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>I admit most of those questions seemed to come from principiants. Also the answers, though, most often lack any sound knowledge about the topic.</p>
+<hr /><p><em>You can run classification and regression on Arduino boards, even the less powerful ones: just don&#039;t use Neural networks. It&#039;s that simple.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino%2F&#038;text=You%20can%20run%20classification%20and%20regression%20on%20Arduino%20boards%2C%20even%20the%20less%20powerful%20ones%3A%20just%20don%27t%20use%20Neural%20networks.%20It%27s%20that%20simple.&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <h2>Introducing MicroML generator</h2>
-<p>Here comes my latest creation: <a href="https://github.com/eloquentarduino/micromlgen">MicroML</a> is a project to bring Machine learning algorithms to microcontrollers. It was born as an alternative to Tensorflow for Microcontrollers, which is solely dedicated to Artificial Neural Networks: here you will find leaner alternatives to neural networks to run inference <strong>even on 8-bit microcontrollers</strong>.<br />
-Quoting from the Tensoflow blog: <em>The core runtime fits in 16 KB on an Arm Cortex M3</em> (that's just the runtime, without any actual operator!). MicroML, on the other hand, lets you deploy models that fit in <strong>under 2 Kb of RAM</strong>.</p>
+<p>So I do you <em>actually</em> run machine learning on such constrained devices?</p>
+<p>Here you are: <a href="https://github.com/eloquentarduino/micromlgen">MicroML</a> is a project to bring Machine learning algorithms to microcontrollers. It was born as an alternative to Tensorflow for Microcontrollers, which is solely dedicated to Artificial Neural Networks: here you will find leaner alternatives to neural networks to run inference <strong>even on 8-bit microcontrollers</strong>.</p>
+<p>Quoting from the Tensoflow blog: <em>The core runtime fits in 16 KB on an Arm Cortex M3</em> (that's just the runtime, without any actual operator!). MicroML, on the other hand, lets you deploy models that fit in <strong>under 2 Kb of RAM</strong>.</p>
 <p>At the current state, it can convert <a href="https://en.wikipedia.org/wiki/Support-vector_machine">Support Vector Machines</a> to optimized C code you can deploy on any MCU of you choice: Arduino (Uno, Nano, Micro...), ESP8266, ESP32, Particle Photon, Sparkfun Edge, Adafruit Feather, you name it.</p>
 <p>Why Support Vector Machines? Because they're really good at classifying highly-dimensional features and are quite easy to optimize for RAM-constrained environments.</p>
 <h2>How to port a classifier</h2>
@@ -1075,7 +1082,7 @@ if __name__ == &#039;__main__&#039;:
 <li><a href="https://github.com/nok/sklearn-porter">sklearn-porter</a> can output C code (among the others), but it's not optimized for microcontrollers. You'll hit a wall on RAM because it needs to declare all the support vectors in memory (to have an idea, the <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html">breast cancer dataset</a> produces a 57x30 matrix of doubles, totalling 6840 bytes just for the support vectors).</li>
 <li>I found one once, but can't find it again </li>
 </ol>
-<p>My effort was to find an implementation that needed the least amount possible of memory: this was possible sacrificing the program space, but that's less often a problem because there's enough space. If you're model fills up the program space you can revert to <code>sklearn-porter</code> (if you have enough RAM, of course).</p>
+<p>My effort was to find an implementation that needed the least amount possible of memory: this was possible sacrificing the program space, but that's less often a problem since RAM is usually the most limiting factor. If your model fills up the program space you can revert to <code>sklearn-porter</code> (if you have enough RAM, of course).</p>
 <h2>Use in Arduino project</h2>
 <p>There are two methods you will need to call to run the predictions in your project:</p>
 <ol>
@@ -1089,8 +1096,8 @@ void classify() {
     Serial.println(classIdxToName(predict(features)));
 }</code></pre>
 <hr />
-<p>I'm starting a series of tutorials about hands-on projects to put Machine learning in use, so stay tuned!</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino-and-esp8266-and-esp32-and-many-more/">You can run Machine learning on Arduino. And ESP8266. And ESP32. And many more&#8230;</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>I'm starting a series of tutorials about hands-on projects to put Machine learning in use: you can follow the <strong>Related posts</strong> links to follow along, so keep reading!</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/">You can run Machine learning on Arduino. And any other MCU out there too!</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 	</channel>
