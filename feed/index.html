@@ -12,13 +12,13 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Tue, 17 Dec 2019 16:44:29 +0000</lastBuildDate>
+	<lastBuildDate>Thu, 19 Dec 2019 19:27:46 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
 	<sy:updateFrequency>
 	1	</sy:updateFrequency>
-	<generator>https://wordpress.org/?v=5.3.1</generator>
+	<generator>https://wordpress.org/?v=5.3.2</generator>
 	<item>
 		<title>Indoor positioning using Arduino and SVM Machine Learning</title>
 		<link>https://eloquentarduino.github.io/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/</link>
@@ -547,18 +547,19 @@ every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>Gesture Identification using Arduino and MicroML</title>
-		<link>https://eloquentarduino.github.io/2019/12/gesture-identification-using-arduino-and-microml/</link>
+		<title>How to do Gesture identification through machine learning on Arduino</title>
+		<link>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</link>
 				<pubDate>Sun, 01 Dec 2019 13:25:46 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=35</guid>
-				<description><![CDATA[<p>In this post we're going to replicate the tutorial found on the Tensorflow blog where an Arduino BLE 33 Nano Sense is used to classify IMU readings into gestures. We’re going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and 2 [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/gesture-identification-using-arduino-and-microml/">Gesture Identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+				<description><![CDATA[<p>In this Arduno Machine learning project we're going to use an accelerometer sensor to identify the gestures you play. This is a remake of the project found on the Tensorflow blog. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/">How to do Gesture identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p>In this post we're going to replicate the tutorial found on the <a href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html">Tensorflow blog </a>where an Arduino BLE 33 Nano Sense is used to classify IMU readings into gestures. We’re going to target a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and 2 kb of RAM. In this project the features are going to be 30 IMU accelerometer readings, taken starting from when a movement is detected. You can decide the use all the 6 axis from the IMU (accelerometer + gyroscope), or only 3 of them (either accelerometer or gyroscope): it will depend on the gestures you want to recognize and the amount of program space you have. Of course 3 dimesionsions will lead to a smaller model, at the cost of some loss in accuracy; do some tests and pick the one that best fits your needs. </p>
+								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to use an accelerometer sensor to identify the gestures you play.<br />
+This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html">Tensorflow blog</a>. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-35"></span></p>
 <p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
@@ -567,8 +568,13 @@ every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
  <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
  <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
 </ol>
-<h3>1. Record sample data</h3>
-<p>First of all, we need to read the raw data from the IMU. This piece of code will be different based on the specific chip you use. To keep things consistent, we'll wrap the IMU logic in 2 functions: <code>imu_setup</code> and <code>imu_read</code>. I'll report a couple of example implementations for the <code>MPU6050</code> and the <code>MPU9250</code>. You should save whichever code you use in a file called <code>imu.h</code>. </p>
+<h2>1. Features definition</h2>
+<p>We're going to use the accelerations along the 3 axis (X, Y, Z) coming from an <a href="https://en.wikipedia.org/wiki/Inertial_measurement_unit">IMU</a> to infer which gesture we're playing. We'll use a fixed number of recordings (<code>NUM_SAMPLES</code>) starting from the first detection of movement. </p>
+<p>This means our feature vectors are going to be of dimension <code>3 * NUM_SAMPLES</code>, which can become too large to fit in the memory of the Arduino Nano. We'll start with a low value for <code>NUM_SAMPLES</code> to keep it as leaner as possible: if your classifications suffer from poor accuracy, you can increase this number.</p>
+<h3>2. Record sample data</h3>
+<h4>2.1 Read the IMU sensor</h4>
+<p>First of all, we need to read the raw data from the IMU. This piece of code will be different based on the specific chip you use. To keep things consistent, we'll wrap the IMU logic in 2 functions: <code>imu_setup</code> and <code>imu_read</code>. </p>
+<p>I'll report a couple of example implementations for the <code>MPU6050</code> and the <code>MPU9250</code> (these are the chip I have at hand). You should save whichever code you use in a file called <code>imu.h</code>. </p>
 <pre><code class="language-cpp">#include &lt;Wire.h&gt;
 // library from https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050
 #include &lt;MPU6050.h&gt;
@@ -581,8 +587,8 @@ void imu_setup() {
     imu.initialize();
 }
 
-void imu_read(float *ax, float *ay, float *az, float *gx, float *gy, float *gz) {
-    imu.getMotion6(&amp;ax, &amp;ay, &amp;az, &amp;gx, &amp;gy, &amp;gz);
+void imu_read(float *ax, float *ay, float *az) {
+    imu.getMotion6(&amp;ax, &amp;ay, &amp;az);
 }</code></pre>
 <pre><code class="language-cpp">#include &lt;Wire.h&gt;
 // library from https://github.com/bolderflight/MPU9250
@@ -595,103 +601,276 @@ void imu_setup() {
     imu.begin();
 }
 
-void imu_read(float *ax, float *ay, float *az, float *gx, float *gy, float *gz) {
+void imu_read(float *ax, float *ay, float *az) {
     imu.readSensor();
 
     *ax = imu.getAccelX_mss();
     *ay = imu.getAccelY_mss();
     *az = imu.getAccelZ_mss();
-    *gx = imu.getGyroX_rads();
-    *gy = imu.getGyroY_rads();
-    *gz = imu.getGyroZ_rads();
 }</code></pre>
-<p>Now we need to check if motion is happening. To keep it simple, we'll use a naive approach that will look for an high value in the acceleration: if a threshold is exceeded, a gesture is starting. To determine the threshold, look at the raw acceleration data when in idle; then make a movement and determine a good value that will discriminate between the two. </p>
-<pre><code class="language-cpp">#include imu.h
+<p>In the main .ino file, paste the following.</p>
+<pre><code class="language-cpp">#include &quot;imu.h&quot;
 
-#define ACCEL_THRESHOLD 3
 #define NUM_SAMPLES 30
-#define csv(x) Serial.print(x); Serial.print(&#039;\t&#039;);
+#define NUM_AXES 3
+// sometimes you may get &quot;spikes&quot; in the readings
+// set a sensible value to truncate too large values
+#define TRUNCATE_AT 20
 
-// naive motion detection
-bool motionDetected() {
-  float ax, ay, az, gx, gy, gz;
+double features[NUM_SAMPLES * NUM_AXES];
 
-  imu_read(&amp;ax, &amp;ay, &amp;az, &amp;gx, &amp;gy, &amp;gz);
-
-  return abs(ax) + abs(ay) + abs(az) &gt; ACCEL_THRESHOLD);
-}</code></pre>
-<p>In the <code>loop</code> we'll check for motion: if no motion is happening, we don't take any action and keep watching. If motion is happening, we print the next 30 readings to Serial. </p>
-<pre><code class="language-cpp">void setup() {
-  Serial.begin(115200);
-
-  if (!imu_setup()) {
-    Serial.println(&quot;Cannot start IMU&quot;);
-    while (1) delay(10000);
-  };
+void setup() {
+    Serial.begin(115200);
+    imu_setup();
 }
 
 void loop() {
-  if (!motionDetected())
-    return delay(10);
+    float ax, ay, az;
 
-  record();
+    imu_read(&amp;ax, &amp;ay, &amp;az);
+
+    ax = constrain(ax, -TRUNCATE_AT, TRUNCATE_AT);
+    ay = constrain(ay, -TRUNCATE_AT, TRUNCATE_AT);
+    az = constrain(az, -TRUNCATE_AT, TRUNCATE_AT);
+
+    Serial.print(ax);
+    Serial.print(&#039;\t&#039;);
+    Serial.print(ay);
+    Serial.print(&#039;\t&#039;);
+    Serial.println(az);
+}</code></pre>
+<p>Open the Serial plotter and make some movement to have an idea of the range of your readings.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Raw-gestures.gif&quot;" alt="Raw IMU readings for the gestures identification project" /></p>
+<h4>2.2 Calibration</h4>
+<p>Don't know if it's just my case, but I'm getting <code>az</code> values of about -10 at rest (you can see this in the previous image). Since I'd like to have almost 0 at rest, I created a super simple calibration procedure to remove this fixed offset from the readings.</p>
+<p>If you're already getting all zeros, you can skip this part. Still, if you add it to your project it won't hurt.</p>
+<pre><code class="language-cpp">double baseline[NUM_AXES];
+double features[NUM_SAMPLES * NUM_AXES];
+
+void setup() {
+    Serial.begin(115200);
+    imu_setup();
+    calibrate();
 }
 
-void record() {
-  float ax, ay, az, gx, gy, gz;
+void loop() {
+    float ax, ay, az;
 
-  for (uint16_t i = 0; i &lt; NUM_SAMPLES; i++) {
-    imu_read(&amp;ax, &amp;ay, &amp;az, &amp;gx, &amp;gy, &amp;gz);
-    csv(ax);
-    csv(ay);
-    csv(az);
-    csv(gx);
-    csv(gy);
-    csv(gz);
-  }
+    imu_read(&amp;ax, &amp;ay, &amp;az);
 
-  Serial.println();
-  delay(2000);
+    ax = constrain(ax - baseline[0], -TRUNCATE, TRUNCATE);
+    ay = constrain(ay - baseline[1], -TRUNCATE, TRUNCATE);
+    az = constrain(az - baseline[2], -TRUNCATE, TRUNCATE);
+}
+
+void calibrate() {
+    float ax, ay, az;
+
+    for (int i = 0; i &lt; 10; i++) {
+        imu_read(&amp;ax, &amp;ay, &amp;az);
+        delay(100);
+    }
+
+    baseline[0] = ax;
+    baseline[1] = ay;
+    baseline[2] = az;
 }</code></pre>
-<p>Record 10-15 samples for each geasture and save them to a file, one for each gesture. If you did a good job, you should end with quite distinguible features, as show in the plot below.<br />
-<img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/gesture-identification-pca.svg" alt="2 components PCA for fruit colors" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif" alt="Calibrated IMU readings for the gestures identification project" /></p>
+<p>Much better.</p>
+<h4>2.3 Detect first motion</h4>
+<p>Now we need to check if motion is happening. To keep it simple, we'll use a naive approach that will look for an high value in the acceleration: if a threshold is exceeded, a gesture is starting. </p>
+<p>If you did the calibration step, a threshold of 5 should work well. If you didn't calibrate, you have to come up with a value that suits your needs.</p>
+<pre><code class="language-cpp">#include imu.h
+
+#define ACCEL_THRESHOLD 5
+
+void loop() {
+    float ax, ay, az;
+
+    imu_read(&amp;ax, &amp;ay, &amp;az);
+
+    ax = constrain(ax - baseline[0], -TRUNCATE, TRUNCATE);
+    ay = constrain(ay - baseline[1], -TRUNCATE, TRUNCATE);
+    az = constrain(az - baseline[2], -TRUNCATE, TRUNCATE);
+
+    if (!motionDetected(ax, ay, az)) {
+        delay(10);
+        return;
+    }
+}
+
+bool motionDetected(float ax, float ay, float az) {
+    return (abs(ax) + abs(ay) + abs(az)) &gt; ACCEL_THRESHOLD;
+}</code></pre>
+<h4>2.4 Record features</h4>
+<p>If no motion is happening, we don't take any action and keep watching. If motion is happening, we print the next <code>NUM_SAMPLES</code> readings to Serial. </p>
+<pre><code class="language-cpp">void loop() {
+    float ax, ay, az;
+
+    imu_read(&amp;ax, &amp;ay, &amp;az);
+
+    ax = constrain(ax - baseline[0], -TRUNCATE, TRUNCATE);
+    ay = constrain(ay - baseline[1], -TRUNCATE, TRUNCATE);
+    az = constrain(az - baseline[2], -TRUNCATE, TRUNCATE);
+
+    if (!motionDetected(ax, ay, az)) {
+        delay(10);
+        return;
+    }
+
+    recordIMU();
+    printFeatures();
+    delay(2000);
+}
+
+void recordIMU() {
+    float ax, ay, az;
+
+    for (int i = 0; i &lt; NUM_SAMPLES; i++) {
+        imu_read(&amp;ax, &amp;ay, &amp;az);
+
+        ax = constrain(ax - baseline[0], -TRUNCATE, TRUNCATE);
+        ay = constrain(ay - baseline[1], -TRUNCATE, TRUNCATE);
+        az = constrain(az - baseline[2], -TRUNCATE, TRUNCATE);
+
+        features[i * NUM_AXES + 0] = ax;
+        features[i * NUM_AXES + 1] = ay;
+        features[i * NUM_AXES + 2] = az;
+
+        delay(INTERVAL);
+    }
+}</code></pre>
+<pre><code class="language-cpp">
+void printFeatures() {
+    const uint16_t numFeatures = sizeof(features) / sizeof(double);
+    
+    for (int i = 0; i < numFeatures; i++) {
+        Serial.print(features[i]);
+        Serial.print(i == numFeatures - 1 ? '\n' : ',');
+    }
+}
+</code></pre>
+<p>Record 15-20 samples for each geasture and save them to a file, one for each gesture. Since we're dealing with highly dimensional data, you should collect as much samples as possible, to average out the noise.</p>
 <h3>2. Train and export the SVM classifier</h3>
 <p>Refere to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" title="Tutorial">tutorial</a></p>
+<p>In this project on Machine learning, differently from the previous and simpler ones, we're not achieving 100% accuracy easily. Motion is quite noise, so you should experiment with a few params for the classifier and choose the ones that perform best. I'll showcase a few examples:</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Linear-kernel.svg" alt="Decision boundaries of 2 PCA components of Gestures features, Linear kernel, 95% accuracy" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.svg" alt="Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel, 97% accuracy" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.01-gamma.svg" alt="Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.01 gamma, 95% accuracy" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.svg" alt="Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma, 99% accuracy" /></p>
+<h4>Select a suitable model</h4>
+<p>Now that we selected the best model, we have to export it to C code. Here comes the culprit: not all models will fit on your board.</p>
+<p>The core of SVM (Support Vector Machines) are support vectors: each trained classifier will be characterized by a certain number of them. The problem is: if there're too much, the generated code will be too large to fit in your flash.</p>
+<p>For this reason, instead of selecting <em>the best</em> model on accuracy, you should make a ranking, from the best performing to the worst. For each model, starting from the top, you should import it in your Arduino project and check its size: if it fits, fine, you're done. Otherwise you should pick the next and try again.</p>
+<p>It may seem a tedious process, but keep in mind that we're trying to infer a class from 90 features in 2 Kb of RAM and 32 Kb of flash: I think this is an acceptable tradeoff.</p>
+<hr /><p><em>We&#039;re fitting a model to infer a class from 90 features in 2 Kb of RAM and 32 Kb of flash!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-gesture-identification-on-arduino%2F&#038;text=We%27re%20fitting%20a%20model%20to%20infer%20a%20class%20from%2090%20features%20in%202%20Kb%20of%20RAM%20and%2032%20Kb%20of%20flash%21&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>I'll report a few figures for different combinations I tested.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Kernel</th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">Gamma</th>
+<th style="text-align: center;">Degree</th>
+<th style="text-align: center;">Vectors</th>
+<th style="text-align: center;">Flash size</th>
+<th style="text-align: center;">RAM (b)</th>
+<th style="text-align: center;">Avg accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RBF</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">0.001</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">37</td>
+<td style="text-align: center;">53 Kb</td>
+<td style="text-align: center;">1228</td>
+<td style="text-align: center;">99%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Poly</strong></td>
+<td style="text-align: center;"><strong>100</strong></td>
+<td style="text-align: center;"><strong>0.001</strong></td>
+<td style="text-align: center;"><strong>2</strong></td>
+<td style="text-align: center;"><strong>12</strong></td>
+<td style="text-align: center;"><strong>25 Kb</strong></td>
+<td style="text-align: center;"><strong>1228</strong></td>
+<td style="text-align: center;"><strong>99%</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">Poly</td>
+<td style="text-align: center;">100</td>
+<td style="text-align: center;">0.001</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">40 Kb</td>
+<td style="text-align: center;">1228</td>
+<td style="text-align: center;">97%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Linear</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: center;">55 Kb</td>
+<td style="text-align: center;">1228</td>
+<td style="text-align: center;">95%</td>
+</tr>
+<tr>
+<td style="text-align: left;">RBF</td>
+<td style="text-align: center;">100</td>
+<td style="text-align: center;">0.01</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">61</td>
+<td style="text-align: center;">80 Kb</td>
+<td style="text-align: center;">1228</td>
+<td style="text-align: center;">95%</td>
+</tr>
+</tbody>
+</table>
+<p>As you can see, we achieved a very high accuracy on the test set for all the classifiers: only one, though, fitted on the Arduino Nano. Of course, if you use a larger board, you can deploy the others too.</p>
+<p>As a side note, take a look at the <code>RAM</code> column: all the values are equal: this is because in the implementation is independant from the number of support vectors and only depends on the number of features.</p>
 <h3>3. Run the inference</h3>
-<p>Now to run the inference process we need to pack the 30 readings in an array and call <code>predict</code> from the generated <code>model.h</code>file. </p>
-<pre><code class="language-cpp">#include imu.h
-#include model.h
+<pre><code class="language-cpp">#include &quot;model.h&quot;
 
-// same as before...
 void loop() {
-  if (!motionDetected())
-    return delay(10);
+    float ax, ay, az;
 
-  classify();
+    imu_read(&amp;ax, &amp;ay, &amp;az);
+
+    ax = constrain(ax - baseline[0], -TRUNCATE, TRUNCATE);
+    ay = constrain(ay - baseline[1], -TRUNCATE, TRUNCATE);
+    az = constrain(az - baseline[2], -TRUNCATE, TRUNCATE);
+
+    if (!motionDetected(ax, ay, az)) {
+        delay(10);
+        return;
+    }
+
+    recordIMU();
+    classify();
+    delay(2000);
 }
 
 void classify() {
-  float ax, ay, az, gx, gy, gz;
-  float features[6 * NUM_SAMPLES] = { 0 };
-
-  for (uint16_t i = 0; i &lt; NUM_SAMPLES; i++) {
-    imu_read(&amp;ax, &amp;ay, &amp;az, &amp;gx, &amp;gy, &amp;gz);
-    features[i * 6 + 0] = ax;
-    features[i * 6 + 1] = ay;
-    features[i * 6 + 2] = az;
-    features[i * 6 + 3] = gx;
-    features[i * 6 + 4] = gy;
-    features[i * 6 + 5] = gz;
-}
-
-  Serial.print(Gesture detected );
-  Serial.println(classIdxToName(predict(features)));
-  delay(2000);
+    Serial.print(&quot;Detected gesture: &quot;);
+    Serial.println(classIdxToName(predict(features)));
 }</code></pre>
-<p>And that's it: gesture identification through machine learning on your Arduino board!</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/gesture-identification-using-arduino-and-microml/">Gesture Identification using Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>Here we are: it has been a long post, but now you can classify gestures with an Arduino Nano and 2 Kb of RAM. </p>
+<hr /><p><em>No fancy Neural Networks, no Tensorflow, no 32-bit ARM processors: plain old SVM on plain old 8 bits with 97% accuracy.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-gesture-identification-on-arduino%2F&#038;text=No%20fancy%20Neural%20Networks%2C%20no%20Tensorflow%2C%20no%2032-bit%20ARM%20processors%3A%20plain%20old%20SVM%20on%20plain%20old%208%20bits%20with%2097%25%20accuracy.&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>Here's a short demo of me playing 3 gestures and getting the results on the serial monitor.</p>
+<div style="width: 640px;" class="wp-video"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
+<video class="wp-video-shortcode" id="video-35-1" width="640" height="360" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4?_=1" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4</a></video></div>
+<p><h4>Project figures</h4>
+<p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 25310 bytes (82%) of program space and 1228 bytes (59%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>Can I run machine learning on Arduino?</em> is <strong>definetly YES</strong>.<br />
+<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p></p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/">How to do Gesture identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
-										</item>
+							<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4" length="1035484" type="video/mp4" />
+			</item>
 		<item>
 		<title>How to do Morse alphabet identification through machine learning on Arduino</title>
 		<link>https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/</link>
