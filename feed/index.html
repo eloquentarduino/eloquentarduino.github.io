@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Thu, 19 Dec 2019 19:27:46 +0000</lastBuildDate>
+	<lastBuildDate>Thu, 19 Dec 2019 19:42:56 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,167 +20,6 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.2</generator>
 	<item>
-		<title>Indoor positioning using Arduino and SVM Machine Learning</title>
-		<link>https://eloquentarduino.github.io/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/</link>
-				<pubDate>Sun, 08 Dec 2019 17:31:16 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[microml]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=224</guid>
-				<description><![CDATA[<p>In this post we'll locate ourself in space using nearby WiFi access points and machine learning. The task of detecting where you are when GPS or satellite localization is not an option is called indoor positioning: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/">Indoor positioning using Arduino and SVM Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p>In this post we'll locate ourself in space using nearby WiFi access points and machine learning. The task of detecting where you are when GPS or satellite localization is not an option is called <a href="https://en.wikipedia.org/wiki/Indoor_positioning_system">indoor positioning</a>: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely available, but the same project could be re-purposed to use Bluetooth, if there are enough devices in your location.<br />
-The inference will occur on a microcontroller thanks to the <a href="/2019/11/introducing-microml/" target="_blank">MicroML framework.</a> For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32.  </p>
-<p><span id="more-224"></span></p>
-<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
-<ol>
-  <li>define the features</li>
-  <li>record sample data: run a few scans for each location to be predicted and record the RSSI (signal strength) of each visible network</li>
- <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
- <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
-</ol>
-<h3>1. Record sample data</h3>
-<p><b>What features are we going to use to run the prediction?</b> We'll use the RSSI of all the known networks, both currently visible and not. If a network is out of range, it will have an RSSI equal to 0.<br />
-So, first of all we need to enumerate all the visble networks we will encounter during the inference process. This is because not all networks will be visible all the time but we have to work with a fixed number of features.<br />
-We take a &quot;reconnaissance tour&quot; of the locations we want to predict and log all the networks we detect. The sketch below will print the detected networks: take note of them since we'll need them later.</p>
-<pre><code class="language-cpp">#include &lt;WiFi.h&gt;
-
-void setup() {
-    Serial.begin(115200);
-    WiFi.mode(WIFI_STA);
-    WiFi.disconnect();
-}
-
-void loop() {
-  int numNetworks = WiFi.scanNetworks();
-
-  for (int i = 0; i &lt; numNetworks; i++) {
-      Serial.println(WiFi.SSID(i));
-
-  delay(3000);
-}</code></pre>
-<p>Now that we have a bunch of SSIDs, we need to assign to each SSID a fixed index, from 0 to MAX_NETWORKS. You can implement this part as you like, but in this demo I'll make use of a class I wrote called <code>Array</code> (you can see the <a href="https://github.com/agrimagsrl/EloquentArduino/blob/master/src/data_structures/Array.h">source code</a> and <a href="https://github.com/agrimagsrl/EloquentArduino/blob/master/examples/ArrayExample/ArrayExample.ino">example</a> on Github), which implements 2 useful functions: <code>push()</code> to add an element to the array and <code>indexOf()</code> to get the index of an element.</p>
-<p>The first step is to populate the array with all the networks we saved from the reconnaissance tour.</p>
-<pre><code class="language-cpp">#include &lt;eDataStructures.h&gt;
-
-#define MAX_NETWORKS 10
-
-using namespace Eloquent::DataStructures;
-
-double features[MAX_NETWORKS];
-Array&lt;String, MAX_NETWORKS&gt; knownNetworks(&quot;&quot;);
-
-void setup() {
-    Serial.begin(115200);
-    WiFi.mode(WIFI_STA);
-    WiFi.disconnect();
-
-    knownNetworks.push(&quot;Put your SSID #0&quot;);
-    knownNetworks.push(&quot;Put your SSID #1&quot;);
-    knownNetworks.push(&quot;Put your SSID #2&quot;);
-    knownNetworks.push(&quot;Put your SSID #3&quot;);
-    // and so on
-}</code></pre>
-<p>The second step is to convert the scan results into a features vector. Each feature will be the RSSI of the given SSID, in the exact order we populated the <code>knownNetworks</code> array. In practice:</p>
-<pre><code class="language-cpp">features[0] == RSSI of &quot;Put your SSID #0&quot;;
-features[1] == RSSI of &quot;Put your SSID #1&quot;;
-features[2] == RSSI of &quot;Put your SSID #2&quot;;
-features[3] == RSSI of &quot;Put your SSID #3&quot;;
-// and so on</code></pre>
-<p>The code below will do the job.</p>
-<pre><code class="language-cpp">void loop() {
-    scan();
-    printFeatures();
-    delay(3000);
-}
-
-void scan() {
-    int numNetworks = WiFi.scanNetworks();
-
-    resetFeatures();
-
-    // assign RSSIs to feature vector
-    for (int i = 0; i &lt; numNetworks; i++) {
-        String ssid = WiFi.SSID(i);
-        uint16_t networkIndex = knownNetworks.indexOf(ssid);
-
-        // only create feature if the current SSID is a known one
-        if (!isnan(networkIndex))
-            features[networkIndex] = WiFi.RSSI(i);
-    }
-}</code></pre>
-<pre><code class="language-cpp">
-void resetFeatures() {
-    const uint16_t numFeatures = sizeof(features) / sizeof(double);
-    
-    for (int i = 0; i < numFeatues; i++)
-        features[i] = 0;
-}
-
-void printFeatures() {
-    const uint16_t numFeatures = sizeof(features) / sizeof(double);
-    
-    for (int i = 0; i < numFeatures; i++) {
-        Serial.print(features[i]);
-        Serial.print(i == numFeatures - 1 ? '\n' : ',');
-    }
-}
-</code></pre>
-<p>Grab some recordings just staying in a location for a few seconds and save the serial output to a file; then move to the next location and repeat: 10-15 samples for each location will suffice.</p>
-<p>If you do a good job, you should end with distinguible features, as show in the plot below.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.svg" alt="Decision boundaries of 2 PCA components from Wifi indoor positioning features" /></p>
-<div class="watchout">
-RSSIs may be a little noisy, mostly on the boundaries where weak networks may appear and disappear with a very low RSSI: this was not a problem for me, but if you're getting bad results you may filter out those low values.</p>
-<pre><code class="language-cpp">
-// replace
-features[networkIndex] = WiFi.RSSI(i);
-
-// with
-#define MIN_RSSI -90 // adjust to your needs
-
-features[networkIndex] = WiFi.RSSI(i) > MIN_RSSI ? WiFi.RSSI(i) : 0;
-</code></pre>
-</div>
-<h3>3. Train and export the SVM classifier</h3>
-
-<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
-
-<p>
-<pre><code class="language-python">from sklearn.svm import SVC
-from micromlgen import port
-
-# put your samples in the dataset folder
-# one class per file
-# one feature vector per line, in CSV format
-features, classmap = load_features('dataset/')
-X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
-c_code = port(classifier, classmap=classmap)
-print(c_code)</code></pre>
-
-<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
-<h3>3. Run the inference</h3>
-<pre><code class="language-cpp">#include &quot;model.h&quot;
-
-void loop() {
-    scan();
-    classify();
-    delay(3000);
-}
-
-void classify() {
-    Serial.print(&quot;You are in &quot;);
-    Serial.println(classIdxToName(predict(features)));
-}</code></pre>
-<p>Move around your house/office/whatever and see your location printed on the serial monitor!</p>
-<hr />
-<p>View the project <a href="https://github.com/agrimagsrl/EloquentArduino/blob/master/examples/MicromlWifiIndoorPositioningExample/MicromlWifiIndoorPositioningExample.ino">on Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/indoor-positioning-using-arduino-and-svm-machine-learning/">Indoor positioning using Arduino and SVM Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
 		<title>Eloquent pin management: the Pin class</title>
 		<link>https://eloquentarduino.github.io/2019/12/arduino-pin-class/</link>
 				<pubDate>Fri, 06 Dec 2019 16:15:13 +0000</pubDate>
@@ -588,7 +427,9 @@ void imu_setup() {
 }
 
 void imu_read(float *ax, float *ay, float *az) {
-    imu.getMotion6(&amp;ax, &amp;ay, &amp;az);
+    float gx, gy, gz;
+
+    imu.getMotion6(&amp;ax, &amp;ay, &amp;az, &amp;gx, &amp;gy, &amp;gz);
 }</code></pre>
 <pre><code class="language-cpp">#include &lt;Wire.h&gt;
 // library from https://github.com/bolderflight/MPU9250
@@ -608,7 +449,7 @@ void imu_read(float *ax, float *ay, float *az) {
     *ay = imu.getAccelY_mss();
     *az = imu.getAccelZ_mss();
 }</code></pre>
-<p>In the main .ino file, paste the following.</p>
+<p>In the main .ino file, we dump the values to Serial monitor / plotter.</p>
 <pre><code class="language-cpp">#include &quot;imu.h&quot;
 
 #define NUM_SAMPLES 30
@@ -751,8 +592,24 @@ void printFeatures() {
 }
 </code></pre>
 <p>Record 15-20 samples for each geasture and save them to a file, one for each gesture. Since we're dealing with highly dimensional data, you should collect as much samples as possible, to average out the noise.</p>
-<h3>2. Train and export the SVM classifier</h3>
-<p>Refere to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" title="Tutorial">tutorial</a></p>
+<h3>3. Train and export the SVM classifier</h3>
+
+<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
+
+<p>
+<pre><code class="language-python">from sklearn.svm import SVC
+from micromlgen import port
+
+# put your samples in the dataset folder
+# one class per file
+# one feature vector per line, in CSV format
+features, classmap = load_features('dataset/')
+X, y = features[:, :-1], features[:, -1]
+classifier = SVC(kernel='linear').fit(X, y)
+c_code = port(classifier, classmap=classmap)
+print(c_code)</code></pre>
+
+<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
 <p>In this project on Machine learning, differently from the previous and simpler ones, we're not achieving 100% accuracy easily. Motion is quite noise, so you should experiment with a few params for the classifier and choose the ones that perform best. I'll showcase a few examples:</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Linear-kernel.svg" alt="Decision boundaries of 2 PCA components of Gestures features, Linear kernel, 95% accuracy" /></p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.svg" alt="Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel, 97% accuracy" /></p>
@@ -761,7 +618,7 @@ void printFeatures() {
 <h4>Select a suitable model</h4>
 <p>Now that we selected the best model, we have to export it to C code. Here comes the culprit: not all models will fit on your board.</p>
 <p>The core of SVM (Support Vector Machines) are support vectors: each trained classifier will be characterized by a certain number of them. The problem is: if there're too much, the generated code will be too large to fit in your flash.</p>
-<p>For this reason, instead of selecting <em>the best</em> model on accuracy, you should make a ranking, from the best performing to the worst. For each model, starting from the top, you should import it in your Arduino project and check its size: if it fits, fine, you're done. Otherwise you should pick the next and try again.</p>
+<p>For this reason, instead of selecting <em>the best</em> model on accuracy, you should make a ranking, from the best performing to the worst. For each model, starting from the top, you should import it in your Arduino project and try to compile: if it fits, fine, you're done. Otherwise you should pick the next and try again.</p>
 <p>It may seem a tedious process, but keep in mind that we're trying to infer a class from 90 features in 2 Kb of RAM and 32 Kb of flash: I think this is an acceptable tradeoff.</p>
 <hr /><p><em>We&#039;re fitting a model to infer a class from 90 features in 2 Kb of RAM and 32 Kb of flash!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-gesture-identification-on-arduino%2F&#038;text=We%27re%20fitting%20a%20model%20to%20infer%20a%20class%20from%2090%20features%20in%202%20Kb%20of%20RAM%20and%2032%20Kb%20of%20flash%21&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <p>I'll report a few figures for different combinations I tested.</p>
@@ -832,7 +689,7 @@ void printFeatures() {
 </tbody>
 </table>
 <p>As you can see, we achieved a very high accuracy on the test set for all the classifiers: only one, though, fitted on the Arduino Nano. Of course, if you use a larger board, you can deploy the others too.</p>
-<p>As a side note, take a look at the <code>RAM</code> column: all the values are equal: this is because in the implementation is independant from the number of support vectors and only depends on the number of features.</p>
+<div class="infobox">As a side note, take a look at the <code>RAM</code> column: all the values are equal: this is because in the implementation is independant from the number of support vectors and only depends on the number of features.</div>
 <h3>3. Run the inference</h3>
 <pre><code class="language-cpp">#include &quot;model.h&quot;
 
@@ -1358,6 +1215,76 @@ void classify() {
     Serial.println(classIdxToName(predict(features)));
 }</code></pre>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">This is how I create my Arduino Machine learning classifiers in 4 easy steps</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>You can run Machine learning on Arduino. And any other MCU out there too!</title>
+		<link>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/</link>
+				<pubDate>Sun, 10 Nov 2019 19:18:40 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[microml]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=76</guid>
+				<description><![CDATA[<p>A lot of forum threads ask about the possibility to run Machine learning on Arduino. The answers mostly follow in one of these 3 categories: Arduino is too resource-constrained to handle Machine learning Come up with a naive implementation of a Multi Layer Perceptron (recently) Sure! You can use Tensorflow Lite for Microcontrollers No single [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/">You can run Machine learning on Arduino. And any other MCU out there too!</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p><a href="https://www.quora.com/I-want-to-make-a-robot-with-an-Arduino-that-uses-basic-machine-learning-where-can-I-start">A</a> <a href="https://robotics.stackexchange.com/questions/568/is-it-possible-to-run-a-neural-network-on-a-microcontroller">lot</a> <a href="https://www.reddit.com/r/robotics/comments/bnmm75/arduino_for_machine_learning/">of</a> <a href="https://www.quora.com/How-do-I-use-machine-learning-with-Arduino">forum</a> <a href="https://forum.arduino.cc/index.php?topic=63981.0">threads</a> ask about the possibility to run Machine learning on Arduino.<br />
+The answers mostly follow in one of these 3 categories:</p>
+<ol>
+<li>Arduino is too resource-constrained to handle Machine learning</li>
+<li>Come up with a naive implementation of a <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">Multi Layer Perceptron</a></li>
+<li>(recently) Sure! You can use <a href="https://www.tensorflow.org/lite/microcontrollers">Tensorflow Lite for Microcontrollers</a></li>
+</ol>
+<p>No single answer I read talked about the other 100s alghoritms that fall under the Machine learning umbrella. <strong>No. Single. One.</strong> Let me explain what I think is wrong with this.</p>
+<p><span id="more-76"></span></p>
+<p>First of all I'd like to state one absolutely important thing:</p>
+<hr /><p><em>Artificial intelligence ≠ Machine learning ≠ Neural networks. This should be clear</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino%2F&#038;text=Artificial%20intelligence%20%E2%89%A0%20Machine%20learning%20%E2%89%A0%20Neural%20networks.%20This%20should%20be%20clear&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>I admit most of those questions seemed to come from principiants. Also the answers, though, most often lack any sound knowledge about the topic.</p>
+<hr /><p><em>You can run classification and regression on Arduino boards, even the less powerful ones: just don&#039;t use Neural networks. It&#039;s that simple.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino%2F&#038;text=You%20can%20run%20classification%20and%20regression%20on%20Arduino%20boards%2C%20even%20the%20less%20powerful%20ones%3A%20just%20don%27t%20use%20Neural%20networks.%20It%27s%20that%20simple.&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<h2>Introducing MicroML generator</h2>
+<p>So I do you <em>actually</em> run machine learning on such constrained devices?</p>
+<p>Here you are: <a href="https://github.com/eloquentarduino/micromlgen">MicroML</a> is a project to bring Machine learning algorithms to microcontrollers. It was born as an alternative to Tensorflow for Microcontrollers, which is solely dedicated to Artificial Neural Networks: here you will find leaner alternatives to neural networks to run inference <strong>even on 8-bit microcontrollers</strong>.</p>
+<p>Quoting from the Tensoflow blog: <em>The core runtime fits in 16 KB on an Arm Cortex M3</em> (that's just the runtime, without any actual operator!). MicroML, on the other hand, lets you deploy models that fit in <strong>under 2 Kb of RAM</strong>.</p>
+<p>At the current state, it can convert <a href="https://en.wikipedia.org/wiki/Support-vector_machine">Support Vector Machines</a> to optimized C code you can deploy on any MCU of you choice: Arduino (Uno, Nano, Micro...), ESP8266, ESP32, Particle Photon, Sparkfun Edge, Adafruit Feather, you name it.</p>
+<p>Why Support Vector Machines? Because they're really good at classifying highly-dimensional features and are quite easy to optimize for RAM-constrained environments.</p>
+<h2>How to port a classifier</h2>
+<p>First of all, you need to train a classifier. You have to use the Python's library <a href="https://scikit-learn.org/stable/">scikit-learn</a> — which you're probably already using considering its widespread adoption. Then you need to install the MicroML package.</p>
+<pre><code class="language-python">pip install micromlgen</code></pre>
+<p>Finally, you <code>port</code> your trained classifier to optimized C code.</p>
+<pre><code class="language-python">from micromlgen import port
+from sklearn.svm import SVC
+from sklearn.datasets import load_iris
+
+if __name__ == &#039;__main__&#039;:
+    iris = load_iris()
+    X = iris.data
+    y = iris.target
+    clf = SVC(kernel=&#039;linear&#039;).fit(X, y)
+    print(port(clf))</code></pre>
+<p>That's it: you now have all you need to do classification in your Arduino projects.</p>
+<h2>Existing alternatives</h2>
+<p>There exists some alternatives to this library, but they suffer from some limitations:</p>
+<ol>
+<li><a href="https://github.com/nok/sklearn-porter">sklearn-porter</a> can output C code (among the others), but it's not optimized for microcontrollers. You'll hit a wall on RAM because it needs to declare all the support vectors in memory (to have an idea, the <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html">breast cancer dataset</a> produces a 57x30 matrix of doubles, totalling 6840 bytes just for the support vectors).</li>
+<li>I found one once, but can't find it again </li>
+</ol>
+<p>My effort was to find an implementation that needed the least amount possible of memory: this was possible sacrificing the program space, but that's less often a problem since RAM is usually the most limiting factor. If your model fills up the program space you can revert to <code>sklearn-porter</code> (if you have enough RAM, of course).</p>
+<h2>Use in Arduino project</h2>
+<p>There are two methods you will need to call to run the predictions in your project:</p>
+<ol>
+<li><code>predict(double features[])</code>: it runs the actual prediction and returns a number representing the predicted class</li>
+<li><code>classIdxToName(uint8_t classIdx)</code>: converts the class index to a readable string, based on the classmap generated from your files</li>
+</ol>
+<pre><code class="language-cpp">#include &quot;model.h&quot;
+
+void classify() {
+    Serial.print(&quot;Predicted class: &quot;);
+    Serial.println(classIdxToName(predict(features)));
+}</code></pre>
+<hr />
+<p>I'm starting a series of tutorials about hands-on projects to put Machine learning in use: you can follow the <strong>Related posts</strong> links to follow along, so keep reading!</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/">You can run Machine learning on Arduino. And any other MCU out there too!</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 	</channel>
