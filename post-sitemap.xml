@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2019-12-19T20:42:56+01:00</lastmod>
+		<lastmod>2019-12-19T20:45:36+01:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/</loc>
@@ -37,14 +37,6 @@
 		<lastmod>2019-12-16T22:31:52+01:00</lastmod>
 	</url>
 	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/</loc>
-		<lastmod>2019-12-16T22:45:54+01:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components from Morse alphabet identification features]]></image:caption>
-		</image:image>
-	</url>
-	<url>
 		<loc>https://eloquentarduino.github.io/2019/11/how-to-write-clean-arduino-code-introducing-the-eloquent-library/</loc>
 		<lastmod>2019-12-16T22:53:12+01:00</lastmod>
 	</url>
@@ -70,7 +62,7 @@
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</loc>
-		<lastmod>2019-12-19T20:42:56+01:00</lastmod>
+		<lastmod>2019-12-19T20:44:55+01:00</lastmod>
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif</image:loc>
 			<image:caption><![CDATA[Calibrated IMU readings for the gestures identification project]]></image:caption>
@@ -90,6 +82,14 @@
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.svg</image:loc>
 			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma, 99% accuracy]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/</loc>
+		<lastmod>2019-12-19T20:45:36+01:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components from Morse alphabet identification features]]></image:caption>
 		</image:image>
 	</url>
 </urlset>

@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Thu, 19 Dec 2019 19:42:56 +0000</lastBuildDate>
+	<lastBuildDate>Thu, 19 Dec 2019 19:45:36 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,375 +20,9 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.2</generator>
 	<item>
-		<title>Eloquent pin management: the Pin class</title>
-		<link>https://eloquentarduino.github.io/2019/12/arduino-pin-class/</link>
-				<pubDate>Fri, 06 Dec 2019 16:15:13 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Eloquent library]]></category>
-		<category><![CDATA[eloquent]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=167</guid>
-				<description><![CDATA[<p>Pin is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like digitalWrite(led, HIGH) and start writing led.turnOn() instead. Pin is actually an abstract class, so you won't use it directly, but through its specialized implementations: DigitalIn DigitalOut AnalogIn AnalogOut Import the library [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-pin-class/">Eloquent pin management: the Pin class</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p><code>Pin</code> is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like <code>digitalWrite(led, HIGH)</code> and start writing <code>led.turnOn()</code> instead. </p>
-<p><span id="more-167"></span></p>
-<p><code>Pin</code> is actually an abstract class, so you won't use it directly, but through its specialized implementations:</p>
-<ol>
-<li>DigitalIn</li>
-<li>DigitalOut</li>
-<li>AnalogIn</li>
-<li>AnalogOut</li>
-</ol>
-<h2>Import the library</h2>
-<div class="watchout">To follow this tutorial along you need to first <a href="/2019/12/how-to-install-the-eloquent-library/" target="_blank">install the Eloquent library</a></div>
-<pre><code class="language-cpp">#import &lt;eIO.h&gt;
-
-using namespace Eloquent::Pin;</code></pre>
-<p>If the namespace stuff is new to you, here I'll briefly say that it is used to avoid name collisions among different libraries. This seems to be an alien topic in the Arduino world and I can't really explain why.</p>
-<p>99% of the libraries out there deal with this problem in one of two modes:</p>
-<ol>
-<li>ignoring it altogether, so you have an <code>MPU6050.h</code> library, which elects itself as the only one implementation possible to access the MPU6050 accelerometer in the world</li>
-<li>prefixing each library file, so you get the <code>Adafruit_Si7021</code> class</li>
-</ol>
-<hr /><p><em>The case for Adafruit_Si7021 should not exist in my opinion: use the damn namespaces!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Farduino-pin-class%2F&#038;text=The%20case%20for%20Adafruit_Si7021%20should%20not%20exist%20in%20my%20opinion%3A%20use%20the%20damn%20namespaces%21&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>With namespaces, it would become:</p>
-<pre><code class="language-cpp">using namespace Adafruit;
-
-Si7021 si;</code></pre>
-<h2>How to use</h2>
-<p>First of all, all the 4 implementations accept a single constructor argument: the pin number.</p>
-<pre><code class="language-cpp"> DigitalOut led(BUILTIN_LED);
- DigitalIn pushButton(10);
- AnalogIn potentiometer(A0);
- AnalogOut pwmLed(8);</code></pre>
-<p>Then it is good practice to init your pins in the setup.</p>
-<pre><code class="language-cpp"> void setup() {
-    led.begin();
-    pushButton.begin();
-    potentiometer.begin();
-    pwmLed.begin();
- }</code></pre>
-<p>All the 4 classes let you ask for the pin current value via the <code>value()</code> method:</p>
-<pre><code class="language-cpp"> void test() {
-    // DigitalIn returns the last read value, as 0/1
-    digitalIn.value();
-
-    // AnalogIn returns the last read value, in the range [0, 1024]
-    analogIn.value();
-
-    // DigitalOut returns the last written value, as 0/1
-    digitalOut.value();
-
-    // AnaloglOut returns the last written value, in the range [0, 255]
-    analogOut.value();
- }</code></pre>
-<p>At this point each class will provide its specialized methods.</p>
-<h4>DigitalIn</h4>
-<pre><code class="language-cpp">void test() {
-    // configure pin as INPUT_PULLUP
-    pin.pullup();
-
-    // configure pin as Active Low 
-    // that is, pin is ON when digitalRead() is LOW
-    pin.activeLow();
-
-    // read and update pin value
-    pin.read();
-
-    // test if pin is on (doesn&#039;t read the pin)
-    pin.isOn();
-
-    // test if pin is off (doesn&#039;t read the pin)
-    pin.isOff();
-
-    // test if pin value changed from last reading
-    pin.changed();
-}</code></pre>
-<h4>DigitalOut</h4>
-<pre><code class="language-cpp">void test() {
-    // set pin as Active Low
-    // that is, turnOn writes LOW
-    pin.activeLow();
-
-    // turn pin on
-    pin.turnOn();
-
-    // turn pin off
-    pin.turnOff();
-
-    // toggle
-    pin.toggle();
-
-    // blink N times at intervals of X milliseconds
-    pin.blink(N, X);
-}</code></pre>
-<h4>AnalogIn</h4>
-<pre><code class="language-cpp">void test() {
-    // read current pin value
-    pin.read();
-
-    // get pin previous value
-    pin.prev();
-
-    // get difference between current value and previous
-    pin.delta();
-
-    // get absolute value of delta()
-    pin.absDelta();
-}</code></pre>
-<h4>AnalogOut</h4>
-<pre><code class="language-cpp">void test() {
-    // write value X to pin
-    pin.write(X);
-}</code></pre>
-<hr />
-<p>If you don't believe a whole class is worthwhile to work with pins, I'll show a few use cases to illustrate my point.</p>
-<h4>Use case #1: active low LED</h4>
-<p>The ESP8266 has a builtin LED you can control, but it is an <em>active low</em> one: it will turn on when you write <code>LOW</code>. In this case, <code>digitalWrite(BUILTIN_LED, LOW)</code> can be misleading regarding your actual intentions. </p>
-<p>It doesn't look intuitive,  it doesn't look <em>eloquent</em>! <code>builtinLed.turnOn()</code> does, however. All you need to get it working correctly is calling <code>builtinLed.activeLow()</code> once in your setup.</p>
-<pre><code class="language-cpp">// BEFORE
-void loop() {
-    // to turn the builtin LED on
-    digitalWrite(led, LOW);
-}</code></pre>
-<pre><code class="language-cpp">// AFTER
-DigitalOut buildtinLed;
-
-void setup() {
-    builtinLed.activeLow();
-}
-
-void loop() {
-    // to turn the builtin LED on
-    builtinLed.turnOn();
-}</code></pre>
-<h4>Use case #2: toggle</h4>
-<p>If you need to toggle the current state of a digital output, you need an helper variable to keep track of the state and remember to <strong>always</strong> update that variable when you write to the output.<br />
-With a class, the state is tightly bound to the instance, so you have a <a href="https://en.wikipedia.org/wiki/Single_source_of_truth">single source of truth</a>: <code>turnOn()</code>, <code>turnOff()</code> and <code>toggle()</code> will take care of updating the inner state accordingly.</p>
-<pre><code class="language-cpp">// BEFORE
-#define LED 1
-
-bool ledState = true;
-
-loop() {
-    digitalWrite(LED, ledState);
-    ledState = !ledState
-}</code></pre>
-<pre><code class="language-cpp">// AFTER
-DigitalOut led(1);
-
-void loop() {
-    led.toggle();
-}</code></pre>
-<h4>Use case #3: analog delta</h4>
-<p>What if you have an analog input and want to know if its valued changed by at least X from your latest reading? You would need an helper variable again. </p>
-<p>Now imagine if you have 5 analog inputs you want to track: you'll end up with 10 variables and of course you have again to <strong>always</strong> keep both in sync.<br />
-<code>AnalogIn</code> conveniently provides <code>delta()</code> and <code>absDelta()</code> methods that give you the change from the previous reading and will always be in sync. Awesome!</p>
-<pre><code class="language-cpp">// BEFORE
-#define INPUT1 A1
-#define INPUT2 A2
-
-uint16_t current1, prev1;
-uint16_t current2, prev2;
-
-void loop() {
-    prev1 = current1;
-    current1 = analogRead(INPUT1);
-    prev2 = current2;
-    current2 = analogRead(INPUT2);
-
-    if (abs(current1 - prev1) &gt; THRESHOLD)
-        ...</code></pre>
-<pre><code class="language-cpp">// AFTER
-AnalogIn input1(A1), input2(A2);
-
-void loop() {
-    input1.read();
-    input2.read();
-
-    if (input1.absDelta() &gt; THRESHOLD)
-        ...
-}</code></pre>
-<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-pin-class/">Eloquent pin management: the Pin class</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
-		<title>Eloquent bounded waiting: the await construct</title>
-		<link>https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/</link>
-				<pubDate>Thu, 05 Dec 2019 18:50:59 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Eloquent library]]></category>
-		<category><![CDATA[eloquent]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=211</guid>
-				<description><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The await construct lets you put an upper bound to the time you're willing [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/">Eloquent bounded waiting: the await construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The <code>await</code> construct lets you put an upper bound to the time you're willing to wait.</p>
-<p><span id="more-211"></span></p>
-<p>Most often, you see example code of this kind:</p>
-<pre><code class="language-cpp">Serial.print(&quot;Attempting to connect to WiFi&quot;);
-
-while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(&quot;.&quot;);
-    delay(500);
-}</code></pre>
-<p>If the connection doesn't succeed (maybe the AP is out of range or is down), you're stuck in an endless wait. A proper way for handling such situations is with a timeout that gets you out of the loop with an error status so you can handle the failure.<br />
-<code>await</code> is exactly this: a construct to await for a condition to become true until a timeout expires, returning true or false as a response.</p>
-<h3>Definition</h3>
-<pre><code class="language-cpp">#define await(condition, timeout) await_with_interval(condition, timeout, 10)
-#define await_with_interval(condition, timeout, interval) \
-  ([]() { \
-    uint32_t start = millis(); \
-    while (millis() - start &lt;= timeout) { \
-      if (condition) return true; \
-      delay(interval); \
-    } \
-  return false; })()</code></pre>
-<h3>How to use</h3>
-<p><code>await</code> needs at least two arguments:</p>
-<ol>
-<li>the condition to await for</li>
-<li>the timeout, in milliseconds</li>
-</ol>
-<pre><code>// these are for greater code readability
-#define Millis 
-#define Second  *1000
-#define Seconds *1000
-</code></pre>
-<pre><code class="language-cpp">bool wifiConnected = await(WiFi.status() == WL_CONNECTED, 10 Seconds)</code></pre>
-<p>The code above will wait 10 seconds for the wifi to connect: on failure, <code>wifiConnected</code> will be false and you can gently fail. </p>
-<p>You can use it for any kind of check, like waiting for <code>Serial</code>.</p>
-<pre><code class="language-cpp">bool serialReady = await(Serial, 5 Seconds)
-bool serialHasCharacters = await(Serial.available(), 5 Seconds)</code></pre>
-<p>The default interval between checks is 10 milliseconds: if you need a custom delay interval you can use the more verbose <code>await_with_interval</code>:</p>
-<pre><code class="language-cpp">// await WiFi for 10 seconds, check if connected every 500 millis
-bool wifiConnected = await_with_interval(WiFi.status() == WL_CONNECTED, 10 Seconds, 500 Millis)</code></pre>
-<h3>How it works</h3>
-<p>The <code>await</code> macro creates an <a href="http://www.cplusplus.com/articles/2LywvCM9/">inline function</a> that loops until the timeout expires. At every loop it checks if the condition is true: if that's the case, it returns true. The inline function construct is needed to get a return value, so you can assign it to a variable or embed directly inside an <code>if</code> test. The following code sample gives you an idea of what's happening.</p>
-<pre><code class="language-cpp">bool wifiConnected = await(WiFi.status() == WL_CONNECTED, 10 Seconds)
-
-// conceptually translates to
-
-bool inline_function() {
-    uint32_t start = millis();
-
-    while (millis() - start &lt;= 10000) {
-      if (WiFi.status() == WL_CONNECTED)
-        return true;
-
-      delay(10);
-    }
-
-   return false;
-}
-
-bool wifiConnected = inline_function();</code></pre>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/">Eloquent bounded waiting: the await construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
-		<title>Eloquent non-blocking code: the Every construct</title>
-		<link>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</link>
-				<pubDate>Thu, 05 Dec 2019 18:42:45 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Eloquent library]]></category>
-		<category><![CDATA[eloquent]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=209</guid>
-				<description><![CDATA[<p>The every construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically. [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/">Eloquent non-blocking code: the Every construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p>The <code>every</code> construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically.</p>
-<p><span id="more-209"></span></p>
-<h3>Definition</h3>
-<pre><code class="language-cpp">#define every(interval) \
-    static uint32_t __every__##interval = millis(); \
-    if (millis() - __every__##interval &gt;= interval &amp;&amp; (__every__##interval = millis()))</code></pre>
-<h3>How to use</h3>
-<pre><code>// these are for greater code readability
-#define Millis 
-#define Second  *1000
-#define Seconds *1000
-</code></pre>
-<pre><code class="language-cpp">int interval = 1 Second;
-
-void setup() {
-    Serial.begin(115200);
-}
-
-void loop() {
-    every(1000 Millis) {
-        Serial.println(&quot;This line is printed every 1 second&quot;);
-    }
-
-    every(2000 Millis) {
-        Serial.println(&quot;This line is printed every 2 seconds&quot;);
-    }
-
-    every(interval) {
-        interval += 1 Second;
-        Serial.print(&quot;You can have variable intervals too! &quot;);
-        Serial.print(&quot;This line will be printed again in &quot;);
-        Serial.print(interval / 1000);
-        Serial.println(&quot; seconds&quot;);
-    }
-}</code></pre>
-<h3>Caveats</h3>
-<p><code>every</code> is just a macro definition and is not a proper timer, so it has some limitations:</p>
-<ol>
-<li>you can't stop, pause or resume it: once set, it will run forever</li>
-<li>its argument must be the suffix of a valid identifier</li>
-<li>you can't use several <code>every</code> with the exact same argument: you have to put all the code that needs to happen at the same interval in the same block</li>
-</ol>
-<h4>Caveat #2</h4>
-<p>The macro works by generating a variable named like <code>__every__##argument</code></p>
-<pre><code class="language-cpp">every(1) ==&gt; uint32_t __every__1;
-every(2) ==&gt; uint32_t __every__2;
-every(a_given_interval) ==&gt; uint32_t __every__a_given_interval;
-every(an invalid interval) ==&gt; uint32_t __every__an invalid interval; // Syntax error
-every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
-<p>So every integer literal and any variable are all valid arguments. Any expression is forbidden.</p>
-<h4>Caveat #3</h4>
-<p>If you use two <code>every</code> with the exact same argument, two variables with the exact same name will be created and it will rise a compile-time error.</p>
-<p>If you can live with this limitations, <code>every</code> only needs the space of an <code>uint32_t</code> to work.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/">Eloquent non-blocking code: the Every construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
-		<title>How to install the Eloquent library</title>
-		<link>https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/</link>
-				<pubDate>Thu, 05 Dec 2019 16:18:48 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Eloquent library]]></category>
-		<category><![CDATA[eloq]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=554</guid>
-				<description><![CDATA[<p>In this short tutorial I'll show you how you can install the Eloquent library to take advange of all the good things it provides to you. It really is super simple, since the Eloquent library is no different from any other library you already installed on your computer, but I'll repeat the steps for clarity. [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/">How to install the Eloquent library</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p>In this short tutorial I'll show you how you can install the <a href="/2019/11/how-to-write-clean-arduino-code-introducing-the-eloquent-library/">Eloquent library</a> to take advange of all the good things it provides to you.</p>
-<p>It really is super simple, since the Eloquent library is no different from any other library you already installed on your computer, but I'll repeat the steps for clarity.</p>
-<p><span id="more-554"></span></p>
-<h2>1. Download the zip from Github</h2>
-<p>The whole library is hosted on Github, so head over to <a href="https://github.com/eloquentarduino/EloquentArduino">the repo</a> and click <em>Clone or download</em> &gt; <em>Download ZIP</em>.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Repo.png" alt="Download zip from Github repository" /></p>
-<h2>2. Extract the zip to you library directory</h2>
-<p>Once downloaded, you should extract the zip into your Arduino libraries folder. The path will vary based on your OS and installation, but I expect you to know where it is.</p>
-<h2>3. Strip the -master suffix</h2>
-<p>When downloaded from Github, your zip and your folder will be named <code>EloquentArduino-master</code>: rename the folder to just <code>EloquentArduino</code>, without the master suffix.</p>
-<h2>4. Done</h2>
-<p>If you follwed the steps correctly, the library is ready to be used.</p>
-<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/">How to install the Eloquent library</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
 		<title>How to do Gesture identification through machine learning on Arduino</title>
 		<link>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</link>
-				<pubDate>Sun, 01 Dec 2019 13:25:46 +0000</pubDate>
+				<pubDate>Thu, 19 Dec 2019 13:25:46 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
@@ -729,9 +363,204 @@ void classify() {
 							<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4" length="1035484" type="video/mp4" />
 			</item>
 		<item>
+		<title>Eloquent pin management: the Pin class</title>
+		<link>https://eloquentarduino.github.io/2019/12/arduino-pin-class/</link>
+				<pubDate>Fri, 06 Dec 2019 16:15:13 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Eloquent library]]></category>
+		<category><![CDATA[eloquent]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=167</guid>
+				<description><![CDATA[<p>Pin is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like digitalWrite(led, HIGH) and start writing led.turnOn() instead. Pin is actually an abstract class, so you won't use it directly, but through its specialized implementations: DigitalIn DigitalOut AnalogIn AnalogOut Import the library [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-pin-class/">Eloquent pin management: the Pin class</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p><code>Pin</code> is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like <code>digitalWrite(led, HIGH)</code> and start writing <code>led.turnOn()</code> instead. </p>
+<p><span id="more-167"></span></p>
+<p><code>Pin</code> is actually an abstract class, so you won't use it directly, but through its specialized implementations:</p>
+<ol>
+<li>DigitalIn</li>
+<li>DigitalOut</li>
+<li>AnalogIn</li>
+<li>AnalogOut</li>
+</ol>
+<h2>Import the library</h2>
+<div class="watchout">To follow this tutorial along you need to first <a href="/2019/12/how-to-install-the-eloquent-library/" target="_blank">install the Eloquent library</a></div>
+<pre><code class="language-cpp">#import &lt;eIO.h&gt;
+
+using namespace Eloquent::Pin;</code></pre>
+<p>If the namespace stuff is new to you, here I'll briefly say that it is used to avoid name collisions among different libraries. This seems to be an alien topic in the Arduino world and I can't really explain why.</p>
+<p>99% of the libraries out there deal with this problem in one of two modes:</p>
+<ol>
+<li>ignoring it altogether, so you have an <code>MPU6050.h</code> library, which elects itself as the only one implementation possible to access the MPU6050 accelerometer in the world</li>
+<li>prefixing each library file, so you get the <code>Adafruit_Si7021</code> class</li>
+</ol>
+<hr /><p><em>The case for Adafruit_Si7021 should not exist in my opinion: use the damn namespaces!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Farduino-pin-class%2F&#038;text=The%20case%20for%20Adafruit_Si7021%20should%20not%20exist%20in%20my%20opinion%3A%20use%20the%20damn%20namespaces%21&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>With namespaces, it would become:</p>
+<pre><code class="language-cpp">using namespace Adafruit;
+
+Si7021 si;</code></pre>
+<h2>How to use</h2>
+<p>First of all, all the 4 implementations accept a single constructor argument: the pin number.</p>
+<pre><code class="language-cpp"> DigitalOut led(BUILTIN_LED);
+ DigitalIn pushButton(10);
+ AnalogIn potentiometer(A0);
+ AnalogOut pwmLed(8);</code></pre>
+<p>Then it is good practice to init your pins in the setup.</p>
+<pre><code class="language-cpp"> void setup() {
+    led.begin();
+    pushButton.begin();
+    potentiometer.begin();
+    pwmLed.begin();
+ }</code></pre>
+<p>All the 4 classes let you ask for the pin current value via the <code>value()</code> method:</p>
+<pre><code class="language-cpp"> void test() {
+    // DigitalIn returns the last read value, as 0/1
+    digitalIn.value();
+
+    // AnalogIn returns the last read value, in the range [0, 1024]
+    analogIn.value();
+
+    // DigitalOut returns the last written value, as 0/1
+    digitalOut.value();
+
+    // AnaloglOut returns the last written value, in the range [0, 255]
+    analogOut.value();
+ }</code></pre>
+<p>At this point each class will provide its specialized methods.</p>
+<h4>DigitalIn</h4>
+<pre><code class="language-cpp">void test() {
+    // configure pin as INPUT_PULLUP
+    pin.pullup();
+
+    // configure pin as Active Low 
+    // that is, pin is ON when digitalRead() is LOW
+    pin.activeLow();
+
+    // read and update pin value
+    pin.read();
+
+    // test if pin is on (doesn&#039;t read the pin)
+    pin.isOn();
+
+    // test if pin is off (doesn&#039;t read the pin)
+    pin.isOff();
+
+    // test if pin value changed from last reading
+    pin.changed();
+}</code></pre>
+<h4>DigitalOut</h4>
+<pre><code class="language-cpp">void test() {
+    // set pin as Active Low
+    // that is, turnOn writes LOW
+    pin.activeLow();
+
+    // turn pin on
+    pin.turnOn();
+
+    // turn pin off
+    pin.turnOff();
+
+    // toggle
+    pin.toggle();
+
+    // blink N times at intervals of X milliseconds
+    pin.blink(N, X);
+}</code></pre>
+<h4>AnalogIn</h4>
+<pre><code class="language-cpp">void test() {
+    // read current pin value
+    pin.read();
+
+    // get pin previous value
+    pin.prev();
+
+    // get difference between current value and previous
+    pin.delta();
+
+    // get absolute value of delta()
+    pin.absDelta();
+}</code></pre>
+<h4>AnalogOut</h4>
+<pre><code class="language-cpp">void test() {
+    // write value X to pin
+    pin.write(X);
+}</code></pre>
+<hr />
+<p>If you don't believe a whole class is worthwhile to work with pins, I'll show a few use cases to illustrate my point.</p>
+<h4>Use case #1: active low LED</h4>
+<p>The ESP8266 has a builtin LED you can control, but it is an <em>active low</em> one: it will turn on when you write <code>LOW</code>. In this case, <code>digitalWrite(BUILTIN_LED, LOW)</code> can be misleading regarding your actual intentions. </p>
+<p>It doesn't look intuitive,  it doesn't look <em>eloquent</em>! <code>builtinLed.turnOn()</code> does, however. All you need to get it working correctly is calling <code>builtinLed.activeLow()</code> once in your setup.</p>
+<pre><code class="language-cpp">// BEFORE
+void loop() {
+    // to turn the builtin LED on
+    digitalWrite(led, LOW);
+}</code></pre>
+<pre><code class="language-cpp">// AFTER
+DigitalOut buildtinLed;
+
+void setup() {
+    builtinLed.activeLow();
+}
+
+void loop() {
+    // to turn the builtin LED on
+    builtinLed.turnOn();
+}</code></pre>
+<h4>Use case #2: toggle</h4>
+<p>If you need to toggle the current state of a digital output, you need an helper variable to keep track of the state and remember to <strong>always</strong> update that variable when you write to the output.<br />
+With a class, the state is tightly bound to the instance, so you have a <a href="https://en.wikipedia.org/wiki/Single_source_of_truth">single source of truth</a>: <code>turnOn()</code>, <code>turnOff()</code> and <code>toggle()</code> will take care of updating the inner state accordingly.</p>
+<pre><code class="language-cpp">// BEFORE
+#define LED 1
+
+bool ledState = true;
+
+loop() {
+    digitalWrite(LED, ledState);
+    ledState = !ledState
+}</code></pre>
+<pre><code class="language-cpp">// AFTER
+DigitalOut led(1);
+
+void loop() {
+    led.toggle();
+}</code></pre>
+<h4>Use case #3: analog delta</h4>
+<p>What if you have an analog input and want to know if its valued changed by at least X from your latest reading? You would need an helper variable again. </p>
+<p>Now imagine if you have 5 analog inputs you want to track: you'll end up with 10 variables and of course you have again to <strong>always</strong> keep both in sync.<br />
+<code>AnalogIn</code> conveniently provides <code>delta()</code> and <code>absDelta()</code> methods that give you the change from the previous reading and will always be in sync. Awesome!</p>
+<pre><code class="language-cpp">// BEFORE
+#define INPUT1 A1
+#define INPUT2 A2
+
+uint16_t current1, prev1;
+uint16_t current2, prev2;
+
+void loop() {
+    prev1 = current1;
+    current1 = analogRead(INPUT1);
+    prev2 = current2;
+    current2 = analogRead(INPUT2);
+
+    if (abs(current1 - prev1) &gt; THRESHOLD)
+        ...</code></pre>
+<pre><code class="language-cpp">// AFTER
+AnalogIn input1(A1), input2(A2);
+
+void loop() {
+    input1.read();
+    input2.read();
+
+    if (input1.absDelta() &gt; THRESHOLD)
+        ...
+}</code></pre>
+<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-pin-class/">Eloquent pin management: the Pin class</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
 		<title>How to do Morse alphabet identification through machine learning on Arduino</title>
 		<link>https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/</link>
-				<pubDate>Sun, 01 Dec 2019 12:07:38 +0000</pubDate>
+				<pubDate>Fri, 06 Dec 2019 12:07:38 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[microml]]></category>
@@ -888,6 +717,177 @@ void loop() {
 <hr />
 <p>View the project on <a href="https://github.com/eloquentarduino/EloquentArduino/tree/master/examples/MicromlMorseIdentificationExample/MicromlMorseIdentificationExample.ino">Github</a></p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/">How to do Morse alphabet identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Eloquent bounded waiting: the await construct</title>
+		<link>https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/</link>
+				<pubDate>Thu, 05 Dec 2019 18:50:59 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Eloquent library]]></category>
+		<category><![CDATA[eloquent]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=211</guid>
+				<description><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The await construct lets you put an upper bound to the time you're willing [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/">Eloquent bounded waiting: the await construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>Sometimes you may need to wait for a certain condition to become true, but you don't want to wait forever: it may be awaiting for Serial, for the Wifi to connect to a network, or the response from a SoftwareSerial peripheral. The <code>await</code> construct lets you put an upper bound to the time you're willing to wait.</p>
+<p><span id="more-211"></span></p>
+<p>Most often, you see example code of this kind:</p>
+<pre><code class="language-cpp">Serial.print(&quot;Attempting to connect to WiFi&quot;);
+
+while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(&quot;.&quot;);
+    delay(500);
+}</code></pre>
+<p>If the connection doesn't succeed (maybe the AP is out of range or is down), you're stuck in an endless wait. A proper way for handling such situations is with a timeout that gets you out of the loop with an error status so you can handle the failure.<br />
+<code>await</code> is exactly this: a construct to await for a condition to become true until a timeout expires, returning true or false as a response.</p>
+<h3>Definition</h3>
+<pre><code class="language-cpp">#define await(condition, timeout) await_with_interval(condition, timeout, 10)
+#define await_with_interval(condition, timeout, interval) \
+  ([]() { \
+    uint32_t start = millis(); \
+    while (millis() - start &lt;= timeout) { \
+      if (condition) return true; \
+      delay(interval); \
+    } \
+  return false; })()</code></pre>
+<h3>How to use</h3>
+<p><code>await</code> needs at least two arguments:</p>
+<ol>
+<li>the condition to await for</li>
+<li>the timeout, in milliseconds</li>
+</ol>
+<pre><code>// these are for greater code readability
+#define Millis 
+#define Second  *1000
+#define Seconds *1000
+</code></pre>
+<pre><code class="language-cpp">bool wifiConnected = await(WiFi.status() == WL_CONNECTED, 10 Seconds)</code></pre>
+<p>The code above will wait 10 seconds for the wifi to connect: on failure, <code>wifiConnected</code> will be false and you can gently fail. </p>
+<p>You can use it for any kind of check, like waiting for <code>Serial</code>.</p>
+<pre><code class="language-cpp">bool serialReady = await(Serial, 5 Seconds)
+bool serialHasCharacters = await(Serial.available(), 5 Seconds)</code></pre>
+<p>The default interval between checks is 10 milliseconds: if you need a custom delay interval you can use the more verbose <code>await_with_interval</code>:</p>
+<pre><code class="language-cpp">// await WiFi for 10 seconds, check if connected every 500 millis
+bool wifiConnected = await_with_interval(WiFi.status() == WL_CONNECTED, 10 Seconds, 500 Millis)</code></pre>
+<h3>How it works</h3>
+<p>The <code>await</code> macro creates an <a href="http://www.cplusplus.com/articles/2LywvCM9/">inline function</a> that loops until the timeout expires. At every loop it checks if the condition is true: if that's the case, it returns true. The inline function construct is needed to get a return value, so you can assign it to a variable or embed directly inside an <code>if</code> test. The following code sample gives you an idea of what's happening.</p>
+<pre><code class="language-cpp">bool wifiConnected = await(WiFi.status() == WL_CONNECTED, 10 Seconds)
+
+// conceptually translates to
+
+bool inline_function() {
+    uint32_t start = millis();
+
+    while (millis() - start &lt;= 10000) {
+      if (WiFi.status() == WL_CONNECTED)
+        return true;
+
+      delay(10);
+    }
+
+   return false;
+}
+
+bool wifiConnected = inline_function();</code></pre>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/">Eloquent bounded waiting: the await construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Eloquent non-blocking code: the Every construct</title>
+		<link>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</link>
+				<pubDate>Thu, 05 Dec 2019 18:42:45 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Eloquent library]]></category>
+		<category><![CDATA[eloquent]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=209</guid>
+				<description><![CDATA[<p>The every construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically. [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/">Eloquent non-blocking code: the Every construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>The <code>every</code> construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically.</p>
+<p><span id="more-209"></span></p>
+<h3>Definition</h3>
+<pre><code class="language-cpp">#define every(interval) \
+    static uint32_t __every__##interval = millis(); \
+    if (millis() - __every__##interval &gt;= interval &amp;&amp; (__every__##interval = millis()))</code></pre>
+<h3>How to use</h3>
+<pre><code>// these are for greater code readability
+#define Millis 
+#define Second  *1000
+#define Seconds *1000
+</code></pre>
+<pre><code class="language-cpp">int interval = 1 Second;
+
+void setup() {
+    Serial.begin(115200);
+}
+
+void loop() {
+    every(1000 Millis) {
+        Serial.println(&quot;This line is printed every 1 second&quot;);
+    }
+
+    every(2000 Millis) {
+        Serial.println(&quot;This line is printed every 2 seconds&quot;);
+    }
+
+    every(interval) {
+        interval += 1 Second;
+        Serial.print(&quot;You can have variable intervals too! &quot;);
+        Serial.print(&quot;This line will be printed again in &quot;);
+        Serial.print(interval / 1000);
+        Serial.println(&quot; seconds&quot;);
+    }
+}</code></pre>
+<h3>Caveats</h3>
+<p><code>every</code> is just a macro definition and is not a proper timer, so it has some limitations:</p>
+<ol>
+<li>you can't stop, pause or resume it: once set, it will run forever</li>
+<li>its argument must be the suffix of a valid identifier</li>
+<li>you can't use several <code>every</code> with the exact same argument: you have to put all the code that needs to happen at the same interval in the same block</li>
+</ol>
+<h4>Caveat #2</h4>
+<p>The macro works by generating a variable named like <code>__every__##argument</code></p>
+<pre><code class="language-cpp">every(1) ==&gt; uint32_t __every__1;
+every(2) ==&gt; uint32_t __every__2;
+every(a_given_interval) ==&gt; uint32_t __every__a_given_interval;
+every(an invalid interval) ==&gt; uint32_t __every__an invalid interval; // Syntax error
+every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
+<p>So every integer literal and any variable are all valid arguments. Any expression is forbidden.</p>
+<h4>Caveat #3</h4>
+<p>If you use two <code>every</code> with the exact same argument, two variables with the exact same name will be created and it will rise a compile-time error.</p>
+<p>If you can live with this limitations, <code>every</code> only needs the space of an <code>uint32_t</code> to work.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/">Eloquent non-blocking code: the Every construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>How to install the Eloquent library</title>
+		<link>https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/</link>
+				<pubDate>Thu, 05 Dec 2019 16:18:48 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Eloquent library]]></category>
+		<category><![CDATA[eloq]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=554</guid>
+				<description><![CDATA[<p>In this short tutorial I'll show you how you can install the Eloquent library to take advange of all the good things it provides to you. It really is super simple, since the Eloquent library is no different from any other library you already installed on your computer, but I'll repeat the steps for clarity. [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/">How to install the Eloquent library</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>In this short tutorial I'll show you how you can install the <a href="/2019/11/how-to-write-clean-arduino-code-introducing-the-eloquent-library/">Eloquent library</a> to take advange of all the good things it provides to you.</p>
+<p>It really is super simple, since the Eloquent library is no different from any other library you already installed on your computer, but I'll repeat the steps for clarity.</p>
+<p><span id="more-554"></span></p>
+<h2>1. Download the zip from Github</h2>
+<p>The whole library is hosted on Github, so head over to <a href="https://github.com/eloquentarduino/EloquentArduino">the repo</a> and click <em>Clone or download</em> &gt; <em>Download ZIP</em>.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Repo.png" alt="Download zip from Github repository" /></p>
+<h2>2. Extract the zip to you library directory</h2>
+<p>Once downloaded, you should extract the zip into your Arduino libraries folder. The path will vary based on your OS and installation, but I expect you to know where it is.</p>
+<h2>3. Strip the -master suffix</h2>
+<p>When downloaded from Github, your zip and your folder will be named <code>EloquentArduino-master</code>: rename the folder to just <code>EloquentArduino</code>, without the master suffix.</p>
+<h2>4. Done</h2>
+<p>If you follwed the steps correctly, the library is ready to be used.</p>
+<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/">How to install the Eloquent library</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
