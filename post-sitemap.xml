@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2019-12-20T07:38:40+01:00</lastmod>
+		<lastmod>2019-12-20T07:41:36+01:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/</loc>
@@ -70,7 +70,7 @@
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</loc>
-		<lastmod>2019-12-20T07:38:40+01:00</lastmod>
+		<lastmod>2019-12-20T07:41:36+01:00</lastmod>
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif</image:loc>
 			<image:caption><![CDATA[Calibrated IMU readings for the gestures identification project]]></image:caption>
