@@ -2,39 +2,11 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2019-12-19T20:45:36+01:00</lastmod>
+		<lastmod>2019-12-20T07:18:46+01:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/</loc>
 		<lastmod>2019-12-16T19:41:16+01:00</lastmod>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-iris-classification-on-arduino/</loc>
-		<lastmod>2019-12-16T22:02:15+01:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/iris-278x300.png</image:loc>
-			<image:caption><![CDATA[Iris features illustrated @ credits to https://gallery.azure.ai/Experiment/Classify-Iris-Dataset-using-Decision-Forest-1]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Iris-features.svg</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Iris features]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Iris-serial.png</image:loc>
-			<image:caption><![CDATA[Iris classification serial output]]></image:caption>
-		</image:image>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-color-identification-on-arduino/</loc>
-		<lastmod>2019-12-16T22:02:29+01:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-the-colors-features.svg</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components from the colors features]]></image:caption>
-		</image:image>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/</loc>
-		<lastmod>2019-12-16T22:31:52+01:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/11/how-to-write-clean-arduino-code-introducing-the-eloquent-library/</loc>
@@ -61,8 +33,12 @@
 		</image:image>
 	</url>
 	<url>
+		<loc>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/</loc>
+		<lastmod>2019-12-20T07:11:25+01:00</lastmod>
+	</url>
+	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</loc>
-		<lastmod>2019-12-19T20:44:55+01:00</lastmod>
+		<lastmod>2019-12-20T07:16:29+01:00</lastmod>
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif</image:loc>
 			<image:caption><![CDATA[Calibrated IMU readings for the gestures identification project]]></image:caption>
@@ -85,11 +61,35 @@
 		</image:image>
 	</url>
 	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-color-identification-on-arduino/</loc>
+		<lastmod>2019-12-20T07:16:56+01:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-the-colors-features.svg</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components from the colors features]]></image:caption>
+		</image:image>
+	</url>
+	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/</loc>
-		<lastmod>2019-12-19T20:45:36+01:00</lastmod>
+		<lastmod>2019-12-20T07:18:11+01:00</lastmod>
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg</image:loc>
 			<image:caption><![CDATA[Decision boundaries of 2 PCA components from Morse alphabet identification features]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-iris-classification-on-arduino/</loc>
+		<lastmod>2019-12-20T07:18:46+01:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/iris-278x300.png</image:loc>
+			<image:caption><![CDATA[Iris features illustrated @ credits to https://gallery.azure.ai/Experiment/Classify-Iris-Dataset-using-Decision-Forest-1]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Iris-features.svg</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Iris features]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Iris-serial.png</image:loc>
+			<image:caption><![CDATA[Iris classification serial output]]></image:caption>
 		</image:image>
 	</url>
 </urlset>
