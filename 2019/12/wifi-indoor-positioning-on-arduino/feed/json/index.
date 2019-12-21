@@ -1,0 +1,8 @@
+{
+    "version": "https://jsonfeed.org/version/1",
+    "user_comment": "This feed allows you to read the posts from this site in any feed reader that supports the JSON Feed format. To add this feed to your reader, copy the following URL -- https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/feed/json/ -- and add it your reader.",
+    "home_page_url": "https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/",
+    "feed_url": "https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/feed/json/",
+    "title": "Comments on: Indoor positioning using Arduino and Machine Learning in 4 steps",
+    "description": "A blog about Arduino, programming &amp; electronics"
+}
