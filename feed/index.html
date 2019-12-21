@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Fri, 20 Dec 2019 06:41:36 +0000</lastBuildDate>
+	<lastBuildDate>Sat, 21 Dec 2019 06:13:58 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -916,7 +916,7 @@ This is a remake of the project found on the <a href="https://blog.tensorflow.or
 </ol>
 <h2>1. Features definition</h2>
 <p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be of 3-dimensional, which leads to a really simple model with very high accuracy.</p>
-<hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-color-identification-on-arduino%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks #Arduino #microml #ml #tinyml #MachineLearning #ai #svm</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-color-identification-on-arduino%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks%20%23Arduino%20%23microml%20%23ml%20%23tinyml%20%23MachineLearning%20%23ai%20%23svm&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <h2>2. Record sample data</h2>
 <p>We don't need any processing to get from the sensor readings to the feature vector, so the code will be straight-forward: read each component from the sensor and assign it to the features array. This part will vary based on the specific chip you have: I'll report the code for a TCS 230/3200. </p>
 <pre><code class="language-cpp">#define S2 2
@@ -1249,7 +1249,7 @@ The answers mostly follow in one of these 3 categories:</p>
 <p>So I do you <em>actually</em> run machine learning on such constrained devices?</p>
 <p>Here you are: <a href="https://github.com/eloquentarduino/micromlgen">MicroML</a> is a project to bring Machine learning algorithms to microcontrollers. It was born as an alternative to Tensorflow for Microcontrollers, which is solely dedicated to Artificial Neural Networks: here you will find leaner alternatives to neural networks to run inference <strong>even on 8-bit microcontrollers</strong>.</p>
 <p>Quoting from the Tensoflow blog: <em>The core runtime fits in 16 KB on an Arm Cortex M3</em> (that's just the runtime, without any actual operator!). </p>
-<p><hr /><p><em>MicroML lets you deploy models that fit in under 2 Kb of RAM #microml #arduino #ai #ml</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino%2F&#038;text=MicroML%20lets%20you%20deploy%20models%20that%20fit%20in%20under%202%20Kb%20of%20RAM%20%23microml%20%23arduino%20%23ai%20%23ml&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />.</p>
+<hr /><p><em>MicroML lets you deploy models that fit in under 2 Kb of RAM #microml #arduino #ai #ml</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F11%2Fyou-can-run-machine-learning-on-arduino%2F&#038;text=MicroML%20lets%20you%20deploy%20models%20that%20fit%20in%20under%202%20Kb%20of%20RAM%20%23microml%20%23arduino%20%23ai%20%23ml&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <p>At the current state, it can convert <a href="https://en.wikipedia.org/wiki/Support-vector_machine">Support Vector Machines</a> to optimized C code you can deploy on any MCU of you choice: Arduino (Uno, Nano, Micro...), ESP8266, ESP32 and really any other MCU with C support.</p>
 <div class="watchout">At the moment you can't deploy to Attiny boards because their compiler seems not to support variadic functions: I'll fix this as soon as possible, already got a working implementation</div>
 <p>Why Support Vector Machines? Because they're really good at classifying highly-dimensional features and are quite easy to optimize for RAM-constrained environments (check the tutorial on <a href="/2019/12/how-to-do-gesture-identification-on-arduino/">Gesture identification</a> which has 90 features!)</p>
