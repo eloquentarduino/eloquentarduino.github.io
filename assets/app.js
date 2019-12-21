@@ -40,7 +40,7 @@ jQuery(function() {
         }
         ])
         .on('autocomplete:selected', function(event, suggestion, dataset) {
-            window.location.href = suggestion.permalink.replace('http:://eloquent.blog/', 'https://eloquentarduino.github.io/')
+            window.location.href = suggestion.permalink.replace('eloquent.blog/', 'eloquentarduino.github.io/')
         });
 
     /*document.querySelector(".searchbox [type='reset']").addEventListener("click", function() {
