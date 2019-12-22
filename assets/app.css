@@ -20,6 +20,10 @@ body {
 	margin-bottom: 0;
 }
 
+.home .post-content p > img {
+  max-width: 80%;
+}
+
 .post-content {
 	font-size: 1.05em;
 }

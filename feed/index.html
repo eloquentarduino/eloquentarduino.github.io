@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 22 Dec 2019 18:20:24 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 22 Dec 2019 18:30:23 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -32,8 +32,8 @@
 ]]></description>
 								<content:encoded><![CDATA[<p>In this Arduno Machine learning tutorial we're going to use a microphone to identify the word you speak.<br />
 This is going to run on an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
-<p><span id="more-180"></span></p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg" alt="from https://www.udemy.com/course/learn-audio-processing-complete-engineers-course/" /></p>
+<p><span id="more-180"></span></p>
 <p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
   <li>define the features</li>
@@ -42,6 +42,9 @@ This is going to run on an Arduino Nano (old generation), equipped with 32 kb of
  <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
 </ol>
 <p>In this project the features are going to be the Fast Fourier Transform of 50 analog readings from a microphone, taken starting from when a loud sound is detected, sampled at intervals of 5 millis.</p>
+<div class="watchout">
+This tutorial is not about "Wake word" detection: it can't distinguish a known word from any other word. It can classify the word you speak among the ones you trained it to recognize!!!
+</div>
 <h3>1. Features definition</h3>
 <p>The microphone we're going to use is a super simple device: it produces an analog signal (0-1024) based on the sound it detects. </p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord-Sensor.jpg" alt="from http://arduinolearning.com/code/ky038-microphone-module-and-arduino-example.php" /></p>
@@ -257,9 +260,9 @@ As you can hear from the video, you should be quite accurate when pronouncing th
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/">Indoor positioning using Arduino and Machine Learning in 4 steps</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to use the nearby WiFi access points to locate where we are. For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg" alt="Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/" /></p>
 <p><span id="more-224"></span></p>
 <p>The task of detecting where you are when GPS or satellite localization is not an option is called <a href="https://en.wikipedia.org/wiki/Indoor_positioning_system">indoor positioning</a>: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely available, but the same project could be re-purposed to use Bluetooth, if there are enough devices in your location.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg" alt="Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/" /></p>
 <p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
   <li>define the features</li>
@@ -433,6 +436,7 @@ void classify() {
 ]]></description>
 								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to use an accelerometer sensor to identify the gestures you play.<br />
 This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html">Tensorflow blog</a>. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.svg" alt="Decision boundaries, 99% accuracy" /></p>
 <p><span id="more-35"></span></p>
 <p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
 <ol>
