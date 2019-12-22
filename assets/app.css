@@ -129,6 +129,10 @@ p.image__alt {
 	margin: 0 0.25em;
 }
 
+.heateorSssSharingArrow {
+  display: none;
+}
+
 #search-input {
     padding: 16px 45px 16px 16px;
     background: #48515C;
