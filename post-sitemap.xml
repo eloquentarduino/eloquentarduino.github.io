@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2019-12-22T19:30:23+01:00</lastmod>
+		<lastmod>2019-12-24T16:37:21+01:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/</loc>
@@ -73,18 +73,6 @@
 		<lastmod>2019-12-22T14:55:38+01:00</lastmod>
 	</url>
 	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/</loc>
-		<lastmod>2019-12-22T19:22:57+01:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg</image:loc>
-			<image:caption><![CDATA[Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.svg</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components from Wifi indoor positioning features]]></image:caption>
-		</image:image>
-	</url>
-	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</loc>
 		<lastmod>2019-12-22T19:25:19+01:00</lastmod>
 		<image:image>
@@ -114,7 +102,7 @@
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/word-classification-using-arduino/</loc>
-		<lastmod>2019-12-22T19:30:23+01:00</lastmod>
+		<lastmod>2019-12-24T16:35:02+01:00</lastmod>
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg</image:loc>
 			<image:caption><![CDATA[from https://www.udemy.com/course/learn-audio-processing-complete-engineers-course/]]></image:caption>
@@ -128,16 +116,28 @@
 			<image:caption><![CDATA[Raw audio stream]]></image:caption>
 		</image:image>
 		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-linear-kernel-87-accuracy.svg</image:loc>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-linear-kernel-87-accuracy.png</image:loc>
 			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, linear kernel]]></image:caption>
 		</image:image>
 		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-poly-3-kernel-91-accuracy.svg</image:loc>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-poly-3-kernel-91-accuracy.png</image:loc>
 			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, poly-3 kernel]]></image:caption>
 		</image:image>
 		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-rbf-kernel-94-accuracy.svg</image:loc>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-rbf-kernel-94-accuracy.png</image:loc>
 			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, rbf kernel]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/</loc>
+		<lastmod>2019-12-24T16:37:21+01:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg</image:loc>
+			<image:caption><![CDATA[Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components from Wifi indoor positioning features]]></image:caption>
 		</image:image>
 	</url>
 </urlset>

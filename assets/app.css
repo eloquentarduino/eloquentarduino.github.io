@@ -21,8 +21,13 @@ body {
 }
 
 .home .post-content p > img {
-  max-width: 80%;
+  max-width: 90%;
 }
+
+.home .post-content img + .image__alt {
+  display: none;
+}
+
 
 .post-content {
 	font-size: 1.05em;

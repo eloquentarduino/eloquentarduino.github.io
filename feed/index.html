@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 22 Dec 2019 18:30:23 +0000</lastBuildDate>
+	<lastBuildDate>Tue, 24 Dec 2019 15:37:21 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -185,9 +185,9 @@ print(c_code)</code></pre>
 <p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
 <p>In this project on Machine learning we're not achieving 100% accuracy easily.<br />
 Audio is quite noise, so you should experiment with a few params for the classifier and choose the ones that perform best. I'll showcase a few examples:</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-linear-kernel-87-accuracy.svg" alt="Decision boundaries of 2 PCA components of Word classification, linear kernel" /></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-poly-3-kernel-91-accuracy.svg" alt="Decision boundaries of 2 PCA components of Word classification, poly-3 kernel" /></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-rbf-kernel-94-accuracy.svg" alt="Decision boundaries of 2 PCA components of Word classification, rbf kernel" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-linear-kernel-87-accuracy.png" alt="Decision boundaries of 2 PCA components of Word classification, linear kernel" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-poly-3-kernel-91-accuracy.png" alt="Decision boundaries of 2 PCA components of Word classification, poly-3 kernel" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-rbf-kernel-94-accuracy.png" alt="Decision boundaries of 2 PCA components of Word classification, rbf kernel" /></p>
 <h4>Select a suitable model</h4>
 <p>Here's an overview table of the 3 tests I did.</p>
 <table>
@@ -371,7 +371,7 @@ void printFeatures() {
 </code></pre>
 <p>Grab some recordings just staying in a location for a few seconds and save the serial output to a file; then move to the next location and repeat: 10-15 samples for each location will suffice.</p>
 <p>If you do a good job, you should end with distinguible features, as show in the plot below.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.svg" alt="Decision boundaries of 2 PCA components from Wifi indoor positioning features" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.png" alt="Decision boundaries of 2 PCA components from Wifi indoor positioning features" /></p>
 <div class="watchout">
 RSSIs may be a little noisy, mostly on the boundaries where weak networks may appear and disappear with a very low RSSI: this was not a problem for me, but if you're getting bad results you may filter out those low values.</p>
 <pre><code class="language-cpp">
@@ -658,7 +658,7 @@ print(c_code)</code></pre>
 <p>The core of SVM (Support Vector Machines) are support vectors: each trained classifier will be characterized by a certain number of them. The problem is: if there're too much, the generated code will be too large to fit in your flash.</p>
 <p>For this reason, instead of selecting <em>the best</em> model on accuracy, you should make a ranking, from the best performing to the worst. For each model, starting from the top, you should import it in your Arduino project and try to compile: if it fits, fine, you're done. Otherwise you should pick the next and try again.</p>
 <p>It may seem a tedious process, but keep in mind that we're trying to infer a class from 90 features in 2 Kb of RAM and 32 Kb of flash: I think this is an acceptable tradeoff.</p>
-<hr /><p><em>We&#039;re fitting a model to infer a class from 90 features in 2 Kb of RAM and 32 Kb of flash!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-gesture-identification-on-arduino%2F&#038;text=We%27re%20fitting%20a%20model%20to%20infer%20a%20class%20from%2090%20features%20in%202%20Kb%20of%20RAM%20and%2032%20Kb%20of%20flash%21&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<hr /><p><em>We&#039;re fitting a model to infer a class from 90 features in 2 Kb of RAM and 32 Kb of flash!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-gesture-identification-on-arduino%2F&#038;text=We%27re%20fitting%20a%20model%20to%20infer%20a%20class%20from%2090%20features%20in%202%20Kb%20of%20RAM%20and%2032%20Kb%20of%20flash%21&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <p>I'll report a few figures for different combinations I tested.</p>
 <table>
 <thead>
@@ -755,7 +755,7 @@ void classify() {
     Serial.println(classIdxToName(predict(features)));
 }</code></pre>
 <p>Here we are: it has been a long post, but now you can classify gestures with an Arduino Nano and 2 Kb of RAM. </p>
-<hr /><p><em>No fancy Neural Networks, no Tensorflow, no 32-bit ARM processors: plain old SVM on plain old 8 bits with 97% accuracy.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-gesture-identification-on-arduino%2F&#038;text=No%20fancy%20Neural%20Networks%2C%20no%20Tensorflow%2C%20no%2032-bit%20ARM%20processors%3A%20plain%20old%20SVM%20on%20plain%20old%208%20bits%20with%2097%25%20accuracy.&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<hr /><p><em>No fancy Neural Networks, no Tensorflow, no 32-bit ARM processors: plain old SVM on plain old 8 bits with 97% accuracy.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-gesture-identification-on-arduino%2F&#038;text=No%20fancy%20Neural%20Networks%2C%20no%20Tensorflow%2C%20no%2032-bit%20ARM%20processors%3A%20plain%20old%20SVM%20on%20plain%20old%208%20bits%20with%2097%25%20accuracy.&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <p>Here's a short demo of me playing 3 gestures and getting the results on the serial monitor.</p>
 <div style="width: 640px;" class="wp-video"><video class="wp-video-shortcode" id="video-35-2" width="640" height="360" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4?_=2" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4</a></video></div>
 <p><h4>Project figures</h4>
@@ -799,7 +799,7 @@ using namespace Eloquent::Pin;</code></pre>
 <li>ignoring it altogether, so you have an <code>MPU6050.h</code> library, which elects itself as the only one implementation possible to access the MPU6050 accelerometer in the world</li>
 <li>prefixing each library file, so you get the <code>Adafruit_Si7021</code> class</li>
 </ol>
-<hr /><p><em>The case for Adafruit_Si7021 should not exist in my opinion: use the damn namespaces!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Farduino-pin-class%2F&#038;text=The%20case%20for%20Adafruit_Si7021%20should%20not%20exist%20in%20my%20opinion%3A%20use%20the%20damn%20namespaces%21&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<hr /><p><em>The case for Adafruit_Si7021 should not exist in my opinion: use the damn namespaces!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Farduino-pin-class%2F&#038;text=The%20case%20for%20Adafruit_Si7021%20should%20not%20exist%20in%20my%20opinion%3A%20use%20the%20damn%20namespaces%21&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <p>With namespaces, it would become:</p>
 <pre><code class="language-cpp">using namespace Adafruit;
 
@@ -1319,7 +1319,7 @@ This is a remake of the project found on the <a href="https://blog.tensorflow.or
 </ol>
 <h2>1. Features definition</h2>
 <p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be of 3-dimensional, which leads to a really simple model with very high accuracy.</p>
-<hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks #Arduino #microml #ml #tinyml #MachineLearning #ai #svm</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-color-identification-on-arduino%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks%20%23Arduino%20%23microml%20%23ml%20%23tinyml%20%23MachineLearning%20%23ai%20%23svm&#038;via=ArduinoEloquent&#038;related=ArduinoEloquent' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks #Arduino #microml #ml #tinyml #MachineLearning #ai #svm</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-color-identification-on-arduino%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks%20%23Arduino%20%23microml%20%23ml%20%23tinyml%20%23MachineLearning%20%23ai%20%23svm&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <h2>2. Record sample data</h2>
 <p>We don't need any processing to get from the sensor readings to the feature vector, so the code will be straight-forward: read each component from the sensor and assign it to the features array. This part will vary based on the specific chip you have: I'll report the code for a TCS 230/3200. </p>
 <pre><code class="language-cpp">#define S2 2
