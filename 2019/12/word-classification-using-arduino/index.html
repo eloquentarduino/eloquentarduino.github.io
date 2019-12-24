@@ -67,7 +67,12 @@ void captureWord() {
 void printFeatures() {
     const uint16_t numFeatures = sizeof(features) / sizeof(double);
     
-    for (int i = 0; i </code></pre><h4>2.4 Fast Fourier Transform</h4><p>Here we are with the Fourier Transform. When implemented in software, the most widely implementation of the FT is actually called <a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">Fast Fourier Transform (FFT)</a>, which is - as you may guess - a fast implementation of the FT.</p><p>Luckily for us, there exists <a href="https://github.com/kosme/arduinoFFT">a library</a> for Arduino that does FFT.</p><p>And is so easy to use that we only need a line to get usable results!</p><pre><code class="language-cpp">#include <arduinoFFT.h>
+    for (int i = 0; i < numFeatures; i++) {
+        Serial.print(features[i]);
+        Serial.print(i == numFeatures - 1 ? '\n' : ',');
+    }
+}
+</code></pre><h4>2.4 Fast Fourier Transform</h4><p>Here we are with the Fourier Transform. When implemented in software, the most widely implementation of the FT is actually called <a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">Fast Fourier Transform (FFT)</a>, which is - as you may guess - a fast implementation of the FT.</p><p>Luckily for us, there exists <a href="https://github.com/kosme/arduinoFFT">a library</a> for Arduino that does FFT.</p><p>And is so easy to use that we only need a line to get usable results!</p><pre><code class="language-cpp">#include <arduinoFFT.h>
 
 arduinoFFT fft;
 

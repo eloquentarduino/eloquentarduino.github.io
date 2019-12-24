@@ -69,7 +69,12 @@ void resetFeatures() {
 void printFeatures() {
     const uint16_t numFeatures = sizeof(features) / sizeof(double);
     
-    for (int i = 0; i </code></pre><p>Grab some recordings just staying in a location for a few seconds and save the serial output to a file; then move to the next location and repeat: 10-15 samples for each location will suffice.</p><p>If you do a good job, you should end with distinguible features, as show in the plot below.</p><p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.png" alt="Decision boundaries of 2 PCA components from Wifi indoor positioning features"></p><div class="watchout"> RSSIs may be a little noisy, mostly on the boundaries where weak networks may appear and disappear with a very low RSSI: this was not a problem for me, but if you're getting bad results you may filter out those low values.<pre><code class="language-cpp">
+    for (int i = 0; i < numFeatures; i++) {
+        Serial.print(features[i]);
+        Serial.print(i == numFeatures - 1 ? '\n' : ',');
+    }
+}
+</code></pre><p>Grab some recordings just staying in a location for a few seconds and save the serial output to a file; then move to the next location and repeat: 10-15 samples for each location will suffice.</p><p>If you do a good job, you should end with distinguible features, as show in the plot below.</p><p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.png" alt="Decision boundaries of 2 PCA components from Wifi indoor positioning features"></p><div class="watchout"> RSSIs may be a little noisy, mostly on the boundaries where weak networks may appear and disappear with a very low RSSI: this was not a problem for me, but if you're getting bad results you may filter out those low values.<pre><code class="language-cpp">
 // replace
 features[networkIndex] = WiFi.RSSI(i);
 

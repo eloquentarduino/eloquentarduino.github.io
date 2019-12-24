@@ -36,7 +36,12 @@ void recordButtonStatus() {
 void printFeatures() {
     const uint16_t numFeatures = sizeof(features) / sizeof(double);
     
-    for (int i = 0; i </code></pre><p>Open the Serial monitor and type a few times each letter: try to introduce some variations each time, for example waiting some more milliseconds before releasing the dash.</p><div class="watchout"> If you've never typed morse code before (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</div><p>Save the recordings for each letter in a file named after the letter, so you will get meaningful results later on.</p><p>You may end with duplicate recordings: don't worry, that's not a problem. I'll paste my recordings for a few letters, as a reference.</p><pre><code>// A (•‒)
+    for (int i = 0; i < numFeatures; i++) {
+        Serial.print(features[i]);
+        Serial.print(i == numFeatures - 1 ? '\n' : ',');
+    }
+}
+</code></pre><p>Open the Serial monitor and type a few times each letter: try to introduce some variations each time, for example waiting some more milliseconds before releasing the dash.</p><div class="watchout"> If you've never typed morse code before (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</div><p>Save the recordings for each letter in a file named after the letter, so you will get meaningful results later on.</p><p>You may end with duplicate recordings: don't worry, that's not a problem. I'll paste my recordings for a few letters, as a reference.</p><pre><code>// A (•‒)
 0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
 0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1
 0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1

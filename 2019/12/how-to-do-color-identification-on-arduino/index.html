@@ -34,7 +34,12 @@ void readRGB() {
 void printFeatures() {
     const uint16_t numFeatures = sizeof(features) / sizeof(double);
     
-    for (int i = 0; i </code></pre><p>Open the Serial monitor and put some colored objects in front of the sensor: move the object a bit and rotate it, so the samples will include different shades of the color.</p><p>Save the recordings for each color in a file named after the color, so you will get meaningful results later on.</p><div class="watchout"> Don’t forget to sample the “empty color” too: don’t put anything in front of the sensor and let it record for a while.</div><p>If you do a good job, you should end with distinguible features, as show in the contour plot below.</p><p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-the-colors-features.png" alt="Decision boundaries of 2 PCA components from the colors features"></p><h3>3. Train and export the SVM classifier</h3><p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p><p></p><pre><code class="language-python">from sklearn.svm import SVC
+    for (int i = 0; i < numFeatures; i++) {
+        Serial.print(features[i]);
+        Serial.print(i == numFeatures - 1 ? '\n' : ',');
+    }
+}
+</code></pre><p>Open the Serial monitor and put some colored objects in front of the sensor: move the object a bit and rotate it, so the samples will include different shades of the color.</p><p>Save the recordings for each color in a file named after the color, so you will get meaningful results later on.</p><div class="watchout"> Don’t forget to sample the “empty color” too: don’t put anything in front of the sensor and let it record for a while.</div><p>If you do a good job, you should end with distinguible features, as show in the contour plot below.</p><p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-the-colors-features.png" alt="Decision boundaries of 2 PCA components from the colors features"></p><h3>3. Train and export the SVM classifier</h3><p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p><p></p><pre><code class="language-python">from sklearn.svm import SVC
 from micromlgen import port
 
 # put your samples in the dataset folder

@@ -138,7 +138,7 @@ void captureWord() {
 void printFeatures() {
     const uint16_t numFeatures = sizeof(features) / sizeof(double);
     
-    for (int i = 0; i < numFeatures; i++) {
+    for (int i = 0; i &lt; numFeatures; i++) {
         Serial.print(features[i]);
         Serial.print(i == numFeatures - 1 ? '\n' : ',');
     }
@@ -363,7 +363,7 @@ void resetFeatures() {
 void printFeatures() {
     const uint16_t numFeatures = sizeof(features) / sizeof(double);
     
-    for (int i = 0; i < numFeatures; i++) {
+    for (int i = 0; i &lt; numFeatures; i++) {
         Serial.print(features[i]);
         Serial.print(i == numFeatures - 1 ? '\n' : ',');
     }
@@ -623,7 +623,7 @@ void recordIMU() {
 void printFeatures() {
     const uint16_t numFeatures = sizeof(features) / sizeof(double);
     
-    for (int i = 0; i < numFeatures; i++) {
+    for (int i = 0; i &lt; numFeatures; i++) {
         Serial.print(features[i]);
         Serial.print(i == numFeatures - 1 ? '\n' : ',');
     }
@@ -1033,7 +1033,7 @@ void recordButtonStatus() {
 void printFeatures() {
     const uint16_t numFeatures = sizeof(features) / sizeof(double);
     
-    for (int i = 0; i < numFeatures; i++) {
+    for (int i = 0; i &lt; numFeatures; i++) {
         Serial.print(features[i]);
         Serial.print(i == numFeatures - 1 ? '\n' : ',');
     }
@@ -1358,7 +1358,7 @@ void readRGB() {
 void printFeatures() {
     const uint16_t numFeatures = sizeof(features) / sizeof(double);
     
-    for (int i = 0; i < numFeatures; i++) {
+    for (int i = 0; i &lt; numFeatures; i++) {
         Serial.print(features[i]);
         Serial.print(i == numFeatures - 1 ? '\n' : ',');
     }
