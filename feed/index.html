@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Tue, 24 Dec 2019 15:49:21 +0000</lastBuildDate>
+	<lastBuildDate>Wed, 25 Dec 2019 08:15:02 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,92 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.2</generator>
 	<item>
+		<title>OMG! Machine learning on Attiny85: Color identification tutorial</title>
+		<link>https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/</link>
+				<pubDate>Mon, 23 Dec 2019 16:57:15 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Arduino Machine learning]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=688</guid>
+				<description><![CDATA[<p>You won't believe it, but you can run Machine learning on an Attiny85 (and many others Attiny). Not that you should, but you can. In this post I'll show you how! When I first run a Machine learning project on my Arduino Nano (old generation), it already felt a big achievement. I mean, that board [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">OMG! Machine learning on Attiny85: Color identification tutorial</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>You won't believe it, but <strong>you can run Machine learning on an Attiny85</strong> (and many others Attiny). Not that you should, but you can. In this post I'll show you how!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/attiny85_ml.png" alt="ri-elaborated from https://cyaninfinite.com/miniaturize-projects-with-attiny85/" /></p>
+<p><span id="more-688"></span></p>
+<p>When I first run a Machine learning project on my Arduino Nano (old generation), it already felt a big achievement. I mean, that board has only 32 Kb of program space and 2 Kb of RAM and you can buy a chinese clone for around 2.50 $.</p>
+<p>It already opened the path to a huge amount of microcontrollers ready to become &quot;intelligent&quot;. </p>
+<p>But it was not enough for me: after all, the <a href="/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">MicroML generator</a> exports plain C that should run anywhere, not only on Arduino boards.</p>
+<p>So I setup to test if I could go even smaller and run it on the #1 of tiny chips: the Attiny85.</p>
+<hr /><p><em>MicroML exports plain C that could run anywhere, not only on Arduino boards.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=MicroML%20exports%20plain%20C%20that%20could%20run%20anywhere%2C%20not%20only%20on%20Arduino%20boards.&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>No, I couldn't.</p>
+<p>The generated code makes use of a variadic function, which seems to not be supported by the Attiny compiler in the Arduino IDE.</p>
+<p>So I had to come up with an alternative implementation to make it work.</p>
+<p>Fortunately I already experimented with a non-variadic version when first writing the porter, so it was a matter of refreshing that algorithm and try it out.</p>
+<p>Guess what? It compiled!</p>
+<p>So I tried porting one my earliear tutorial (the <a href="/2019/12/how-to-do-color-identification-on-arduino/">color identification</a> one) to the Attiny and...</p>
+<hr /><p><em>Boom! Machine learning on an Attiny85!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=Boom%21%20Machine%20learning%20on%20an%20Attiny85%21&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>So, here's a step-by-step tutorial on how you can do it too.</p>
+<div class="watchout">
+I strongly suggest you read <a href="/2019/12/how-to-do-color-identification-on-arduino/" target="_blank" rel="noopener noreferrer">the original tutorial</a> before following this one, because I won't go into too much details on the common steps here.
+</div>
+<h3>1. Features definition</h3>
+<p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be 3-dimensional, which leads to a really simple model with very high accuracy.</p>
+<div class="watchout">
+The Attiny85 has 8 Kb of flash and 512 bytes of RAM, so you won't be able to load any model that uses more than a few features (probably less than 10).
+</div>
+<h2>2. Record sample data</h2>
+<p>You must do this step on a board with a Serial interface, like an Arduino Uno / Nano / Pro Mini. See <a href="/2019/12/how-to-do-color-identification-on-arduino/" target="_blank" rel="noopener noreferrer">the original tutorial</a> for the code of this step.</p>
+<h3>3. Train and export the SVM classifier</h3>
+<p>This part is exactly the same as the original, except for a single parameter: you will pass <code>platform=attiny</code> to the <code>port</code> function.</p>
+<pre><code class="language-python">from sklearn.svm import SVC
+from micromlgen import port
+
+# put your samples in the dataset folder
+# one class per file
+# one feature vector per line, in CSV format
+features, classmap = load_features(&#039;dataset/&#039;)
+X, y = features[:, :-1], features[:, -1]
+classifier = SVC(kernel=&#039;linear&#039;).fit(X, y)
+c_code = port(classifier, classmap=classmap, platform=&#039;attiny&#039;)
+print(c_code)</code></pre>
+<div class="watchout">
+The Attiny mode has been implemented in version 0.8 of micromlgen: if you installed an earlier version, first update
+</div>
+<p>At this point you have to copy the printed code and import it in your project, in a file called <code>model.h</code>.</p>
+<h2>4. Run the inference</h2>
+<p>Since we don't have a Serial, we will blink a LED a number of times dependant on the prediction result.</p>
+<pre><code class="language-cpp">#include &quot;model.h&quot;
+
+#define LED 0
+
+void loop() {
+  readRGB();
+  classify();
+  delay(1000);
+}
+
+void classify() {
+    for (uint8_t times = predict(features) + 1; times &gt; 0; times--) {
+        digitalWrite(LED, HIGH);
+        delay(10);
+        digitalWrite(LED, LOW);
+        delay(10);
+    }
+}</code></pre>
+<p>Here we are: put some colored object in front of the sensor and see the LED blink.</p>
+<h4>Project figures</h4>
+<p>On my machine, the sketch requires 3434 bytes (41%) of program space and 21 bytes (4%) of RAM. This means you could actually run machine learning in even less space than what the Attiny85 provides. </p>
+<p>This model in particular it's so tiny you <strong>can run in even on an Attiny45, which has only 4 Kb of flash and 256 bytes of RAM</strong>.</p>
+<p>I'd like you to look at the RAM figure for a moment: <strong>21 bytes</strong>. 21 bytes is all the memory you need to run a Machine learning algorithm on a microcontroller. This is the result of the implementation I chose: the least RAM overhead possible. I challenge you to go any lower than this.</p>
+<hr /><p><em>21 bytes is all the memory you need to run a Machine learning algorithm on a microcontroller</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=21%20bytes%20is%20all%20the%20memory%20you%20need%20to%20run%20a%20Machine%20learning%20algorithm%20on%20a%20microcontroller&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p><br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
+<hr>
+<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlColorIdentificationAttinyExample/MicromlColorIdentificationAttinyExample.ino" target="_blank">Github</a></p></p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">OMG! Machine learning on Attiny85: Color identification tutorial</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
 		<title>Word classification using Arduino and MicroML</title>
 		<link>https://eloquentarduino.github.io/2019/12/word-classification-using-arduino/</link>
 				<pubDate>Sun, 22 Dec 2019 18:12:59 +0000</pubDate>
@@ -1407,159 +1493,6 @@ void loop() {
 <hr>
 <p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlColorIdentificationExample/MicromlColorIdentificationExample.ino" target="_blank">Github</a></p></p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-color-identification-on-arduino/">How to do color identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
-		<title>How to do Iris classification through machine learning on Arduino</title>
-		<link>https://eloquentarduino.github.io/2019/12/how-to-do-iris-classification-on-arduino/</link>
-				<pubDate>Sun, 01 Dec 2019 09:02:02 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[microml]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=409</guid>
-				<description><![CDATA[<p>In this first tutorial from the series Arduino Machine learning we're going to implement the &#34;Hello world&#34; of Machine learning projects: classifying the Iris dataset on an Arduino board. The Iris dataset is a well known one in the Machine learning world and is often used in introductory tutorials about classification. In this tutorial we're [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-iris-classification-on-arduino/">How to do Iris classification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p>In this first tutorial from the series <em><a href="/category/programming/arduino-machine-learning/">Arduino Machine learning</a></em> we're going to implement the &quot;Hello world&quot; of Machine learning projects: classifying the Iris dataset on an Arduino board. The <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set">Iris dataset</a> is a well known one in the Machine learning world and is often used in introductory tutorials about classification.<br />
-In this tutorial we're going to run the classification directly on a Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM: that's the only thing you will need!</p>
-<p><span id="more-409"></span></p>
-<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
-<ol>
-  <li>define the features</li>
-  <li>record sample data: we'll use the publicly available dataset</li>
- <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
- <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
-</ol>
-<h3>1. Features definition</h3>
-<p>There are 4 features in this dataset: sepal length, sepal width, petal length, petal width; and 3 classes: Setosa, Versicolor, Virginica. You can see in the picture below how they relate to the actual flower.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/iris-278x300.png" alt="Iris features illustrated @ credits to https://gallery.azure.ai/Experiment/Classify-Iris-Dataset-using-Decision-Forest-1" /></p>
-<h3>2. Sample data</h3>
-<p>You may download the dataset <a href="https://gist.github.com/netj/8836201">here</a>.<br />
-An excerpt of the dataset is reported in the following table.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align: center;">sepal.length</th>
-<th style="text-align: center;">sepal.width</th>
-<th style="text-align: center;">petal.length</th>
-<th style="text-align: center;">petal.width</th>
-<th style="text-align: center;">variety</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: center;">5.1</td>
-<td style="text-align: center;">3.5</td>
-<td style="text-align: center;">1.4</td>
-<td style="text-align: center;">0.2</td>
-<td style="text-align: center;">Setosa</td>
-</tr>
-<tr>
-<td style="text-align: center;">4.9</td>
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">1.4</td>
-<td style="text-align: center;">0.2</td>
-<td style="text-align: center;">Setosa</td>
-</tr>
-<tr>
-<td style="text-align: center;">4.6</td>
-<td style="text-align: center;">3.1</td>
-<td style="text-align: center;">1.5</td>
-<td style="text-align: center;">0.2</td>
-<td style="text-align: center;">Setosa</td>
-</tr>
-<tr>
-<td style="text-align: center;">5.8</td>
-<td style="text-align: center;">2.6</td>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">1.2</td>
-<td style="text-align: center;">Versicolor</td>
-</tr>
-<tr>
-<td style="text-align: center;">5.6</td>
-<td style="text-align: center;">2.7</td>
-<td style="text-align: center;">4.2</td>
-<td style="text-align: center;">1.3</td>
-<td style="text-align: center;">Versicolor</td>
-</tr>
-<tr>
-<td style="text-align: center;">6.3</td>
-<td style="text-align: center;">2.5</td>
-<td style="text-align: center;">5</td>
-<td style="text-align: center;">1.9</td>
-<td style="text-align: center;">Virginica</td>
-</tr>
-<tr>
-<td style="text-align: center;">6.5</td>
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">5.2</td>
-<td style="text-align: center;">2</td>
-<td style="text-align: center;">Virginica</td>
-</tr>
-<tr>
-<td style="text-align: center;">5.9</td>
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">5.1</td>
-<td style="text-align: center;">1.8</td>
-<td style="text-align: center;">Virginica</td>
-</tr>
-</tbody>
-</table>
-<p>A contour plot of this dataset is depicted in the image below.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Iris-features.svg" alt="Decision boundaries of 2 PCA components of Iris features" /></p>
-<h3>3. Train and export the SVM classifier</h3>
-
-<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
-
-<p>
-<pre><code class="language-python">from sklearn.svm import SVC
-from micromlgen import port
-
-# put your samples in the dataset folder
-# one class per file
-# one feature vector per line, in CSV format
-features, classmap = load_features('dataset/')
-X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
-c_code = port(classifier, classmap=classmap)
-print(c_code)</code></pre>
-
-<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
-<h3>4. Run the inference</h3>
-<p>We will be running the inferences from the features entered via Serial monitor: you type 4 float values representing the 4 features and get back the predicted Iris species.</p>
-<pre><code class="language-cpp">#include &quot;iris.h&quot;
-
-void setup() {
-    Serial.begin(115200);
-}
-
-void loop() {
-    if (Serial.available()) {
-        double features[4];
-
-        for (int i = 0; i &lt; 4; i++) {
-            // split features on comma (,)
-            String feature = Serial.readStringUntil(&#039;,&#039;);
-
-            features[i] = atof(feature.c_str());
-        }
-
-        Serial.print(&quot;Detected species: &quot;);
-        Serial.println(classIdxToName(predict(features)));
-    }
-
-    delay(10);
-}</code></pre>
-<p>If you open the Serial monitor you should see something like the next picture as you type in the features from different species.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Iris-serial.png" alt="Iris classification serial output" /></p>
-<p>That’s it: you deployed machine learning in 2 Kb!</p>
-<p><h4>Project figures</h4>
-<p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 7446 bytes (24%) of program space and 302 bytes (14%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>Can I run machine learning on Arduino?</em> is <strong>definetly YES</strong>.<br />
-<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
-<hr>
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlIrisExample/MicromlIrisExample.ino" target="_blank">Github</a></p></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-iris-classification-on-arduino/">How to do Iris classification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 	</channel>
