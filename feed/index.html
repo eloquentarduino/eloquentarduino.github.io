@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Wed, 25 Dec 2019 08:23:11 +0000</lastBuildDate>
+	<lastBuildDate>Wed, 25 Dec 2019 08:41:00 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -607,8 +607,7 @@ void loop() {
 <p>Open the Serial plotter and make some movement to have an idea of the range of your readings.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Raw-gestures.gif&quot;" alt="Raw IMU readings for the gestures identification project" /></p>
 <h4>2.2 Calibration</h4>
-<p>Don't know if it's just my case, but I'm getting <code>az</code> values of about -10 at rest (you can see this in the previous image). Since I'd like to have almost 0 at rest, I created a super simple calibration procedure to remove this fixed offset from the readings.</p>
-<p>If you're already getting all zeros, you can skip this part. Still, if you add it to your project it won't hurt.</p>
+<p>Due to gravity, we get a stable value of -9.8 on the Z axis at rest (you can see this in the previous image). Since I'd like to have almost 0 at rest, I created a super simple calibration procedure to remove this fixed offset from the readings.</p>
 <pre><code class="language-cpp">double baseline[NUM_AXES];
 double features[NUM_SAMPLES * NUM_AXES];
 
