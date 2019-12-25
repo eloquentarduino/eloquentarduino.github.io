@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>A blog about Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Wed, 25 Dec 2019 08:15:02 +0000</lastBuildDate>
+	<lastBuildDate>Wed, 25 Dec 2019 08:23:11 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -735,10 +735,10 @@ print(c_code)</code></pre>
 
 <p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
 <p>In this project on Machine learning, differently from the previous and simpler ones, we're not achieving 100% accuracy easily. Motion is quite noise, so you should experiment with a few params for the classifier and choose the ones that perform best. I'll showcase a few examples:</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Linear-kernel.svg" alt="Decision boundaries of 2 PCA components of Gestures features, Linear kernel, 95% accuracy" /></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.svg" alt="Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel, 97% accuracy" /></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.01-gamma.svg" alt="Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.01 gamma, 95% accuracy" /></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.svg" alt="Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma, 99% accuracy" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Linear-kernel.png" alt="Decision boundaries of 2 PCA components of Gestures features, Linear kernel" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.png" alt="Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.01-gamma.png" alt="Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.01 gamma" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png" alt="Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma" /></p>
 <h4>Select a suitable model</h4>
 <p>Now that we selected the best model, we have to export it to C code. Here comes the culprit: not all models will fit on your board.</p>
 <p>The core of SVM (Support Vector Machines) are support vectors: each trained classifier will be characterized by a certain number of them. The problem is: if there're too much, the generated code will be too large to fit in your flash.</p>

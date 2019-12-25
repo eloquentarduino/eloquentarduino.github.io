@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2019-12-25T09:15:02+01:00</lastmod>
+		<lastmod>2019-12-25T09:23:11+01:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/</loc>
@@ -69,34 +69,6 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</loc>
-		<lastmod>2019-12-22T19:25:19+01:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.svg</image:loc>
-			<image:caption><![CDATA[Decision boundaries, 99% accuracy]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif</image:loc>
-			<image:caption><![CDATA[Calibrated IMU readings for the gestures identification project]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Linear-kernel.svg</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Linear kernel, 95% accuracy]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.svg</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel, 97% accuracy]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.01-gamma.svg</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.01 gamma, 95% accuracy]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.svg</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma, 99% accuracy]]></image:caption>
-		</image:image>
-	</url>
-	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/arduino-pin-class/</loc>
 		<lastmod>2019-12-24T16:41:40+01:00</lastmod>
 	</url>
@@ -146,6 +118,34 @@
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/attiny85_ml.png</image:loc>
 			<image:caption><![CDATA[ri-elaborated from https://cyaninfinite.com/miniaturize-projects-with-attiny85/]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</loc>
+		<lastmod>2019-12-25T09:23:11+01:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.svg</image:loc>
+			<image:caption><![CDATA[Decision boundaries, 99% accuracy]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif</image:loc>
+			<image:caption><![CDATA[Calibrated IMU readings for the gestures identification project]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Linear-kernel.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Linear kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.01-gamma.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.01 gamma]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma]]></image:caption>
 		</image:image>
 	</url>
 </urlset>
