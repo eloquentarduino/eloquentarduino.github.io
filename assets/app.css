@@ -408,3 +408,36 @@ Adapted from: http://blog.heyimcat.com/universal-signup-form/ */
     #mc_embed_signup .clear {display: block; width: 100% }
     #mc_embed_signup .button {width: 100%; margin:0; }
 }
+
+
+.toc {
+  border: 1px solid #a2a9b1;
+  background-color: #f8f9fa;
+  display: inline-block;
+  font-size: 95%;
+  margin-top: 10px;
+  padding: 10px 40px 10px 0;
+}
+
+.toc h6 {
+  margin: 0 0 10px 35px;
+  text-align: left;
+}
+
+.toc ol, .toc ol ol {
+  counter-reset: item;
+  list-style: none;
+}
+
+.toc li {
+  counter-increment: item;
+  margin: 0 !important;
+}
+
+.toc li:before {
+  content: counters(item, ".") ". ";
+}
+
+.toc li a {
+  color: #0645ad;
+}

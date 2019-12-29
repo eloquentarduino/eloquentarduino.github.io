@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sat, 28 Dec 2019 17:54:22 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 29 Dec 2019 18:15:54 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -49,14 +49,15 @@
 <div class="watchout">
 I strongly suggest you read <a href="/2019/12/how-to-do-color-identification-on-arduino/" target="_blank" rel="noopener noreferrer">the original tutorial</a> before following this one, because I won't go into too much details on the common steps here.
 </div>
-<h3>1. Features definition</h3>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a><li><a href="#tocproject-figures">Project figures</a></ol></div></p>
+<h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be 3-dimensional, which leads to a really simple model with very high accuracy.</p>
 <div class="watchout">
 The Attiny85 has 8 Kb of flash and 512 bytes of RAM, so you won't be able to load any model that uses more than a few features (probably less than 10).
 </div>
-<h2>2. Record sample data</h2>
+<h2 id="tocrecord-sample-data">2. Record sample data</h2>
 <p>You must do this step on a board with a Serial interface, like an Arduino Uno / Nano / Pro Mini. See <a href="/2019/12/how-to-do-color-identification-on-arduino/" target="_blank" rel="noopener noreferrer">the original tutorial</a> for the code of this step.</p>
-<h3>3. Train and export the SVM classifier</h3>
+<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
 <p>This part is exactly the same as the original, except for a single parameter: you will pass <code>platform=attiny</code> to the <code>port</code> function.</p>
 <pre><code class="language-python">from sklearn.svm import SVC
 from micromlgen import port
@@ -86,7 +87,7 @@ The Attiny mode has been implemented in version 0.8 of micromlgen: if you instal
 </div>
 
 <!--End mc_embed_signup-->
-<h2>4. Run the inference</h2>
+<h2 id="tocrun-the-inference">4. Run the inference</h2>
 <p>Since we don't have a Serial, we will blink a LED a number of times dependant on the prediction result.</p>
 <pre><code class="language-cpp">#include &quot;model.h&quot;
 
@@ -107,7 +108,7 @@ void classify() {
     }
 }</code></pre>
 <p>Here we are: put some colored object in front of the sensor and see the LED blink.</p>
-<h4>Project figures</h4>
+<h2 id="tocproject-figures">Project figures</h2>
 <p>On my machine, the sketch requires 3434 bytes (41%) of program space and 21 bytes (4%) of RAM. This means you could actually run machine learning in even less space than what the Attiny85 provides. </p>
 <p>This model in particular it's so tiny you <strong>can run in even on an Attiny45, which has only 4 Kb of flash and 256 bytes of RAM</strong>.</p>
 <p>I'd like you to look at the RAM figure for a moment: <strong>21 bytes</strong>. 21 bytes is all the memory you need to run a Machine learning algorithm on a microcontroller. This is the result of the implementation I chose: the least RAM overhead possible. I challenge you to go any lower than this.</p>
@@ -133,22 +134,16 @@ void classify() {
 This is going to run on an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg" alt="from https://www.udemy.com/course/learn-audio-processing-complete-engineers-course/" /></p>
 <p><span id="more-180"></span></p>
-<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
-<ol>
-  <li>define the features</li>
-  <li>record sample data: repeat each word a few times and save the values from the serial monitor to a file, one for each word</li>
- <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
- <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
-</ol>
 <p>In this project the features are going to be the Fast Fourier Transform of 50 analog readings from a microphone, taken starting from when a loud sound is detected, sampled at intervals of 5 millis.</p>
 <div class="watchout">
 This tutorial is not about "Wake word" detection: it can't distinguish a known word from any other word. It can classify the word you speak among the ones you trained it to recognize!!!
 </div>
-<h3>1. Features definition</h3>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#toctranslate-the-raw-values">Translate the raw values</a><li><a href="#tocdetect-sound">Detect sound</a><li><a href="#tocrecord-the-words">Record the words</a><li><a href="#tocfast-fourier-transform">Fast Fourier Transform</a></li></ol><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><ol><li><a href="#tocselect-a-suitable-model">Select a suitable model</a></li></ol><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>The microphone we're going to use is a super simple device: it produces an analog signal (0-1024) based on the sound it detects. </p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord-Sensor.jpg" alt="from http://arduinolearning.com/code/ky038-microphone-module-and-arduino-example.php" /></p>
 <p>When working with audio you almost always don't want to use raw readings, since they're hardly useful. Instead you often go with <a href="https://en.wikipedia.org/wiki/Fourier_transform">Fourier Transform</a>, which extracts the frequency information from a time signal. That's going to become our features vector: let's see how in the next step.</p>
-<h3>2. Record sample data</h3>
+<h2 id="tocrecord-sample-data">2. Record sample data</h2>
 <p>First of all, we start with raw audio data. The following plot is me saying random words.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Raw-audio.gif" alt="Raw audio stream" /></p>
 <pre><code class="language-cpp">#define MIC A0
@@ -163,13 +158,13 @@ void loop() {
     Serial.println(analogRead(MIC));
     delay(INTERVAL);
 }</code></pre>
-<h4>2.1 Translate the raw values</h4>
+<h3 id="toctranslate-the-raw-values">2.1 Translate the raw values</h3>
 <p>For the Fourier Transform to work, we need to provide as input an array of values both positive and negative. <code>analogRead()</code> is returning only positive values, tough, so we need to translate them.</p>
 <pre><code class="language-cpp">int16_t readMic() {
     // this translated the analog value to a proper interval
     return  (analogRead(MIC) - 512) &gt;&gt; 2;
 }</code></pre>
-<h4>2.2 Detect sound</h4>
+<h3 id="tocdetect-sound">2.2 Detect sound</h3>
 <p>As in the <a href="/2019/12/how-to-do-gesture-identification-on-arduino/">tutorial about gesture classification</a>, we'll start recording the features when a word is beginning to be pronounced. Also in this project we'll use a threshold to detect the start of a word.</p>
 <p>To do this, we first record a &quot;background&quot; sound level, that is the value produced by the sensor when we're not talking at all.</p>
 <pre><code class="language-cpp">float backgroundSound = 0;
@@ -204,7 +199,7 @@ void loop() {
 bool soundDetected() {
     return abs(read() - backgroundSound) &gt;= SOUND_THRESHOLD;
 }</code></pre>
-<h4>2.3 Record the words</h4>
+<h3 id="tocrecord-the-words">2.3 Record the words</h3>
 <p>As for the gestures, we'll record a fixed number of readings at a fixed interval.<br />
 Here a tradeoff arises: you want to have a decent number of readings to be able to accurately describe the words you want to classify, but not too much otherwise your model is going to be too large to fit in your board.</p>
 <p>I made some experiments, and I got good results with 32 samples at 5 millis interval, which covers ~150 ms of speech.</p>
@@ -243,7 +238,7 @@ void printFeatures() {
     }
 }
 </code></pre>
-<h4>2.4 Fast Fourier Transform</h4>
+<h3 id="tocfast-fourier-transform">2.4 Fast Fourier Transform</h3>
 <p>Here we are with the Fourier Transform. When implemented in software, the most widely implementation of the FT is actually called <a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">Fast Fourier Transform (FFT)</a>, which is - as you may guess - a fast implementation of the FT. </p>
 <p>Luckily for us, there exists <a href="https://github.com/kosme/arduinoFFT">a library</a> for Arduino that does FFT.</p>
 <p>And is so easy to use that we only need a line to get usable results!</p>
@@ -264,7 +259,7 @@ void captureWord() {
 <div class="watchout">
 After you have recorded the samples for a word, I suggest you to manually check them. It is sufficient to look at the first 3 values: if one of them seems to be clearly out of range, I suggest you to delete it. You will lose some accuracy, but your model will be smaller.
 </div>
-<h3>3. Train and export the SVM classifier</h3>
+<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
 
@@ -287,7 +282,7 @@ Audio is quite noise, so you should experiment with a few params for the classif
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-linear-kernel-87-accuracy.png" alt="Decision boundaries of 2 PCA components of Word classification, linear kernel" /></p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-poly-3-kernel-91-accuracy.png" alt="Decision boundaries of 2 PCA components of Word classification, poly-3 kernel" /></p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-rbf-kernel-94-accuracy.png" alt="Decision boundaries of 2 PCA components of Word classification, rbf kernel" /></p>
-<h4>Select a suitable model</h4>
+<h3 id="tocselect-a-suitable-model">2.5 Select a suitable model</h3>
 <p>Here's an overview table of the 3 tests I did.</p>
 <table>
 <thead>
@@ -317,7 +312,7 @@ Audio is quite noise, so you should experiment with a few params for the classif
 </table>
 <p>Of course the one with the RBF kernel would be the most desiderable since it has a very high accuracy: 36 support vectors, tough, will produce a model too large to fit on an Arduino Nano.</p>
 <p>So you're forced to pick the one with the highest accuracy that fit on your board: in my case it was the Linear kernel one.</p>
-<h3>3. Run the inference</h3>
+<h2 id="tocrun-the-inference">4. Run the inference</h2>
 <pre><code class="language-cpp">#include &quot;model.h&quot;
 
 void loop() {
@@ -362,17 +357,11 @@ As you can hear from the video, you should be quite accurate when pronouncing th
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg" alt="Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/" /></p>
 <p><span id="more-224"></span></p>
 <p>The task of detecting where you are when GPS or satellite localization is not an option is called <a href="https://en.wikipedia.org/wiki/Indoor_positioning_system">indoor positioning</a>: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely available, but the same project could be re-purposed to use Bluetooth, if there are enough devices in your location.</p>
-<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
-<ol>
-  <li>define the features</li>
-  <li>record sample data: run a few scans for each location to be predicted and record the RSSI (signal strength) of each visible network</li>
- <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
- <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
-</ol>
-<h2>1. Features definition</h2>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#tocenumerate-the-access-points">Enumerate the access points</a><li><a href="#toccreate-an-access-point-array">Create an access point array</a><li><a href="#tocconvert-to-features-vector">Convert to features vector</a></li></ol><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>The features for this project are going to be the RSSIs (Received signal strength indication) of the known WiFi networks. If a network is out of range, it will have an RSSI equal to 0.</p>
-<h3>2. Record sample data</h3>
-<h4>2.1 Enumerate the access points</h4>
+<h2 id="tocrecord-sample-data">2. Record sample data</h2>
+<h3 id="tocenumerate-the-access-points">2.1 Enumerate the access points</h3>
 <p>First of all we need to enumerate all the networks we will encounter during the inference process. This is because not all networks will be visible all the time:  we have to work, however, with a fixed number of features.</p>
 <p>To begin, we take a &quot;reconnaissance tour&quot; of the locations we want to predict and log all the networks we detect. Load the following sketch and take note of all the networks that appear on the Serial monitor.</p>
 <pre><code class="language-cpp">#include &lt;WiFi.h&gt;
@@ -391,7 +380,7 @@ void loop() {
 
   delay(3000);
 }</code></pre>
-<h4>2.2 Create an access point array</h4>
+<h3 id="toccreate-an-access-point-array">2.2 Create an access point array</h3>
 <p>Now that we have a bunch of SSIDs, we need to assign each SSID to a fixed index, from 0 to <code>MAX_NETWORKS</code>.</p>
 <p>You can implement this part as you like, but in this demo I'll make use of a class I wrote called <code>Array</code> (you can see the <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/src/data_structures/Array.h">source code</a> and <a href="https://github.com/agrimagsrl/eloquentarduino/blob/master/examples/ArrayExample/ArrayExample.ino">example</a> on Github), which implements 2 useful functions: </p>
 <ol>
@@ -420,7 +409,7 @@ void setup() {
     knownNetworks.push(&quot;Put your SSID #3&quot;);
     // and so on
 }</code></pre>
-<h4>2.3 Convert to features vector</h4>
+<h3 id="tocconvert-to-features-vector">2.3 Convert to features vector</h3>
 <p>The second step is to convert the scan results into a features vector. Each feature will be the RSSI of the given SSID, in the exact order we populated the <code>knownNetworks</code> array.</p>
 <p>In practice:</p>
 <pre><code class="language-cpp">features[0] == RSSI of &quot;Put your SSID #0&quot;;
@@ -483,7 +472,7 @@ features[networkIndex] = WiFi.RSSI(i);
 features[networkIndex] = WiFi.RSSI(i) > MIN_RSSI ? WiFi.RSSI(i) : 0;
 </code></pre>
 </div>
-<h3>3. Train and export the SVM classifier</h3>
+<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
 
@@ -501,7 +490,7 @@ c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 
 <p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
-<h3>4. Run the inference</h3>
+<h2 id="tocrun-the-inference">4. Run the inference</h2>
 <pre><code class="language-cpp">#include &quot;model.h&quot;
 
 void loop() {
@@ -535,20 +524,14 @@ void classify() {
 ]]></description>
 								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to use an accelerometer sensor to identify the gestures you play.<br />
 This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html">Tensorflow blog</a>. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.svg" alt="Decision boundaries, 99% accuracy" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png" alt="Decision boundaries, 99% accuracy" /></p>
 <p><span id="more-35"></span></p>
-<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
-<ol>
-  <li>define the features</li>
-  <li>record sample data: repeat each gesture a few times and save the values from the serial monitor to a file, one for each gesture</li>
- <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
- <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
-</ol>
-<h2>1. Features definition</h2>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#tocread-the-imu-sensor">Read the IMU sensor</a><li><a href="#toccalibration">Calibration</a><li><a href="#tocdetect-first-motion">Detect first motion</a><li><a href="#tocrecord-features">Record features</a></li></ol><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><ol><li><a href="#tocselect-a-suitable-model">Select a suitable model</a></li></ol><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>We're going to use the accelerations along the 3 axis (X, Y, Z) coming from an <a href="https://en.wikipedia.org/wiki/Inertial_measurement_unit">IMU</a> to infer which gesture we're playing. We'll use a fixed number of recordings (<code>NUM_SAMPLES</code>) starting from the first detection of movement. </p>
 <p>This means our feature vectors are going to be of dimension <code>3 * NUM_SAMPLES</code>, which can become too large to fit in the memory of the Arduino Nano. We'll start with a low value for <code>NUM_SAMPLES</code> to keep it as leaner as possible: if your classifications suffer from poor accuracy, you can increase this number.</p>
-<h3>2. Record sample data</h3>
-<h4>2.1 Read the IMU sensor</h4>
+<h2 id="tocrecord-sample-data">2. Record sample data</h2>
+<h3 id="tocread-the-imu-sensor">2.1 Read the IMU sensor</h3>
 <p>First of all, we need to read the raw data from the IMU. This piece of code will be different based on the specific chip you use. To keep things consistent, we'll wrap the IMU logic in 2 functions: <code>imu_setup</code> and <code>imu_read</code>. </p>
 <p>I'll report a couple of example implementations for the <code>MPU6050</code> and the <code>MPU9250</code> (these are the chip I have at hand). You should save whichever code you use in a file called <code>imu.h</code>. </p>
 <pre><code class="language-cpp">#include &quot;Wire.h&quot;
@@ -619,7 +602,7 @@ void loop() {
 }</code></pre>
 <p>Open the Serial plotter and make some movement to have an idea of the range of your readings.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Raw-gestures.gif&quot;" alt="Raw IMU readings for the gestures identification project" /></p>
-<h4>2.2 Calibration</h4>
+<h3 id="toccalibration">2.2 Calibration</h3>
 <p>Due to gravity, we get a stable value of -9.8 on the Z axis at rest (you can see this in the previous image). Since I'd like to have almost 0 at rest, I created a super simple calibration procedure to remove this fixed offset from the readings.</p>
 <pre><code class="language-cpp">double baseline[NUM_AXES];
 double features[NUM_SAMPLES * NUM_AXES];
@@ -654,7 +637,7 @@ void calibrate() {
 }</code></pre>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif" alt="Calibrated IMU readings for the gestures identification project" /></p>
 <p>Much better.</p>
-<h4>2.3 Detect first motion</h4>
+<h3 id="tocdetect-first-motion">2.3 Detect first motion</h3>
 <p>Now we need to check if motion is happening. To keep it simple, we'll use a naive approach that will look for an high value in the acceleration: if a threshold is exceeded, a gesture is starting. </p>
 <p>If you did the calibration step, a threshold of 5 should work well. If you didn't calibrate, you have to come up with a value that suits your needs.</p>
 <pre><code class="language-cpp">#include imu.h
@@ -679,7 +662,7 @@ void loop() {
 bool motionDetected(float ax, float ay, float az) {
     return (abs(ax) + abs(ay) + abs(az)) &gt; ACCEL_THRESHOLD;
 }</code></pre>
-<h4>2.4 Record features</h4>
+<h3 id="tocrecord-features">2.4 Record features</h3>
 <p>If no motion is happening, we don't take any action and keep watching. If motion is happening, we print the next <code>NUM_SAMPLES</code> readings to Serial. </p>
 <pre><code class="language-cpp">void loop() {
     float ax, ay, az;
@@ -728,7 +711,7 @@ void printFeatures() {
 }
 </code></pre>
 <p>Record 15-20 samples for each geasture and save them to a file, one for each gesture. Since we're dealing with highly dimensional data, you should collect as much samples as possible, to average out the noise.</p>
-<h3>3. Train and export the SVM classifier</h3>
+<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
 
@@ -751,7 +734,7 @@ print(c_code)</code></pre>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.png" alt="Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel" /></p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.01-gamma.png" alt="Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.01 gamma" /></p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png" alt="Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma" /></p>
-<h4>Select a suitable model</h4>
+<h3 id="tocselect-a-suitable-model">3.1 Select a suitable model</h3>
 <p>Now that we selected the best model, we have to export it to C code. Here comes the culprit: not all models will fit on your board.</p>
 <p>The core of SVM (Support Vector Machines) are support vectors: each trained classifier will be characterized by a certain number of them. The problem is: if there're too much, the generated code will be too large to fit in your flash.</p>
 <p>For this reason, instead of selecting <em>the best</em> model on accuracy, you should make a ranking, from the best performing to the worst. For each model, starting from the top, you should import it in your Arduino project and try to compile: if it fits, fine, you're done. Otherwise you should pick the next and try again.</p>
@@ -826,7 +809,7 @@ print(c_code)</code></pre>
 </table>
 <p>As you can see, we achieved a very high accuracy on the test set for all the classifiers: only one, though, fitted on the Arduino Nano. Of course, if you use a larger board, you can deploy the others too.</p>
 <div class="infobox">As a side note, take a look at the <code>RAM</code> column: all the values are equal: this is because in the implementation is independant from the number of support vectors and only depends on the number of features.</div>
-<h3>3. Run the inference</h3>
+<h2 id="tocrun-the-inference">4. Run the inference</h2>
 <pre><code class="language-cpp">#include &quot;model.h&quot;
 
 void loop() {
@@ -886,7 +869,7 @@ void classify() {
 <li>AnalogIn</li>
 <li>AnalogOut</li>
 </ol>
-<h2>Import the library</h2>
+<h2 id="tocimport-the-library">Import the library</h2>
 <div class="watchout">To follow this tutorial along you need to first <a href="/2019/12/how-to-install-the-eloquent-library/" target="_blank">install the Eloquent library</a></div>
 <pre><code class="language-cpp">#import &lt;eIO.h&gt;
 
@@ -902,7 +885,7 @@ using namespace Eloquent::Pin;</code></pre>
 <pre><code class="language-cpp">using namespace Adafruit;
 
 Si7021 si;</code></pre>
-<h2>How to use</h2>
+<h2 id="tochow-to-use">How to use</h2>
 <p>First of all, all the 4 implementations accept a single constructor argument: the pin number.</p>
 <pre><code class="language-cpp"> DigitalOut led(BUILTIN_LED);
  DigitalIn pushButton(10);
@@ -1061,8 +1044,8 @@ void loop() {
 ]]></content:encoded>
 										</item>
 		<item>
-		<title>How to do Morse alphabet identification through machine learning on Arduino</title>
-		<link>https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/</link>
+		<title>Morse alphabet identification on Arduino with Machine learning</title>
+		<link>https://eloquentarduino.github.io/2019/12/morse-identification-on-arduino/</link>
 				<pubDate>Fri, 06 Dec 2019 12:07:38 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
@@ -1070,21 +1053,15 @@ void loop() {
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=194</guid>
 				<description><![CDATA[<p>In this Arduno Machine learning project we're going to identify the letters from the Morse alphabet. In practice, we'll translate dots (•) and dashes (‒) &#34;typed&#34; with a push button into meaningful characters. In this tutorial we're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/">How to do Morse alphabet identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/morse-identification-on-arduino/">Morse alphabet identification on Arduino with Machine learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to identify the letters from the <a href="https://en.wikipedia.org/wiki/Morse_code">Morse alphabet</a>.<br />
 In practice, we'll translate dots (•) and dashes (‒)  &quot;typed&quot; with a push button into meaningful characters.<br />
 In this tutorial we're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-194"></span></p>
 <p><img src="https://i.ytimg.com/vi/L6gxfX4GrbI/maxresdefault.jpg" alt="credits to https://www.youtube.com/watch?v=L6gxfX4GrbI" /></p>
-<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
-<ol>
-  <li>define the features</li>
-  <li>record sample data: repeat each letter a few times and save the values from the serial monitor to a file, one for each letter.</li>
- <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
- <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
-</ol>
-<h3>1. Features definition</h3>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>For our task we'll use a simple push button as input and a fixed number of samples taken at a fixed interval (100 ms), starting from the first detection of the button press. I chose to record 30 samples for each letter, but you can easily customize the value as per your needs. </p>
 <p>With 30 samples at 100 ms frequency, we'll have 3 seconds to &quot;type&quot; the letter and on the Serial monitor will appear a sequence of 0s and 1s, representing if the button was pressed or not; the inference procedure will translate this sequence into a letter.<br />
 As a reference, here are a couple example of what we'll be working with.</p>
@@ -1096,7 +1073,7 @@ As a reference, here are a couple example of what we'll be working with.</p>
 
 // E (•)
 0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
-<h3>2. Record sample data</h3>
+<h2 id="tocrecord-sample-data">2. Record sample data</h2>
 <p>To the bare minimum, we'll need a push button and two wires: one to ground and the other to a digital pin. Since in the example we'll make the button an <code>INPUT_PULLUP</code>, we'll read 0 when the button is pressed and 1 when not.  </p>
 <p><img src="https://www.arduino.cc/en/uploads/Tutorial/PullUp_bbd.png" alt="credits to https://www.arduino.cc/en/Tutorial/DigitalInputPullup" /></p>
 <p>All we need to do is detect a press and record the following 30 samples of the digital pin:</p>
@@ -1181,7 +1158,7 @@ void printFeatures() {
 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
 <p>If you do a good job, you should end with quite distinguible features, as show in the plot below.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg" alt="Decision boundaries of 2 PCA components from Morse alphabet identification features" /></p>
-<h3>3. Train and export the SVM classifier</h3>
+<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
 
@@ -1199,7 +1176,7 @@ c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 
 <p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
-<h3>3. Run the inference</h3>
+<h2 id="tocrun-the-inference">4. Run the inference</h2>
 <pre><code class="language-cpp">#include &quot;model.h&quot;
 
 void loop() {
@@ -1219,7 +1196,7 @@ void loop() {
 <br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
 <hr>
 <p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlMorseIdentificationExample/MicromlMorseIdentificationExample.ino" target="_blank">Github</a></p></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-morse-alphabet-identification-on-arduino/">How to do Morse alphabet identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/morse-identification-on-arduino/">Morse alphabet identification on Arduino with Machine learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
@@ -1245,7 +1222,7 @@ while (WiFi.status() != WL_CONNECTED) {
 }</code></pre>
 <p>If the connection doesn't succeed (maybe the AP is out of range or is down), you're stuck in an endless wait. A proper way for handling such situations is with a timeout that gets you out of the loop with an error status so you can handle the failure.<br />
 <code>await</code> is exactly this: a construct to await for a condition to become true until a timeout expires, returning true or false as a response.</p>
-<h3>Definition</h3>
+<h3 id="tocdefinition">Definition</h3>
 <pre><code class="language-cpp">#define await(condition, timeout) await_with_interval(condition, timeout, 10)
 #define await_with_interval(condition, timeout, interval) \
   ([]() { \
@@ -1255,7 +1232,7 @@ while (WiFi.status() != WL_CONNECTED) {
       delay(interval); \
     } \
   return false; })()</code></pre>
-<h3>How to use</h3>
+<h3 id="tochow-to-use">How to use</h3>
 <p><code>await</code> needs at least two arguments:</p>
 <ol>
 <li>the condition to await for</li>
@@ -1274,7 +1251,7 @@ bool serialHasCharacters = await(Serial.available(), 5 Seconds)</code></pre>
 <p>The default interval between checks is 10 milliseconds: if you need a custom delay interval you can use the more verbose <code>await_with_interval</code>:</p>
 <pre><code class="language-cpp">// await WiFi for 10 seconds, check if connected every 500 millis
 bool wifiConnected = await_with_interval(WiFi.status() == WL_CONNECTED, 10 Seconds, 500 Millis)</code></pre>
-<h3>How it works</h3>
+<h3 id="tochow-it-works">How it works</h3>
 <p>The <code>await</code> macro creates an <a href="http://www.cplusplus.com/articles/2LywvCM9/">inline function</a> that loops until the timeout expires. At every loop it checks if the condition is true: if that's the case, it returns true. The inline function construct is needed to get a return value, so you can assign it to a variable or embed directly inside an <code>if</code> test. The following code sample gives you an idea of what's happening.</p>
 <pre><code class="language-cpp">bool wifiConnected = await(WiFi.status() == WL_CONNECTED, 10 Seconds)
 
@@ -1311,11 +1288,11 @@ bool wifiConnected = inline_function();</code></pre>
 ]]></description>
 								<content:encoded><![CDATA[<p>The <code>every</code> construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically.</p>
 <p><span id="more-209"></span></p>
-<h3>Definition</h3>
+<h3 id="tocdefinition">Definition</h3>
 <pre><code class="language-cpp">#define every(interval) \
     static uint32_t __every__##interval = millis(); \
     if (millis() - __every__##interval &gt;= interval &amp;&amp; (__every__##interval = millis()))</code></pre>
-<h3>How to use</h3>
+<h3 id="tochow-to-use">How to use</h3>
 <pre><code>// these are for greater code readability
 #define Millis 
 #define Second  *1000
@@ -1344,7 +1321,7 @@ void loop() {
         Serial.println(&quot; seconds&quot;);
     }
 }</code></pre>
-<h3>Caveats</h3>
+<h3 id="toccaveats">Caveats</h3>
 <p><code>every</code> is just a macro definition and is not a proper timer, so it has some limitations:</p>
 <ol>
 <li>you can't stop, pause or resume it: once set, it will run forever</li>
@@ -1380,14 +1357,14 @@ every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
 								<content:encoded><![CDATA[<p>In this short tutorial I'll show you how you can install the <a href="/2019/11/how-to-write-clean-arduino-code-introducing-the-eloquent-library/">Eloquent library</a> to take advange of all the good things it provides to you.</p>
 <p>It really is super simple, since the Eloquent library is no different from any other library you already installed on your computer, but I'll repeat the steps for clarity.</p>
 <p><span id="more-554"></span></p>
-<h2>1. Download the zip from Github</h2>
+<h2 id="tocdownload-the-zip-from-github">1. Download the zip from Github</h2>
 <p>The whole library is hosted on Github, so head over to <a href="https://github.com/eloquentarduino/EloquentArduino">the repo</a> and click <em>Clone or download</em> &gt; <em>Download ZIP</em>.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Repo.png" alt="Download zip from Github repository" /></p>
-<h2>2. Extract the zip to you library directory</h2>
+<h2 id="tocextract-the-zip-to-you-library-directory">2. Extract the zip to you library directory</h2>
 <p>Once downloaded, you should extract the zip into your Arduino libraries folder. The path will vary based on your OS and installation, but I expect you to know where it is.</p>
-<h2>3. Strip the -master suffix</h2>
+<h2 id="tocstrip-the-master-suffix">3. Strip the -master suffix</h2>
 <p>When downloaded from Github, your zip and your folder will be named <code>EloquentArduino-master</code>: rename the folder to just <code>EloquentArduino</code>, without the master suffix.</p>
-<h2>4. Done</h2>
+<h2 id="tocdone">4. Done</h2>
 <p>If you follwed the steps correctly, the library is ready to be used.</p>
 <br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/">How to install the Eloquent library</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
@@ -1395,7 +1372,7 @@ every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
 										</item>
 		<item>
 		<title>How to do color identification through machine learning on Arduino</title>
-		<link>https://eloquentarduino.github.io/2019/12/how-to-do-color-identification-on-arduino/</link>
+		<link>https://eloquentarduino.github.io/2019/12/color-identification-on-arduino/</link>
 				<pubDate>Sun, 01 Dec 2019 10:35:29 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
@@ -1403,22 +1380,16 @@ every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=6</guid>
 				<description><![CDATA[<p>In this Arduno Machine learning project we're going to use an RGB sensor to identify objects based on their color. This is a remake of the project found on the Tensorflow blog. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-color-identification-on-arduino/">How to do color identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/color-identification-on-arduino/">How to do color identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to use an RGB sensor to identify objects based on their color.<br />
 This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/fruit-identification-using-arduino-and-tensorflow.html">Tensorflow blog</a>. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-6"></span></p>
-<p>This tutorial is part of a <a href="/category/programming/arduino-machine-learning/" target="_blank">series of tutorials</a> about Machine learning on Arduino and all follow the same outline:</p>
-<ol>
-  <li>define the features</li>
-  <li>record sample data: put some colored objects in front of your sensor and save the readings</li>
- <li>train an SVM classifier with Python's scikit-learn and export it to optimized C code using <code><a href="https://github.com/agrimagsrl/micromlgen" target="_blank">micromlgen</a></code></li>
- <li>copy and paste the generated code in a <code>model.h</code> file in the Arduino project and call <code>predict()</code> from it</li>
-</ol>
-<h2>1. Features definition</h2>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be of 3-dimensional, which leads to a really simple model with very high accuracy.</p>
-<hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks #Arduino #microml #ml #tinyml #MachineLearning #ai #svm</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-color-identification-on-arduino%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks%20%23Arduino%20%23microml%20%23ml%20%23tinyml%20%23MachineLearning%20%23ai%20%23svm&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<h2>2. Record sample data</h2>
+<hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks #Arduino #microml #ml #tinyml #MachineLearning #ai #svm</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fcolor-identification-on-arduino%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks%20%23Arduino%20%23microml%20%23ml%20%23tinyml%20%23MachineLearning%20%23ai%20%23svm&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<h2 id="tocrecord-sample-data">2. Record sample data</h2>
 <p>We don't need any processing to get from the sensor readings to the feature vector, so the code will be straight-forward: read each component from the sensor and assign it to the features array. This part will vary based on the specific chip you have: I'll report the code for a TCS 230/3200. </p>
 <pre><code class="language-cpp">#define S2 2
 #define S3 3
@@ -1469,7 +1440,7 @@ Don’t forget to sample the “empty color” too: don’t put anything in fron
 </div>
 <p>If you do a good job, you should end with distinguible features, as show in the contour plot below.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-the-colors-features.png" alt="Decision boundaries of 2 PCA components from the colors features" /></p>
-<h3>3. Train and export the SVM classifier</h3>
+<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank">tutorial</a></p>
 
@@ -1487,7 +1458,7 @@ c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 
 <p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
-<h2>4. Run the inference</h2>
+<h2 id="tocrun-the-inference">4. Run the inference</h2>
 <pre><code class="language-cpp">#include model.h
 
 void loop() {
@@ -1504,7 +1475,7 @@ void loop() {
 <br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
 <hr>
 <p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlColorIdentificationExample/MicromlColorIdentificationExample.ino" target="_blank">Github</a></p></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-do-color-identification-on-arduino/">How to do color identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/color-identification-on-arduino/">How to do color identification through machine learning on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 	</channel>
