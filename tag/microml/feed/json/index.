@@ -4,7 +4,7 @@
     "home_page_url": "https://eloquentarduino.github.io/tag/microml/",
     "feed_url": "https://eloquentarduino.github.io/tag/microml/feed/json/",
     "title": "Eloquent Arduino Blog",
-    "description": "A blog about Arduino, programming &amp; electronics",
+    "description": "Machine learning on Arduino, programming &amp; electronics",
     "items": [
         {
             "id": "https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/",

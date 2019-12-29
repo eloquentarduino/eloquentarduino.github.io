@@ -1,6 +1,6 @@
 jQuery(function() {
     /* add caption to images */
-    jQuery('img').each(function(i, img) {
+    jQuery('.post-inner img').each(function(i, img) {
         var alt = img.getAttribute('alt')
 
         if (!alt) return;

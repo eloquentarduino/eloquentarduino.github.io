@@ -4,7 +4,7 @@
     "home_page_url": "https://eloquentarduino.github.io/tag/eloquent/",
     "feed_url": "https://eloquentarduino.github.io/tag/eloquent/feed/json/",
     "title": "Eloquent Arduino Blog",
-    "description": "A blog about Arduino, programming &amp; electronics",
+    "description": "Machine learning on Arduino, programming &amp; electronics",
     "items": [
         {
             "id": "https://eloquentarduino.github.io/2019/12/arduino-pin-class/",
