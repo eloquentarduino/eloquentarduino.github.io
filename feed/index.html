@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 29 Dec 2019 18:15:54 +0000</lastBuildDate>
+	<lastBuildDate>Tue, 31 Dec 2019 12:08:37 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,22 +20,22 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.2</generator>
 	<item>
-		<title>OMG! Machine learning on Attiny85: Color identification tutorial</title>
+		<title>Embedded Machine learning on Attiny85</title>
 		<link>https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/</link>
 				<pubDate>Mon, 23 Dec 2019 16:57:15 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=688</guid>
-				<description><![CDATA[<p>You won't believe it, but you can run Machine learning on an Attiny85 (and many others Attiny). Not that you should, but you can. In this post I'll show you how! When I first run a Machine learning project on my Arduino Nano (old generation), it already felt a big achievement. I mean, that board [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">OMG! Machine learning on Attiny85: Color identification tutorial</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+				<description><![CDATA[<p>You won't believe it, but you can run Machine learning on embedded systems like an Attiny85 (and many others Attiny)! When I first run a Machine learning project on my Arduino Nano (old generation), it already felt a big achievement. I mean, that board has only 32 Kb of program space and 2 Kb of [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">Embedded Machine learning on Attiny85</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
-								<content:encoded><![CDATA[<p>You won't believe it, but <strong>you can run Machine learning on an Attiny85</strong> (and many others Attiny). Not that you should, but you can. In this post I'll show you how!</p>
+								<content:encoded><![CDATA[<p>You won't believe it, but <strong>you can run Machine learning on embedded systems like an Attiny85</strong> (and many others Attiny)!</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/attiny85_ml.png" alt="ri-elaborated from https://cyaninfinite.com/miniaturize-projects-with-attiny85/" /></p>
 <p><span id="more-688"></span></p>
 <p>When I first run a Machine learning project on my Arduino Nano (old generation), it already felt a big achievement. I mean, that board has only 32 Kb of program space and 2 Kb of RAM and you can buy a chinese clone for around 2.50 $.</p>
-<p>It already opened the path to a huge amount of microcontrollers ready to become &quot;intelligent&quot;. </p>
-<p>But it was not enough for me: after all, the <a href="/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">MicroML generator</a> exports plain C that should run anywhere, not only on Arduino boards.</p>
+<p>It already opened the path to a embedded machine learning at a new scale, given the huge amount of microcontrollers ready to become &quot;intelligent&quot;. </p>
+<p>But it was not enough for me: after all, the <a href="/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">MicroML generator</a> exports plain C that should run on any embedded system, not only on Arduino boards.</p>
 <p>So I setup to test if I could go even smaller and run it on the #1 of tiny chips: the Attiny85.</p>
 <hr /><p><em>MicroML exports plain C that could run anywhere, not only on Arduino boards.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=MicroML%20exports%20plain%20C%20that%20could%20run%20anywhere%2C%20not%20only%20on%20Arduino%20boards.&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <p>No, I couldn't.</p>
@@ -45,7 +45,7 @@
 <p>Guess what? It compiled!</p>
 <p>So I tried porting one my earliear tutorial (the <a href="/2019/12/how-to-do-color-identification-on-arduino/">color identification</a> one) to the Attiny and...</p>
 <hr /><p><em>Boom! Machine learning on an Attiny85!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=Boom%21%20Machine%20learning%20on%20an%20Attiny85%21&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>So, here's a step-by-step tutorial on how you can do it too.</p>
+<p>Here's a step-by-step tutorial on how you can do it too.</p>
 <div class="watchout">
 I strongly suggest you read <a href="/2019/12/how-to-do-color-identification-on-arduino/" target="_blank" rel="noopener noreferrer">the original tutorial</a> before following this one, because I won't go into too much details on the common steps here.
 </div>
@@ -116,7 +116,7 @@ void classify() {
 <p><br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
 <hr>
 <p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlColorIdentificationAttinyExample/MicromlColorIdentificationAttinyExample.ino" target="_blank">Github</a></p></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">OMG! Machine learning on Attiny85: Color identification tutorial</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">Embedded Machine learning on Attiny85</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 		<item>
@@ -350,19 +350,41 @@ As you can hear from the video, you should be quite accurate when pronouncing th
 		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=224</guid>
-				<description><![CDATA[<p>In this Arduno Machine learning project we're going to use the nearby WiFi access points to locate where we are. For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32. The task of detecting where you are when GPS or satellite localization is not an option is called [&#8230;]</p>
+				<description><![CDATA[<p>In this Arduno Machine learning project we're going to use the nearby WiFi access points to locate where we are. For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32. Table of contentsWhat is indoor positioning?What will we use it for?What you needHow it worksFeatures definitionRecord sample dataEnumerate [&#8230;]</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/">Indoor positioning using Arduino and Machine Learning in 4 steps</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to use the nearby WiFi access points to locate where we are. For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg" alt="Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/" /></p>
 <p><span id="more-224"></span></p>
-<p>The task of detecting where you are when GPS or satellite localization is not an option is called <a href="https://en.wikipedia.org/wiki/Indoor_positioning_system">indoor positioning</a>: it could be in a building, an airport, a parking garage. I opted for WiFi because it is widely available, but the same project could be re-purposed to use Bluetooth, if there are enough devices in your location.</p>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#tocenumerate-the-access-points">Enumerate the access points</a><li><a href="#toccreate-an-access-point-array">Create an access point array</a><li><a href="#tocconvert-to-features-vector">Convert to features vector</a></li></ol><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocwhat-is-indoor-positioning">What is indoor positioning?</a><ol><li><a href="#tocwhat-will-we-use-it-for">What will we use it for?</a><li><a href="#tocwhat-you-need">What you need</a><li><a href="#tochow-it-works">How it works</a></li></ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#tocenumerate-the-access-points">Enumerate the access points</a><li><a href="#toccreate-an-access-point-array">Create an access point array</a><li><a href="#tocconvert-to-features-vector">Convert to features vector</a></li></ol><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<h2 id="tocwhat-is-indoor-positioning">What is indoor positioning?</h2>
+<p>We all are used to GPS positioning: our device will use satellites to track our position on Earth. GPS works very well and with a very high accuracy (you can expect only a few meters of error).</p>
+<p>But it suffers a problem: it needs <em>Line of Sight</em> (a clear path from your device to the satellites). If you're not in an open place, like inside a building, you're out of luck.</p>
+<p>The task of detecting where you are when GPS localization is not an option is called <a href="https://en.wikipedia.org/wiki/Indoor_positioning_system">indoor positioning</a>: it could be in a building, an airport, a parking garage. </p>
+<p>There are lots of different approaches to this task (Wikipedia lists more than 10 of them), each with a varying level of commitment, difficulty, cost and accuracy.</p>
+<p>For this tutorial I opted for one that is both cost-efficient, easy to implement and readily available in most of the locations: <strong>WiFi indoor positioning</strong>.</p>
+<h3 id="tocwhat-will-we-use-it-for">What will we use it for?</h3>
+<p>In this tutorial about Machine learning on Arduino we're going to use Wifi indoor positioning to detect in which room of our house / office we are. This is the most basic task we can accomplish and will get us a feeling of level of accuracy we can achieve with such a simple setup.</p>
+<p>On this basis, we'll construct more sophisticated projects in future posts.</p>
+<h3 id="tocwhat-you-need">What you need</h3>
+<p>To accomplish this tutorial, you really need 2 things:</p>
+<ol>
+<li>a WiFi equipped board (ESP8266, ESP32, Arduino MKR WiFi 1010...)</li>
+<li>be in a place with a few WiFi networks around</li>
+</ol>
+<p>If you're doing this at home or in your office, there's a good change your neighbours have WiFi networks in their apartments you can leverage. If you live in an isolated contryside, sorry, this will not work for you.</p>
+<h3 id="tochow-it-works">How it works</h3>
+<p>So, how exactly does Wifi indoor positioning works in conjuction with Machine learning? </p>
+<p>Let's pretend there are 5 different WiFi networks around you, like in the picture below.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Wifi1.png" alt="Wifi indoor positioning example" /></p>
+<p>As you can see there are two markers on the map: each of these markers will &quot;see&quot; different networks, with different <em>signal strengths</em> (a.k.a <a href="https://en.wikipedia.org/wiki/Received_signal_strength_indication">RSSI</a>).</p>
+<p>As you move around, those numbers will change: each room will be identified by the unique combination of the RSSIs.</p>
 <h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>The features for this project are going to be the RSSIs (Received signal strength indication) of the known WiFi networks. If a network is out of range, it will have an RSSI equal to 0.</p>
 <h2 id="tocrecord-sample-data">2. Record sample data</h2>
+<p>Before actually recording the sample data to train our classifier, we need to do some preliminary work. This is because not all networks will be visible all the time:  we have to work, however, with a fixed number of features.</p>
 <h3 id="tocenumerate-the-access-points">2.1 Enumerate the access points</h3>
-<p>First of all we need to enumerate all the networks we will encounter during the inference process. This is because not all networks will be visible all the time:  we have to work, however, with a fixed number of features.</p>
+<p>First of all we need to enumerate all the networks we will encounter during the inference process. </p>
 <p>To begin, we take a &quot;reconnaissance tour&quot; of the locations we want to predict and log all the networks we detect. Load the following sketch and take note of all the networks that appear on the Serial monitor.</p>
 <pre><code class="language-cpp">#include &lt;WiFi.h&gt;
 
@@ -869,7 +891,7 @@ void classify() {
 <li>AnalogIn</li>
 <li>AnalogOut</li>
 </ol>
-<h2 id="tocimport-the-library">Import the library</h2>
+<h2>Import the library</h2>
 <div class="watchout">To follow this tutorial along you need to first <a href="/2019/12/how-to-install-the-eloquent-library/" target="_blank">install the Eloquent library</a></div>
 <pre><code class="language-cpp">#import &lt;eIO.h&gt;
 
@@ -885,7 +907,7 @@ using namespace Eloquent::Pin;</code></pre>
 <pre><code class="language-cpp">using namespace Adafruit;
 
 Si7021 si;</code></pre>
-<h2 id="tochow-to-use">How to use</h2>
+<h2>How to use</h2>
 <p>First of all, all the 4 implementations accept a single constructor argument: the pin number.</p>
 <pre><code class="language-cpp"> DigitalOut led(BUILTIN_LED);
  DigitalIn pushButton(10);
@@ -1222,7 +1244,7 @@ while (WiFi.status() != WL_CONNECTED) {
 }</code></pre>
 <p>If the connection doesn't succeed (maybe the AP is out of range or is down), you're stuck in an endless wait. A proper way for handling such situations is with a timeout that gets you out of the loop with an error status so you can handle the failure.<br />
 <code>await</code> is exactly this: a construct to await for a condition to become true until a timeout expires, returning true or false as a response.</p>
-<h3 id="tocdefinition">Definition</h3>
+<h3>Definition</h3>
 <pre><code class="language-cpp">#define await(condition, timeout) await_with_interval(condition, timeout, 10)
 #define await_with_interval(condition, timeout, interval) \
   ([]() { \
@@ -1232,7 +1254,7 @@ while (WiFi.status() != WL_CONNECTED) {
       delay(interval); \
     } \
   return false; })()</code></pre>
-<h3 id="tochow-to-use">How to use</h3>
+<h3>How to use</h3>
 <p><code>await</code> needs at least two arguments:</p>
 <ol>
 <li>the condition to await for</li>
@@ -1251,7 +1273,7 @@ bool serialHasCharacters = await(Serial.available(), 5 Seconds)</code></pre>
 <p>The default interval between checks is 10 milliseconds: if you need a custom delay interval you can use the more verbose <code>await_with_interval</code>:</p>
 <pre><code class="language-cpp">// await WiFi for 10 seconds, check if connected every 500 millis
 bool wifiConnected = await_with_interval(WiFi.status() == WL_CONNECTED, 10 Seconds, 500 Millis)</code></pre>
-<h3 id="tochow-it-works">How it works</h3>
+<h3>How it works</h3>
 <p>The <code>await</code> macro creates an <a href="http://www.cplusplus.com/articles/2LywvCM9/">inline function</a> that loops until the timeout expires. At every loop it checks if the condition is true: if that's the case, it returns true. The inline function construct is needed to get a return value, so you can assign it to a variable or embed directly inside an <code>if</code> test. The following code sample gives you an idea of what's happening.</p>
 <pre><code class="language-cpp">bool wifiConnected = await(WiFi.status() == WL_CONNECTED, 10 Seconds)
 
@@ -1288,11 +1310,11 @@ bool wifiConnected = inline_function();</code></pre>
 ]]></description>
 								<content:encoded><![CDATA[<p>The <code>every</code> construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically.</p>
 <p><span id="more-209"></span></p>
-<h3 id="tocdefinition">Definition</h3>
+<h3>Definition</h3>
 <pre><code class="language-cpp">#define every(interval) \
     static uint32_t __every__##interval = millis(); \
     if (millis() - __every__##interval &gt;= interval &amp;&amp; (__every__##interval = millis()))</code></pre>
-<h3 id="tochow-to-use">How to use</h3>
+<h3>How to use</h3>
 <pre><code>// these are for greater code readability
 #define Millis 
 #define Second  *1000
@@ -1321,7 +1343,7 @@ void loop() {
         Serial.println(&quot; seconds&quot;);
     }
 }</code></pre>
-<h3 id="toccaveats">Caveats</h3>
+<h3>Caveats</h3>
 <p><code>every</code> is just a macro definition and is not a proper timer, so it has some limitations:</p>
 <ol>
 <li>you can't stop, pause or resume it: once set, it will run forever</li>
@@ -1357,14 +1379,14 @@ every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
 								<content:encoded><![CDATA[<p>In this short tutorial I'll show you how you can install the <a href="/2019/11/how-to-write-clean-arduino-code-introducing-the-eloquent-library/">Eloquent library</a> to take advange of all the good things it provides to you.</p>
 <p>It really is super simple, since the Eloquent library is no different from any other library you already installed on your computer, but I'll repeat the steps for clarity.</p>
 <p><span id="more-554"></span></p>
-<h2 id="tocdownload-the-zip-from-github">1. Download the zip from Github</h2>
+<h2>1. Download the zip from Github</h2>
 <p>The whole library is hosted on Github, so head over to <a href="https://github.com/eloquentarduino/EloquentArduino">the repo</a> and click <em>Clone or download</em> &gt; <em>Download ZIP</em>.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Repo.png" alt="Download zip from Github repository" /></p>
-<h2 id="tocextract-the-zip-to-you-library-directory">2. Extract the zip to you library directory</h2>
+<h2>2. Extract the zip to you library directory</h2>
 <p>Once downloaded, you should extract the zip into your Arduino libraries folder. The path will vary based on your OS and installation, but I expect you to know where it is.</p>
-<h2 id="tocstrip-the-master-suffix">3. Strip the -master suffix</h2>
+<h2>3. Strip the -master suffix</h2>
 <p>When downloaded from Github, your zip and your folder will be named <code>EloquentArduino-master</code>: rename the folder to just <code>EloquentArduino</code>, without the master suffix.</p>
-<h2 id="tocdone">4. Done</h2>
+<h2>4. Done</h2>
 <p>If you follwed the steps correctly, the library is ready to be used.</p>
 <br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/">How to install the Eloquent library</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
