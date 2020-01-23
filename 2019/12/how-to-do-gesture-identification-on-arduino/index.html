@@ -156,7 +156,7 @@ void printFeatures() {
         Serial.print(i == numFeatures - 1 ? 'n' : ',');
     }
 }
-</code></pre><p>Record 15-20 samples for each geasture and save them to a file, one for each gesture. Since we're dealing with highly dimensional data, you should collect as much samples as possible, to average out the noise.</p><h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2><p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn" target="_blank" rel="noopener noreferrer">tutorial</a></p><p></p><pre><code class="language-python">from sklearn.svm import SVC
+</code></pre><p>Record 15-20 samples for each geasture and save them to a file, one for each gesture. Since we're dealing with highly dimensional data, you should collect as much samples as possible, to average out the noise.</p><h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2><p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p><p></p><pre><code class="language-python">from sklearn.svm import SVC
 from micromlgen import port
 
 # put your samples in the dataset folder
