@@ -1,0 +1,8 @@
+{
+    "version": "https://jsonfeed.org/version/1",
+    "user_comment": "This feed allows you to read the posts from this site in any feed reader that supports the JSON Feed format. To add this feed to your reader, copy the following URL -- https://eloquentarduino.github.io/2019/11/how-to-train-a-classifier-in-scikit-learn/feed/json/ -- and add it your reader.",
+    "home_page_url": "https://eloquentarduino.github.io/2019/11/how-to-train-a-classifier-in-scikit-learn/",
+    "feed_url": "https://eloquentarduino.github.io/2019/11/how-to-train-a-classifier-in-scikit-learn/feed/json/",
+    "title": "Comments on: This is how I create my Arduino Machine learning classifiers in 4 easy steps",
+    "description": "Machine learning on Arduino, programming &amp; electronics"
+}
