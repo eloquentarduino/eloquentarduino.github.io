@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2020-01-23T12:11:09+00:00</lastmod>
+		<lastmod>2020-01-25T16:17:10+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</loc>
@@ -11,14 +11,6 @@
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/</loc>
 		<lastmod>2019-12-16T22:03:25+00:00</lastmod>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/</loc>
-		<lastmod>2019-12-17T16:44:29+00:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Repo.png</image:loc>
-			<image:caption><![CDATA[Download zip from Github repository]]></image:caption>
-		</image:image>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/</loc>
@@ -30,66 +22,6 @@
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/11/CleanCode.jpg</image:loc>
 			<image:caption><![CDATA[from https://www.wlion.com/blog/5-reasons-you-should-be-writing-clean-code/]]></image:caption>
-		</image:image>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/arduino-pin-class/</loc>
-		<lastmod>2019-12-24T15:41:40+00:00</lastmod>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/word-classification-using-arduino/</loc>
-		<lastmod>2019-12-29T18:10:35+00:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg</image:loc>
-			<image:caption><![CDATA[from https://www.udemy.com/course/learn-audio-processing-complete-engineers-course/]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord-Sensor.jpg</image:loc>
-			<image:caption><![CDATA[from http://arduinolearning.com/code/ky038-microphone-module-and-arduino-example.php]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Raw-audio.gif</image:loc>
-			<image:caption><![CDATA[Raw audio stream]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-linear-kernel-87-accuracy.png</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, linear kernel]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-poly-3-kernel-91-accuracy.png</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, poly-3 kernel]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-rbf-kernel-94-accuracy.png</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, rbf kernel]]></image:caption>
-		</image:image>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</loc>
-		<lastmod>2019-12-29T18:13:20+00:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png</image:loc>
-			<image:caption><![CDATA[Decision boundaries, 99% accuracy]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif</image:loc>
-			<image:caption><![CDATA[Calibrated IMU readings for the gestures identification project]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Linear-kernel.png</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Linear kernel]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.png</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.01-gamma.png</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.01 gamma]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma]]></image:caption>
 		</image:image>
 	</url>
 	<url>
@@ -125,32 +57,12 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/</loc>
-		<lastmod>2019-12-29T18:33:17+00:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/attiny85_ml.png</image:loc>
-			<image:caption><![CDATA[ri-elaborated from https://cyaninfinite.com/miniaturize-projects-with-attiny85/]]></image:caption>
-		</image:image>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/</loc>
-		<lastmod>2020-01-01T11:44:14+00:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg</image:loc>
-			<image:caption><![CDATA[Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Wifi1.png</image:loc>
-			<image:caption><![CDATA[Wifi indoor positioning example]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.png</image:loc>
-			<image:caption><![CDATA[Decision boundaries of 2 PCA components from Wifi indoor positioning features]]></image:caption>
-		</image:image>
+		<loc>https://eloquentarduino.github.io/2019/11/how-to-train-a-classifier-in-scikit-learn/</loc>
+		<lastmod>2020-01-23T12:11:09+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2020/01/motion-detection-with-esp32-cam-only-arduino-version/</loc>
-		<lastmod>2020-01-05T14:06:34+00:00</lastmod>
+		<lastmod>2020-01-25T16:11:53+00:00</lastmod>
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.gif</image:loc>
 			<image:caption><![CDATA[ESP32 camera motion detection example]]></image:caption>
@@ -169,8 +81,100 @@
 		</image:image>
 	</url>
 	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/</loc>
+		<lastmod>2020-01-25T16:15:38+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Repo.png</image:loc>
+			<image:caption><![CDATA[Download zip from Github repository]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/arduino-pin-class/</loc>
+		<lastmod>2020-01-25T16:15:54+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</loc>
+		<lastmod>2020-01-25T16:16:46+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries, 99% accuracy]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif</image:loc>
+			<image:caption><![CDATA[Calibrated IMU readings for the gestures identification project]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Linear-kernel.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Linear kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.01-gamma.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.01 gamma]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/</loc>
+		<lastmod>2020-01-25T16:16:52+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg</image:loc>
+			<image:caption><![CDATA[Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Wifi1.png</image:loc>
+			<image:caption><![CDATA[Wifi indoor positioning example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components from Wifi indoor positioning features]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/word-classification-using-arduino/</loc>
+		<lastmod>2020-01-25T16:16:58+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg</image:loc>
+			<image:caption><![CDATA[from https://www.udemy.com/course/learn-audio-processing-complete-engineers-course/]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord-Sensor.jpg</image:loc>
+			<image:caption><![CDATA[from http://arduinolearning.com/code/ky038-microphone-module-and-arduino-example.php]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Raw-audio.gif</image:loc>
+			<image:caption><![CDATA[Raw audio stream]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-linear-kernel-87-accuracy.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, linear kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-poly-3-kernel-91-accuracy.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, poly-3 kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-rbf-kernel-94-accuracy.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, rbf kernel]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/</loc>
+		<lastmod>2020-01-25T16:17:04+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/attiny85_ml.png</image:loc>
+			<image:caption><![CDATA[ri-elaborated from https://cyaninfinite.com/miniaturize-projects-with-attiny85/]]></image:caption>
+		</image:image>
+	</url>
+	<url>
 		<loc>https://eloquentarduino.github.io/2020/01/image-recognition-with-esp32-and-arduino/</loc>
-		<lastmod>2020-01-19T10:34:31+00:00</lastmod>
+		<lastmod>2020-01-25T16:17:10+00:00</lastmod>
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.gif</image:loc>
 			<image:caption><![CDATA[Apple vs Orange]]></image:caption>
@@ -187,10 +191,6 @@
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange-decision-boundaries.png</image:loc>
 			<image:caption><![CDATA[Apple vs Orange decision boundaries]]></image:caption>
 		</image:image>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/11/how-to-train-a-classifier-in-scikit-learn/</loc>
-		<lastmod>2020-01-23T12:11:09+00:00</lastmod>
 	</url>
 </urlset>
 <!-- XML Sitemap generated by Yoast SEO -->
