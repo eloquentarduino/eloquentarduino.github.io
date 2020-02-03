@@ -27,13 +27,11 @@
                 "Computer vision"
             ],
             "attachments": [
-                [
-                    {
-                        "url": "https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4",
-                        "mime_type": "video/mp4",
-                        "size_in_bytes": 1642079
-                    }
-                ]
+                {
+                    "url": "https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4",
+                    "mime_type": "video/mp4",
+                    "size_in_bytes": 1642079
+                }
             ]
         },
         {
@@ -55,13 +53,11 @@
                 "Computer vision"
             ],
             "attachments": [
-                [
-                    {
-                        "url": "https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4",
-                        "mime_type": "video/mp4",
-                        "size_in_bytes": 1673368
-                    }
-                ]
+                {
+                    "url": "https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4",
+                    "mime_type": "video/mp4",
+                    "size_in_bytes": 1673368
+                }
             ]
         }
     ]

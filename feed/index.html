@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sat, 25 Jan 2020 16:17:10 +0000</lastBuildDate>
+	<lastBuildDate>Mon, 03 Feb 2020 15:53:24 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,161 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.2</generator>
 	<item>
+		<title>Easy TinyML on ESP32 and Arduino</title>
+		<link>https://eloquentarduino.github.io/2020/01/easy-tinyml-on-esp32-and-arduino/</link>
+				<pubDate>Sat, 25 Jan 2020 19:36:29 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Arduino Machine learning]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=864</guid>
+				<description><![CDATA[<p>In this post I will show you how to easily deploy your Tensorflow Lite model to an ESP32 using the Arduino IDE without any compilation stuff. So I finally settled on giving a try to TinyML, which is a way to deploy Tensorflow Lite models to microcontrollers. As a first step, I downloaded the free [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/01/easy-tinyml-on-esp32-and-arduino/">Easy TinyML on ESP32 and Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>In this post I will show you how to easily deploy your Tensorflow Lite model to an ESP32 using the Arduino IDE <strong>without any compilation stuff</strong>.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/tf-arduino-esp.png" alt="tf arduino esp" /></p>
+<p><span id="more-864"></span></p>
+<p>So I finally settled on giving a try to TinyML, which is a way to deploy Tensorflow Lite models to microcontrollers.<br />
+As a first step, I downloaded the free chapters from <a href="https://tinymlbook.com/">the TinyML book website</a> and rapidly skimmed through them.</p>
+<p>Let me say that, even if it starts from &quot;too beginner&quot; level for me (they explain why you need to use the arrow instead of the point to access a pointer's property), it is a very well written book. They uncover every single aspect you may encounter during your first steps and give a very sound introduction to the general topic of training, validating and testing a dataset on a model.</p>
+<p>If I will go on with this TinyML stuff, I'll probably buy a copy: I strongly recommend you to at least read the free sample.</p>
+<p>Once done reading the 6 chapters, I wanted to try the described tutorial on my ESP32. Sadly, it is not mentioned in the supported boards on the book, so I had to solve it by myself.</p>
+<p>In this post I'm going to make a sort of recap of my learnings about the steps you need to follow to implement TF models to a microcontroller and introduce you to a tiny library I wrote for the purpose of facilitating the deployment in the Arduino IDE: <a href="https://github.com/eloquentarduino/EloquentTinyML">EloquentTinyML</a>.</p>
+<h2>Building our first model</h2>
+<p>First of all, we need a model to deploy.</p>
+<p>The book guides us on building a neural network capable of predicting the sine value of a given number, in the range from 0 to Pi (3.14).</p>
+<p>It's an easy model to get started (the &quot;Hello world&quot; of machine learning, according to the authors), so we'll stick with it.</p>
+<p>I won't go into too much details about generating data and training the classifier, because I suppose you already know that part if you want to port Tensorflow on a microcontroller.</p>
+<p>Here's the code from the book.</p>
+<pre><code class="language-python">import math
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras import layers
+
+def get_model():
+    SAMPLES = 1000
+    np.random.seed(1337)
+    x_values = np.random.uniform(low=0, high=2*math.pi, size=SAMPLES)
+    # shuffle and add noise
+    np.random.shuffle(x_values)
+    y_values = np.sin(x_values)
+    y_values += 0.1 * np.random.randn(*y_values.shape)
+
+    # split into train, validation, test
+    TRAIN_SPLIT =  int(0.6 * SAMPLES)
+    TEST_SPLIT = int(0.2 * SAMPLES + TRAIN_SPLIT)
+    x_train, x_test, x_validate = np.split(x_values, [TRAIN_SPLIT, TEST_SPLIT])
+    y_train, y_test, y_validate = np.split(y_values, [TRAIN_SPLIT, TEST_SPLIT])
+
+    # create a NN with 2 layers of 16 neurons
+    model = tf.keras.Sequential()
+    model.add(layers.Dense(16, activation=&#039;relu&#039;, input_shape=(1,)))
+    model.add(layers.Dense(16, activation=&#039;relu&#039;))
+    model.add(layers.Dense(1))
+    model.compile(optimizer=&#039;rmsprop&#039;, loss=&#039;mse&#039;, metrics=[&#039;mae&#039;])
+    model.fit(x_train, y_train, epochs=200, batch_size=16,
+                        validation_data=(x_validate, y_validate))
+    return model</code></pre>
+<h2>Exporting the model</h2>
+<p>Now that we have a model, we need to convert it into a form ready to be deployed on our microcontroller. This is actually just an array of bytes that the TF interpreter will read to recreate the model.</p>
+<pre><code class="language-python">model = get_model()
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_SIZE]
+tflite_model = converter.convert()
+
+# Save the model to disk
+open(&quot;sine_model_quantized.tflite&quot;, &quot;wb&quot;).write(tflite_model)</code></pre>
+<p>Then you have to convert to a C array in the command line.</p>
+<pre><code class="language-bash">xxd -i sine_model_quantized.tflite &gt; sine_model_quantized.cc</code></pre>
+<p>This is copy-paste code that hardly would change, so, for ease my development cycle, I wrapped this little snippet in a tiny package you can use: it's called <code>tinymlgen</code>.</p>
+<pre><code class="language-bash">pip install tinymlgen</code></pre>
+<pre><code class="language-python">from tinymlgen import port
+
+model = get_model()
+c_code = port(model, pretty_print=True)
+print(c_code)</code></pre>
+<p>I point you to the <a href="https://github.com/eloquentarduino/tinymlgen">Github repo</a> for a couple more options you can configure. </p>
+<p>Using this package, you don't have to open a terminal and use the <code>xxd</code> program to get a usable result.</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">STAY UP TO DATE</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<h2>Use the model</h2>
+<p>Now it is finally the time we deploy the model on our microcontroller. </p>
+<p>This part can be tricky, actually, if you don't have one of the supported boards in the book (Arduino Nano 33, SparkFun Edge or STM32F746G Discovery kit). </p>
+<p>I tried just setting &quot;ESP32&quot; as my target in the Arduino IDE and I got tons of errors.</p>
+<p>Luckily for us, a man called Wezley Sherman wrote a tutorial on <a href="https://towardsdatascience.com/tensorflow-meet-the-esp32-3ac36d7f32c7">how to get a TinyML project to compile using the PlatformIO environment</a>. He saved me the effort to try to fix all the broken import errors on my own.</p>
+<p>Since I could get the project to compile using PlatformIO (which I don't use in my everyday tinkering), I settled to get the project to compile in the Arduino IDE.</p>
+<p>Fortunately, it was not difficult at all, so I can finally bring you this library that does all the heavy lifting for you.</p>
+<p>Thanks to the library, you won't need to download the full Tensorflow Lite framework and compile it on your own machine: it has been already done for you.</p>
+<p>As an added bonus, I created a wrapper class that incapsulates all the boring repetitive stuff, so you can focus solely on the application logic.</p>
+<p>Install the library from <a href="https://github.com/eloquentarduino/EloquentTinyML">Github</a> first.</p>
+<pre><code class="language-bash">git clone https://github.com/eloquentarduino/EloquentTinyML.git</code></pre>
+<hr /><p><em>#EloquentTinyML escapes you from compiling Tensforflow on your own machine</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2020%2F01%2Feasy-tinyml-on-esp32-and-arduino%2F&#038;text=%23EloquentTinyML%20escapes%20you%20from%20compiling%20Tensforflow%20on%20your%20own%20machine&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
+<p>Here is an example on how you use it.</p>
+<pre><code class="language-cpp">#include &quot;EloquentTinyML.h&quot;
+// sine_model.h contains the array you exported from the previous step
+// with either xxd or tinymlgen
+#include &quot;sine_model.h&quot;
+
+#define NUMBER_OF_INPUTS 1
+#define NUMBER_OF_OUTPUTS 1
+// in future projects you may need to tweak this value
+// it&#039;s a trial and error process
+#define TENSOR_ARENA_SIZE 2*1024
+
+Eloquent::TinyML::TfLite&lt;NUMBER_OF_INPUTS, NUMBER_OF_OUTPUTS, TENSOR_ARENA_SIZE&gt; ml(sine_model);
+
+void setup() {
+    Serial.begin(115200);
+}
+
+void loop() {
+    // pick up a random x and predict its sine
+    float x = 3.14 * random(100) / 100;
+    float y = sin(x);
+    float input[1] = { x };
+    float predicted = ml.predict(input);
+
+    Serial.print(&quot;sin(&quot;);
+    Serial.print(x);
+    Serial.print(&quot;) = &quot;);
+    Serial.print(y);
+    Serial.print(&quot;\t predicted: &quot;);
+    Serial.println(predicted);
+    delay(1000);
+}</code></pre>
+<p>Does it look easy to use? I bet so.</p>
+<p>For simple cases like this example where you have a single output, the <code>predict</code> method returns that output so you can esaily assign it to a variable.</p>
+<p>If this is not the case and you expect multiple output from your model, you have to declare an output array.</p>
+<pre><code class="language-cpp">float input[10] = { ... };
+float output[5] = { 0 };
+
+ml.predict(input, output);</code></pre>
+<h2>Wrapping up</h2>
+<p>I hoped this post helped you kickstart your next TinyML project on your ESP32.</p>
+<p>It served me as a foundation for the next experiments I'm willing to do on this platform which is really in its early stages, so needs a lot of investigation about its capabilities.</p>
+<p>I plan to do a comparison with my MicroML framework when I get more experience in both, so staty tuned for the upcoming updates.</p>
+<h2>Disclaimer</h2>
+<p>I tested the library on both Ubuntu 18.04 and Windows 10 64 bit: if you are on a different platform and get compiling errors, please let me know in the comments so I can fix them.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/01/easy-tinyml-on-esp32-and-arduino/">Easy TinyML on ESP32 and Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
 		<title>Apple or Orange? Image recognition with ESP32 and Arduino</title>
 		<link>https://eloquentarduino.github.io/2020/01/image-recognition-with-esp32-and-arduino/</link>
 				<pubDate>Sun, 12 Jan 2020 10:32:08 +0000</pubDate>
@@ -1602,74 +1757,6 @@ bool inline_function() {
 
 bool wifiConnected = inline_function();</code></pre>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/">Eloquent bounded waiting: the await construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
-		<title>Eloquent non-blocking code: the Every construct</title>
-		<link>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</link>
-				<pubDate>Thu, 05 Dec 2019 18:42:45 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Eloquent library]]></category>
-		<category><![CDATA[eloquent]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=209</guid>
-				<description><![CDATA[<p>The every construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically. [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/">Eloquent non-blocking code: the Every construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p>The <code>every</code> construct lets you run a piace of code at regular intervals in a fluent way. If you don't need to start, stop, pause your timer, this construct is a valid alternative to more complex timer libraries already available: it only takes a time interval as argument and will execute the code block periodically.</p>
-<p><span id="more-209"></span></p>
-<h3>Definition</h3>
-<pre><code class="language-cpp">#define every(interval) \
-    static uint32_t __every__##interval = millis(); \
-    if (millis() - __every__##interval &gt;= interval &amp;&amp; (__every__##interval = millis()))</code></pre>
-<h3>How to use</h3>
-<pre><code>// these are for greater code readability
-#define Millis 
-#define Second  *1000
-#define Seconds *1000
-</code></pre>
-<pre><code class="language-cpp">int interval = 1 Second;
-
-void setup() {
-    Serial.begin(115200);
-}
-
-void loop() {
-    every(1000 Millis) {
-        Serial.println(&quot;This line is printed every 1 second&quot;);
-    }
-
-    every(2000 Millis) {
-        Serial.println(&quot;This line is printed every 2 seconds&quot;);
-    }
-
-    every(interval) {
-        interval += 1 Second;
-        Serial.print(&quot;You can have variable intervals too! &quot;);
-        Serial.print(&quot;This line will be printed again in &quot;);
-        Serial.print(interval / 1000);
-        Serial.println(&quot; seconds&quot;);
-    }
-}</code></pre>
-<h3>Caveats</h3>
-<p><code>every</code> is just a macro definition and is not a proper timer, so it has some limitations:</p>
-<ol>
-<li>you can't stop, pause or resume it: once set, it will run forever</li>
-<li>its argument must be the suffix of a valid identifier</li>
-<li>you can't use several <code>every</code> with the exact same argument: you have to put all the code that needs to happen at the same interval in the same block</li>
-</ol>
-<h4>Caveat #2</h4>
-<p>The macro works by generating a variable named like <code>__every__##argument</code></p>
-<pre><code class="language-cpp">every(1) ==&gt; uint32_t __every__1;
-every(2) ==&gt; uint32_t __every__2;
-every(a_given_interval) ==&gt; uint32_t __every__a_given_interval;
-every(an invalid interval) ==&gt; uint32_t __every__an invalid interval; // Syntax error
-every(1 Second) ==&gt; uint32_t __every__1 *1000; // Syntax error</code></pre>
-<p>So every integer literal and any variable are all valid arguments. Any expression is forbidden.</p>
-<h4>Caveat #3</h4>
-<p>If you use two <code>every</code> with the exact same argument, two variables with the exact same name will be created and it will rise a compile-time error.</p>
-<p>If you can live with this limitations, <code>every</code> only needs the space of an <code>uint32_t</code> to work.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/">Eloquent non-blocking code: the Every construct</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 	</channel>

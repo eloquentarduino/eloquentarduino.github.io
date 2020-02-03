@@ -27,13 +27,11 @@
                 "Computer vision"
             ],
             "attachments": [
-                [
-                    {
-                        "url": "https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4",
-                        "mime_type": "video/mp4",
-                        "size_in_bytes": 1642079
-                    }
-                ]
+                {
+                    "url": "https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4",
+                    "mime_type": "video/mp4",
+                    "size_in_bytes": 1642079
+                }
             ]
         },
         {
@@ -72,13 +70,11 @@
                 "Arduino Machine learning"
             ],
             "attachments": [
-                [
-                    {
-                        "url": "https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4",
-                        "mime_type": "video/mp4",
-                        "size_in_bytes": 2055653
-                    }
-                ]
+                {
+                    "url": "https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4",
+                    "mime_type": "video/mp4",
+                    "size_in_bytes": 2055653
+                }
             ]
         },
         {
@@ -117,13 +113,11 @@
                 "Arduino Machine learning"
             ],
             "attachments": [
-                [
-                    {
-                        "url": "https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4",
-                        "mime_type": "video/mp4",
-                        "size_in_bytes": 1035484
-                    }
-                ]
+                {
+                    "url": "https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4",
+                    "mime_type": "video/mp4",
+                    "size_in_bytes": 1035484
+                }
             ]
         },
         {
