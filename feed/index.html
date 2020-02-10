@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Tue, 04 Feb 2020 22:16:13 +0000</lastBuildDate>
+	<lastBuildDate>Mon, 10 Feb 2020 12:32:21 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -319,7 +319,7 @@ void linearize_features() {
 Image acquisition is a very noisy process: even keeping the camera still, you will get fluctuating values. <br />You need to be very accurate during this phase if you want to achieve good results.<br /> I suggest you immobilize your camera with tape to a flat surface or use some kind of photographic easel.
 </div>
 <h2 id="toctraining-the-classifier">Training the classifier</h2>
-<p>To train the classifier, save the features for each object in a file, one features vector per line. Then follow the steps on <a href="/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">how to train a ML classifier for Arduino</a> to get the exported model.</p>
+<p>To train the classifier, save the features for each object in a file, one features vector per line. Then follow the steps on <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn">how to train a ML classifier for Arduino</a> to get the exported model.</p>
 <p>You can experiment with different classifier configurations. </p>
 <p>My features were well distinguishable, so I had great results (100% accuracy) with any kernel (even linear).</p>
 <p>One odd thing happened with the RBF kernel: I had to use an extremely low gamma value (0.0000001). Does anyone can explain me why? I usually go with a default value of 0.001.</p>
