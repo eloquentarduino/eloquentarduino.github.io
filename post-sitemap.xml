@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2020-02-16T10:19:56+00:00</lastmod>
+		<lastmod>2020-02-17T17:26:13+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</loc>
@@ -202,7 +202,7 @@
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2020/02/even-smaller-machine-learning-models-for-your-mcu/</loc>
-		<lastmod>2020-02-16T10:19:56+00:00</lastmod>
+		<lastmod>2020-02-17T17:26:13+00:00</lastmod>
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/rvm.jpg</image:loc>
 			<image:caption><![CDATA[RVM vs SVM support vectors]]></image:caption>
