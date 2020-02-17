@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Mon, 17 Feb 2020 17:26:13 +0000</lastBuildDate>
+	<lastBuildDate>Mon, 17 Feb 2020 17:29:21 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -183,7 +183,7 @@ y_predict = clf.predict(X)</code></pre>
 <li>if both SVM and RVM achieve comparable performace, go with RVM: it's much lighter than SVM in most cases and will run faster</li>
 </ul>
 <h2 id="tocsize-comparison">Size comparison</h2>
-<p>As a reference, here is the codes generated for an SVM classifier and an RVM one.</p>
+<p>As a reference, here is the codes generated for an SVM classifier and an RVM one to classify the IRIS dataset.</p>
 <pre><code class="language-c">uint8_t predict_rvm(double *x) {
     double decision[3] = { 0 };
     decision[0] = -0.6190847299428206;
