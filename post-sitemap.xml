@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2020-02-17T17:29:21+00:00</lastmod>
+		<lastmod>2020-02-23T12:08:12+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</loc>
@@ -210,6 +210,22 @@
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/rvm.jpg</image:loc>
 			<image:caption><![CDATA[RVM vs SVM support vectors]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/</loc>
+		<lastmod>2020-02-23T12:08:12+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST.gif</image:loc>
+			<image:caption><![CDATA[Arduino handwritten digit classification]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-examples.jpg</image:loc>
+			<image:caption><![CDATA[Handwritten digits example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-feature-extraction.jpg</image:loc>
+			<image:caption><![CDATA[Handwritten digit feature extraction]]></image:caption>
 		</image:image>
 	</url>
 </urlset>

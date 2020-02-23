@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Mon, 17 Feb 2020 17:29:21 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 23 Feb 2020 12:08:12 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,221 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.2</generator>
 	<item>
+		<title>Handwritten digit classification with Arduino and MicroML</title>
+		<link>https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/</link>
+				<pubDate>Sun, 23 Feb 2020 10:53:03 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[Computer vision]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=931</guid>
+				<description><![CDATA[<p>We continue exploring the endless possibilities on the MicroML (Machine Learning for Microcontrollers) framework on Arduino and ESP32 boards: in this post we're back to image classification. In particular, we'll distinguish handwritten digits using an ESP32 camera. If this is the first time you're reading my blog, you may have missed that I'm on a [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/">Handwritten digit classification with Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>We continue exploring the endless possibilities on the MicroML (Machine Learning for Microcontrollers) framework on Arduino and ESP32 boards: in this post we're back to image classification. In particular, we'll distinguish handwritten digits using an ESP32 camera.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST.gif" alt="Arduino handwritten digit classification" /></p>
+<p><span id="more-931"></span></p>
+<p>If this is the first time you're reading my blog, you may have missed that I'm on a journey to push the limits of Machine learning on embedded devices like the Arduino boards and ESP32.</p>
+<p>I started with <a href="/2019/12/how-to-do-gesture-identification-on-arduino/">accelerometer data classification</a>, then did <a href="/2019/12/wifi-indoor-positioning-on-arduino/">Wifi indoor positioning</a> as a proof of concept.</p>
+<p>In the last weeks, though, I undertook a more difficult path that is image classification.</p>
+<p>Image classification is where Convolutional Neural Networks really shine, but I'm here to <a href="/2020/01/image-recognition-with-esp32-and-arduino/">question this settlement</a> and demostrate that it is possible to come up with much lighter alternatives.</p>
+<p>In this post we continue with the examples, replicating a &quot;benchmark&quot; dataset in Machine learning: the handwritten digits classification.</p>
+<div class="infobox">
+If you are curious about a specific image classification task you would like to see implemented, <b>let me know in the comments</b>: I'm always open to new ideas
+</div>
+<h2>The task</h2>
+<p>The objective of this example is to be able to tell what an handwritten digit is, taking as input a photo from the ESP32 camera.</p>
+<p>In particular, we have 3 handwritten numbers and the task of our model will be to distinguish which image is what number.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-examples.jpg" alt="Handwritten digits example" /></p>
+<p>I only have a single image per digit, but you're free to draw as many samples as you like: it should help improve the performance of you're classifier.</p>
+<h2>1. Feature extraction</h2>
+<p>When dealing with images, if you use a CNN this step is often overlooked: CNNs are made on purpose to handle raw pixel values, so you just throw the image in and it is handled properly.</p>
+<p>When using other types of classifiers, it could help add a bit of feature engineering to help the classifier doing its job and achieve high accuracy.</p>
+<p>But not this time.</p>
+<p>I wanted to be as &quot;light&quot; as possible in this demo, so I only took a couple steps during the feature acquisition:</p>
+<ol>
+<li>use a grayscale image</li>
+<li>downsample to a manageable size</li>
+<li>convert it to black/white with a threshold</li>
+</ol>
+<p>I would hardly call this feature engineering.</p>
+<p>This is an example of the result of this pipeline.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-feature-extraction.jpg" alt="Handwritten digit feature extraction" /></p>
+<p>The code for this pipeline is really simple and is almost the same from the example on <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">motion detection</a>.</p>
+<pre><code class="language-c">#include &quot;esp_camera.h&quot;
+
+#define PWDN_GPIO_NUM     -1
+#define RESET_GPIO_NUM    15
+#define XCLK_GPIO_NUM     27
+#define SIOD_GPIO_NUM     22
+#define SIOC_GPIO_NUM     23
+#define Y9_GPIO_NUM       19
+#define Y8_GPIO_NUM       36
+#define Y7_GPIO_NUM       18
+#define Y6_GPIO_NUM       39
+#define Y5_GPIO_NUM        5
+#define Y4_GPIO_NUM       34
+#define Y3_GPIO_NUM       35
+#define Y2_GPIO_NUM       32
+#define VSYNC_GPIO_NUM    25
+#define HREF_GPIO_NUM     26
+#define PCLK_GPIO_NUM     21
+
+#define FRAME_SIZE FRAMESIZE_QQVGA
+#define WIDTH 160
+#define HEIGHT 120
+#define BLOCK_SIZE 5
+#define W (WIDTH / BLOCK_SIZE)
+#define H (HEIGHT / BLOCK_SIZE)
+#define THRESHOLD 127
+
+double features[H*W] = { 0 };
+
+void setup() {
+    Serial.begin(115200);
+    Serial.println(setup_camera(FRAME_SIZE) ? &quot;OK&quot; : &quot;ERR INIT&quot;);
+    delay(3000);
+}
+
+void loop() {
+    if (!capture_still()) {
+        Serial.println(&quot;Failed capture&quot;);
+        delay(2000);
+        return;
+    }
+
+    print_features();
+    delay(3000);
+}
+
+bool setup_camera(framesize_t frameSize) {
+    camera_config_t config;
+
+    config.ledc_channel = LEDC_CHANNEL_0;
+    config.ledc_timer = LEDC_TIMER_0;
+    config.pin_d0 = Y2_GPIO_NUM;
+    config.pin_d1 = Y3_GPIO_NUM;
+    config.pin_d2 = Y4_GPIO_NUM;
+    config.pin_d3 = Y5_GPIO_NUM;
+    config.pin_d4 = Y6_GPIO_NUM;
+    config.pin_d5 = Y7_GPIO_NUM;
+    config.pin_d6 = Y8_GPIO_NUM;
+    config.pin_d7 = Y9_GPIO_NUM;
+    config.pin_xclk = XCLK_GPIO_NUM;
+    config.pin_pclk = PCLK_GPIO_NUM;
+    config.pin_vsync = VSYNC_GPIO_NUM;
+    config.pin_href = HREF_GPIO_NUM;
+    config.pin_sscb_sda = SIOD_GPIO_NUM;
+    config.pin_sscb_scl = SIOC_GPIO_NUM;
+    config.pin_pwdn = PWDN_GPIO_NUM;
+    config.pin_reset = RESET_GPIO_NUM;
+    config.xclk_freq_hz = 20000000;
+    config.pixel_format = PIXFORMAT_GRAYSCALE;
+    config.frame_size = frameSize;
+    config.jpeg_quality = 12;
+    config.fb_count = 1;
+
+    bool ok = esp_camera_init(&amp;config) == ESP_OK;
+
+    sensor_t *sensor = esp_camera_sensor_get();
+    sensor-&gt;set_framesize(sensor, frameSize);
+
+    return ok;
+}
+
+bool capture_still() {
+    camera_fb_t *frame = esp_camera_fb_get();
+
+    if (!frame)
+        return false;
+
+    // reset all the features
+    for (size_t i = 0; i &lt; H * W; i++)
+      features[i] = 0;
+
+    // for each pixel, compute the position in the downsampled image
+    for (size_t i = 0; i &lt; frame-&gt;len; i++) {
+      const uint16_t x = i % WIDTH;
+      const uint16_t y = floor(i / WIDTH);
+      const uint8_t block_x = floor(x / BLOCK_SIZE);
+      const uint8_t block_y = floor(y / BLOCK_SIZE);
+      const uint16_t j = block_y * W + block_x;
+
+      features[j] += frame-&gt;buf[i];
+    }
+
+    // apply threshold
+    for (size_t i = 0; i &lt; H * W; i++) {
+      features[i] = (features[i] / (BLOCK_SIZE * BLOCK_SIZE) &gt; THRESHOLD) ? 1 : 0;
+    }
+
+    return true;
+}
+
+void print_features() {
+    for (size_t i = 0; i &lt; H * W; i++) {
+        Serial.print(features[i]);
+
+        if (i != H * W - 1)
+          Serial.print(&#039;,&#039;);
+    }
+
+    Serial.println();
+}</code></pre>
+<h2>2. Samples recording</h2>
+<p>To create your own dataset, you need a collection of handwritten digits.</p>
+<p>You can do this part as you like, by using pieces of paper or a monitor. I used a tablet because it was well illuminated and I could open a bunch of tabs to keep a record of my samples.</p>
+<p>As in the <a href="/2020/01/image-recognition-with-esp32-and-arduino/">apple vs orange</a>, keep in mind that you should be consistent during both the training phase and the inference phase.</p>
+<p>This is why I used tape to fix my ESP32 camera to the desk and kept the tablet in the exact same position.</p>
+<p>If you desire, you could experiment varying slightly the capturing setup during the training and see if your classifier still achieves good accuracy: this is a test I didn't make.</p>
+<h2>3. Train and export the SVM classifier</h2>
+
+<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
+
+<p>
+<pre><code class="language-python">from sklearn.svm import SVC
+from micromlgen import port
+
+# put your samples in the dataset folder
+# one class per file
+# one feature vector per line, in CSV format
+features, classmap = load_features('dataset/')
+X, y = features[:, :-1], features[:, -1]
+classifier = SVC(kernel='linear').fit(X, y)
+c_code = port(classifier, classmap=classmap)
+print(c_code)</code></pre>
+
+<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
+<h2>4. The result</h2>
+<p>Okay, at this point you should have all the working pieces to do handwritten digit image classification on your ESP32 camera. Include your model in the sketch and run the classification.</p>
+<pre><code class="language-c">#include &quot;model.h&quot;
+
+void loop() {
+    if (!capture_still()) {
+        Serial.println(&quot;Failed capture&quot;);
+        delay(2000);
+
+        return;
+    }
+
+    Serial.print(&quot;Number: &quot;);
+    Serial.println(classIdxToName(predict(features)));
+    delay(3000);
+}</code></pre>
+<p>Done.</p>
+<p>You can see a demo of my results in the video below.</p>
+<div style="width: 788px;" class="wp-video"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
+<video class="wp-video-shortcode" id="video-931-1" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4?_=1" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4</a></video></div>
+<h3>Project figures</h3>
+<p>My dataset is composed of 25 training samples in total and the SVM with linear kernel produced 17 support vectors.</p>
+<p>On my M5Stick camera board, the overhead for the model is 6.8 Kb of flash and the inference takes 7ms: not that bad!</p>
+<hr>
+<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/HandwrittenDigitClassificationExample/HandwrittenDigitClassificationExample.ino" target="_blank" rel="noopener noreferrer">Github</a></p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/">Handwritten digit classification with Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+							<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4" length="6424809" type="video/mp4" />
+			</item>
+		<item>
 		<title>Even smaller Machine learning models for your MCU: up to -82% code size</title>
 		<link>https://eloquentarduino.github.io/2020/02/even-smaller-machine-learning-models-for-your-mcu/</link>
 				<pubDate>Sat, 15 Feb 2020 16:37:32 +0000</pubDate>
@@ -560,8 +775,7 @@ Image acquisition is a very noisy process: even keeping the camera still, you wi
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange-decision-boundaries.png" alt="Apple vs Orange decision boundaries" /></p>
 <h2 id="tocreal-world-example">Real world example</h2>
 <p>If you followed all the steps above, you should now have a model capable of detecting if your camera is shotting an apple or an orange, as you can see in the following video.</p>
-<div style="width: 788px;" class="wp-video"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
-<video class="wp-video-shortcode" id="video-820-1" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4?_=1" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4</a></video></div>
+<div style="width: 788px;" class="wp-video"><video class="wp-video-shortcode" id="video-820-2" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4?_=2" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4</a></video></div>
 <p></p>
 <p>The little white object you see at the bottom of the image is the camera, taped to the desk.</p>
 <p>Did you think it was possible to do simple image classification on your ESP32?</p>
@@ -674,7 +888,7 @@ Image acquisition is a very noisy process: even keeping the camera still, you wi
 <p>Now the fun part. I'll show you how it performs on a real-world scenario.</p>
 <p>To keep it simple, I wrote a sketch that does only motion detection, not video streaming over HTTP. </p>
 <p>This means you won't be able to see the original image recorded from the camera. Nevertheless, I have kept the block size to a minimum to allow for the best quality possible.</p>
-<div style="width: 652px;" class="wp-video"><video class="wp-video-shortcode" id="video-779-2" width="652" height="604" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4?_=2" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4</a></video></div>
+<div style="width: 652px;" class="wp-video"><video class="wp-video-shortcode" id="video-779-3" width="652" height="604" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4?_=3" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4</a></video></div>
 <p>This is me passing my arm in front of the camera a few times.</p>
 <p>The grid you see represents the actual pixels used for the computation. Each cell corresponds to one pixel of the downscaled image.</p>
 <p>The orange cells highlight the pixels that the algorithm sees as &quot;different&quot; from one frame to the next. As you can see, some pixels are detected even if no motion is happening. That's the noise I talked about multiple times during the post.</p>
@@ -1026,7 +1240,7 @@ void loop() {
 }</code></pre>
 <p>And that's it: word classification through machine learning on your Arduino board! Say some word and see the classification result on the Serial monitor. </p>
 <p>Here's me testing the system (English is not my language, so forgive my bad pronounce). The video quality is very low, I know, but you get the point.</p>
-<div style="width: 640px;" class="wp-video"><video class="wp-video-shortcode" id="video-180-3" width="640" height="352" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4?_=3" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4</a></video></div>
+<div style="width: 640px;" class="wp-video"><video class="wp-video-shortcode" id="video-180-4" width="640" height="352" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4?_=4" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4</a></video></div>
 <div class="watchout">
 As you can hear from the video, you should be quite accurate when pronouncing the words. I have to admit there are cases where the system totally fails to classify correctly the words. Restarting helps most of the time, so I'm suspecting there could be some kind of leak that "corrupts" the inference procedure.
 </div>
@@ -1556,7 +1770,7 @@ void classify() {
 <p>Here we are: it has been a long post, but now you can classify gestures with an Arduino Nano and 2 Kb of RAM. </p>
 <hr /><p><em>No fancy Neural Networks, no Tensorflow, no 32-bit ARM processors: plain old SVM on plain old 8 bits with 97% accuracy.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-gesture-identification-on-arduino%2F&#038;text=No%20fancy%20Neural%20Networks%2C%20no%20Tensorflow%2C%20no%2032-bit%20ARM%20processors%3A%20plain%20old%20SVM%20on%20plain%20old%208%20bits%20with%2097%25%20accuracy.&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <p>Here's a short demo of me playing 3 gestures and getting the results on the serial monitor.</p>
-<div style="width: 640px;" class="wp-video"><video class="wp-video-shortcode" id="video-35-4" width="640" height="360" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4?_=4" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4</a></video></div>
+<div style="width: 640px;" class="wp-video"><video class="wp-video-shortcode" id="video-35-5" width="640" height="360" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4?_=5" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4</a></video></div>
 <p><h4>Project figures</h4>
 <p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 25310 bytes (82%) of program space and 1228 bytes (59%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>Can I run machine learning on Arduino?</em> is <strong>definetly YES</strong>.<br />
 <br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
@@ -1758,162 +1972,6 @@ void loop() {
 }</code></pre>
 <br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-pin-class/">Eloquent pin management: the Pin class</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
-		<item>
-		<title>Morse alphabet identification on Arduino with Machine learning</title>
-		<link>https://eloquentarduino.github.io/2019/12/morse-identification-on-arduino/</link>
-				<pubDate>Fri, 06 Dec 2019 12:07:38 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[microml]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=194</guid>
-				<description><![CDATA[<p>In this Arduno Machine learning project we're going to identify the letters from the Morse alphabet. In practice, we'll translate dots (•) and dashes (‒) &#34;typed&#34; with a push button into meaningful characters. In this tutorial we're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/morse-identification-on-arduino/">Morse alphabet identification on Arduino with Machine learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to identify the letters from the <a href="https://en.wikipedia.org/wiki/Morse_code">Morse alphabet</a>.<br />
-In practice, we'll translate dots (•) and dashes (‒)  &quot;typed&quot; with a push button into meaningful characters.<br />
-In this tutorial we're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
-<p><span id="more-194"></span></p>
-<p><img src="https://i.ytimg.com/vi/L6gxfX4GrbI/maxresdefault.jpg" alt="credits to https://www.youtube.com/watch?v=L6gxfX4GrbI" /></p>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
-<h2 id="tocfeatures-definition">1. Features definition</h2>
-<p>For our task we'll use a simple push button as input and a fixed number of samples taken at a fixed interval (100 ms), starting from the first detection of the button press. I chose to record 30 samples for each letter, but you can easily customize the value as per your needs. </p>
-<p>With 30 samples at 100 ms frequency, we'll have 3 seconds to &quot;type&quot; the letter and on the Serial monitor will appear a sequence of 0s and 1s, representing if the button was pressed or not; the inference procedure will translate this sequence into a letter.<br />
-As a reference, here are a couple example of what we'll be working with.</p>
-<pre><code class="language-cpp">// A (•‒)
-0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
-
-// D (‒••)
-0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1
-
-// E (•)
-0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
-<h2 id="tocrecord-sample-data">2. Record sample data</h2>
-<p>To the bare minimum, we'll need a push button and two wires: one to ground and the other to a digital pin. Since in the example we'll make the button an <code>INPUT_PULLUP</code>, we'll read 0 when the button is pressed and 1 when not.  </p>
-<p><img src="https://www.arduino.cc/en/uploads/Tutorial/PullUp_bbd.png" alt="credits to https://www.arduino.cc/en/Tutorial/DigitalInputPullup" /></p>
-<p>All we need to do is detect a press and record the following 30 samples of the digital pin:</p>
-<pre><code class="language-cpp">#define IN 4
-#define NUM_SAMPLES 30
-#define INTERVAL 100
-
-double features[NUM_SAMPLES];
-
-void setup() {
-  Serial.begin(115200);
-  pinMode(IN, INPUT_PULLUP);
-}
-
-void loop() {
-  if (digitalRead(IN) == 0) {
-    recordButtonStatus();
-    printFeatures();
-    delay(1000);
-  }
-
-  delay(10);
-}
-
-void recordButtonStatus() {
-  for (int i = 0; i &lt; NUM_SAMPLES; i++) {
-    features[i] = digitalRead(IN);
-    delay(INTERVAL);
-  } 
-}</code></pre>
-<pre><code class="language-cpp">
-void printFeatures() {
-    const uint16_t numFeatures = sizeof(features) / sizeof(double);
-    
-    for (int i = 0; i &lt; numFeatures; i++) {
-        Serial.print(features[i]);
-        Serial.print(i == numFeatures - 1 ? 'n' : ',');
-    }
-}
-</code></pre>
-<p>Open the Serial monitor and type a few times each letter: try to introduce some variations each time, for example waiting some more milliseconds before releasing the dash.</p>
-<div class="watchout"> If you've never typed morse code before (as me), choose letters with few keystrokes and quite differentiable, otherwise you will need to be very good with the timing.</div>
-<p>Save the recordings for each letter in a file named after the letter, so you will get meaningful results later on.</p>
-<p>You may end with duplicate recordings: don't worry, that's not a problem. I'll paste my recordings for a few letters, as a reference.</p>
-<pre><code>// A (•‒)
-0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1
-
-// D (‒••)
-0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,0,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,1,1
-
-// E (•)
-0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-// S (•••)
-0,0,0,1,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,1,1,1,1,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-// T (‒)
-0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
-<p>If you do a good job, you should end with quite distinguible features, as show in the plot below.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg" alt="Decision boundaries of 2 PCA components from Morse alphabet identification features" /></p>
-<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
-
-<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
-
-<p>
-<pre><code class="language-python">from sklearn.svm import SVC
-from micromlgen import port
-
-# put your samples in the dataset folder
-# one class per file
-# one feature vector per line, in CSV format
-features, classmap = load_features('dataset/')
-X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
-c_code = port(classifier, classmap=classmap)
-print(c_code)</code></pre>
-
-<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
-<h2 id="tocrun-the-inference">4. Run the inference</h2>
-<pre><code class="language-cpp">#include &quot;model.h&quot;
-
-void loop() {
-  if (digitalRead(IN) == 0) {
-    recordButtonStatus();
-    Serial.print(&quot;Detected letter: &quot;);
-    Serial.println(classIdxToName(predict(features)));
-    delay(1000);
-  }
-
-  delay(10);
-}</code></pre>
-<p>Type some letter using the push button and see the identified value printed on the serial monitor.</p>
-<p>That’s it: you deployed machine learning in 2 Kb! </p>
-<p><h4>Project figures</h4>
-<p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 12546 bytes (40%) of program space and 366 bytes (17%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>Can I run machine learning on Arduino?</em> is <strong>definetly YES</strong>.<br />
-<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
-<hr>
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlMorseIdentificationExample/MicromlMorseIdentificationExample.ino" target="_blank" rel="noopener noreferrer">Github</a></p></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/morse-identification-on-arduino/">Morse alphabet identification on Arduino with Machine learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 										</item>
 	</channel>
