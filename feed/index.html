@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Mon, 02 Mar 2020 19:07:46 +0000</lastBuildDate>
+	<lastBuildDate>Mon, 02 Mar 2020 19:19:00 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -29,12 +29,20 @@
 		<category><![CDATA[Eloquent library]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=956</guid>
-				<description><![CDATA[<p>Ever wanted to use your thermal camera with Arduino but found it difficult to go beyond the tutorials code? Let's see the easiest possible way to view your thermal camera streaming without an LCD display! MLX90640 eloquent library As you may know if you read my previous posts, I strongly believe in &#34;eloquent&#34; code, that [&#8230;]</p>
+				<description><![CDATA[<p>Ever wanted to use your thermal camera with Arduino but found it difficult to go beyond the tutorials code? Let's see the easiest possible way to view your thermal camera streaming without an LCD display! MLX90640 thermal camera For Arduino there are essentially two thermal camera available: the AMG8833 and the MLX90640. The AMG8833 is [&#8230;]</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/easy-arduino-thermal-camera-with-ascii-video-streaming/">Easy Arduino thermal camera with (ASCII) video streaming</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 								<content:encoded><![CDATA[<p>Ever wanted to use your thermal camera with Arduino but found it difficult to go beyond the tutorials code? Let's see the easiest possible way to view your thermal camera streaming without an LCD display!</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/thermal-image-rgb-vs-ascii.jpg" alt="Arduino thermal image rgb vs ascii" /></p>
 <p><span id="more-956"></span></p>
+<h2>MLX90640 thermal camera</h2>
+<p>For Arduino there are essentially two thermal camera available: the AMG8833 and the MLX90640.</p>
+<p>The AMG8833 is 8x8 and the MLX90640 is 32x24.</p>
+<p>They're not cheap, it is true.</p>
+<p>But if you have to spend money, I strongly advise you to buy the MLX90640: I have one and it's not that accurate. I can't imagine how low definition would be the AMG8833.</p>
+<p>If you want to actually get something meaningful from the camera, the AMG8833 won't give you any good results.</p>
+<p>Sure, you can do interpolation: interpolation would give you <em>the impression</em> you have a better definition, but you're just &quot;inventing&quot; values you don't actually have.</p>
+<p>For demo projects it could be enough. But for any serious application, spend 20$ more and buy an MLX90640.</p>
 <h2>MLX90640 eloquent library</h2>
 <p>As you may know if you read <a href="/2019/11/how-to-write-clean-arduino-code/">my previous posts</a>, I strongly believe in &quot;eloquent&quot; code, that is code that's as easy as possible to read.</p>
 <p>How many lines do you think you need to read a MLX90640 camera? Well, not that much in fact.</p>
