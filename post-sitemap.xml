@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2020-02-23T12:08:12+00:00</lastmod>
+		<lastmod>2020-03-02T19:07:46+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</loc>
@@ -55,10 +55,6 @@
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Iris-serial.png</image:loc>
 			<image:caption><![CDATA[Iris classification serial output]]></image:caption>
 		</image:image>
-	</url>
-	<url>
-		<loc>https://eloquentarduino.github.io/2019/11/how-to-train-a-classifier-in-scikit-learn/</loc>
-		<lastmod>2020-01-23T12:11:09+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2020/01/motion-detection-with-esp32-cam-only-arduino-version/</loc>
@@ -214,7 +210,7 @@
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/</loc>
-		<lastmod>2020-02-23T12:08:12+00:00</lastmod>
+		<lastmod>2020-02-23T12:11:37+00:00</lastmod>
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST.gif</image:loc>
 			<image:caption><![CDATA[Arduino handwritten digit classification]]></image:caption>
@@ -226,6 +222,18 @@
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-feature-extraction.jpg</image:loc>
 			<image:caption><![CDATA[Handwritten digit feature extraction]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/11/how-to-train-a-classifier-in-scikit-learn/</loc>
+		<lastmod>2020-02-27T13:25:48+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/02/easy-arduino-thermal-camera-with-ascii-video-streaming/</loc>
+		<lastmod>2020-03-02T19:07:46+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/thermal-image-rgb-vs-ascii.jpg</image:loc>
+			<image:caption><![CDATA[Arduino thermal image rgb vs ascii]]></image:caption>
 		</image:image>
 	</url>
 </urlset>

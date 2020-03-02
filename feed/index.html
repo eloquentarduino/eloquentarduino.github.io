@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 23 Feb 2020 12:08:12 +0000</lastBuildDate>
+	<lastBuildDate>Mon, 02 Mar 2020 19:07:46 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,12 +20,308 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.2</generator>
 	<item>
+		<title>Easy Arduino thermal camera with (ASCII) video streaming</title>
+		<link>https://eloquentarduino.github.io/2020/02/easy-arduino-thermal-camera-with-ascii-video-streaming/</link>
+				<pubDate>Sat, 29 Feb 2020 16:20:15 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Computer vision]]></category>
+		<category><![CDATA[Electronics]]></category>
+		<category><![CDATA[Eloquent library]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=956</guid>
+				<description><![CDATA[<p>Ever wanted to use your thermal camera with Arduino but found it difficult to go beyond the tutorials code? Let's see the easiest possible way to view your thermal camera streaming without an LCD display! MLX90640 eloquent library As you may know if you read my previous posts, I strongly believe in &#34;eloquent&#34; code, that [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/easy-arduino-thermal-camera-with-ascii-video-streaming/">Easy Arduino thermal camera with (ASCII) video streaming</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>Ever wanted to use your thermal camera with Arduino but found it difficult to go beyond the tutorials code? Let's see the easiest possible way to view your thermal camera streaming without an LCD display!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/thermal-image-rgb-vs-ascii.jpg" alt="Arduino thermal image rgb vs ascii" /></p>
+<p><span id="more-956"></span></p>
+<h2>MLX90640 eloquent library</h2>
+<p>As you may know if you read <a href="/2019/11/how-to-write-clean-arduino-code/">my previous posts</a>, I strongly believe in &quot;eloquent&quot; code, that is code that's as easy as possible to read.</p>
+<p>How many lines do you think you need to read a MLX90640 camera? Well, not that much in fact.</p>
+<pre><code class="language-cpp">#include &quot;EloquentMLX90640.h&quot;
+
+using namespace Eloquent::Sensors;
+
+float buffer[768];
+MLX90640 camera;
+
+void setup() {
+  Serial.begin(115200);
+
+  if (!camera.begin()) {
+    Serial.println(&quot;Init error&quot;);
+    delay(50000);
+  }
+}
+
+void loop() {
+  camera.read(buffer);
+  delay(3000);
+}</code></pre>
+<p>If you skip the declaration lines, you only need a <code>begin()</code> and <code>read()</code> call.</p>
+<p>That's it.</p>
+<p>What <code>begin()</code> does is to run all of the boilerplate code I mentioned earlier (checking the connection and initializing the parameters).</p>
+<p><code>read()</code> populates the buffer you pass as argument with the temperature readings.</p>
+<p>From now on, you're free to handle that array as you may like: this is the most flexible way for the library to handle any use-case. It simply does not pose any restriction.</p>
+<p>You can find the camera code <a href="#anchor-camera-code">at the end of the page</a> or <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/ThermalCameraToAsciiArtExample/EloquentMLX90640.h">on Github</a>.</p>
+<h2>Printing as ASCII Art</h2>
+<p>Now that you have this data, you may want to actually &quot;view&quot; it. Well, that's not an easy task as one may hope.</p>
+<p>You will need an LCD if you want to create a standalone product. If you have one, it'll be the best, it's a really cute project to build.</p>
+<p>Here's a video from Adafruit that showcases even a 3D-printed case.</p>
+<p><iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/ZjQEykbvb5w" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></p>
+<p>If you don't have an LCD, though, it is less practical to access your image.</p>
+<p>I did this in the past, and it meant creating a Python script reading the serial port every second and updating a plot.<br />
+It works, sure, but it's not the most convenient way to handle it.</p>
+<p>This is the reason I thought about ASCII art: it is used to draw images in plain text, so you can view them directly in the serial monitor.</p>
+<p>Of course they will not be as accurate or representative as RGB images, but can give you an idea of what you're framing in realtime.</p>
+<p>I wrote a class to do this. Once imported in your sketch, it is super easy to get it working.</p>
+<pre><code class="language-cpp">#include &quot;EloquentAsciiArt.h&quot;
+
+using namespace Eloquent::ImageProcessing;
+
+float buffer[768];
+uint8_t bufferBytes[768];
+MLX90640 camera;
+// we need to specify width and height of the image
+AsciiArt&lt;32, 24&gt; art(bufferBytes);
+
+void loop() {
+  camera.read(buffer);
+
+  // convert float image to uint8
+  for (size_t i = 0; i &lt; 768; i++) {
+    // assumes readings are in the range 0-40 degrees
+    // change as per your need
+    bufferBytes[i] = map(buffer[i], 0, 40, 0, 255);
+  }
+
+  // print to Serial with a border of 2 characters, to distinguish one image from the next
+  art.print(&amp;Serial, 2);
+  delay(2000);
+}</code></pre>
+<p>As you can see, you need to create an <code>AsciiArt</code> object, map the image pixels in the range <code>0-255</code> and call the <code>print()</code> method: easy peasy!</p>
+<p>You can find the ASCII art generator code <a href="#anchor-ascii-art-code">at the end of the page</a> or <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/ThermalCameraToAsciiArtExample/EloquentAsciiArt.h">on Github</a>.</p>
+<p>Here's the result of the sketch. It's a video of me putting my arms at the top of my head, once at a time, then standing up.</p>
+<div class="watchout">Resize the Serial Monitor as only a single frame at a time is visble to have a "video streaming" effect</div>
+<div style="width: 342px;" class="wp-video"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
+<video class="wp-video-shortcode" id="video-956-1" width="342" height="636" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/Thermal-ascii-speedup.mp4?_=1" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/02/Thermal-ascii-speedup.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/02/Thermal-ascii-speedup.mp4</a></video></div>
+<p>Of course the visual effect won't be as impressive as an RGB image, but you can clearly see my figure moving.</p>
+<p>The real bad part is the &quot;glitch&quot; you see between each frame when the scrolling happens: this is something I don't know if it's possible to mitigate.</p>
+<hr>
+<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/ThermalCameraToAsciiArtExample" target="_blank" rel="noopener noreferrer">Github</a></p>
+<hr />
+<div id="anchor-camera-code"></div>
+<pre><code class="language-cpp">#pragma once
+
+#include &quot;Wire.h&quot;
+#include &quot;MLX90640_API.h&quot;
+#include &quot;MLX90640_I2C_Driver.h&quot;
+
+#ifndef TA_SHIFT
+//Default shift for MLX90640 in open air
+#define TA_SHIFT 8
+#endif
+
+namespace Eloquent {
+    namespace Sensors {
+
+        enum class MLX90640Status {
+            OK,
+            NOT_CONNECTED,
+            DUMP_ERROR,
+            PARAMETER_ERROR,
+            FRAME_ERROR
+        };
+
+        class MLX90640 {
+        public:
+            /**
+             *
+             * @param address
+             */
+            MLX90640(uint8_t address = 0x33) :
+                _address(address),
+                _status(MLX90640Status::OK) {
+
+            }
+
+            /**
+             *
+             * @return
+             */
+            bool begin() {
+                Wire.begin();
+                Wire.setClock(400000);
+
+                return isConnected() &amp;&amp; loadParams();
+            }
+
+            /**
+             *
+             * @return
+             */
+            bool read(float result[768]) {
+                for (byte x = 0 ; x &lt; 2 ; x++) {
+                    uint16_t frame[834];
+                    int status = MLX90640_GetFrameData(_address, frame);
+
+                    if (status &lt; 0)
+                        return fail(MLX90640Status::FRAME_ERROR);
+
+                    float vdd = MLX90640_GetVdd(frame, &amp;_params);
+                    float Ta = MLX90640_GetTa(frame, &amp;_params);
+                    float tr = Ta - TA_SHIFT;
+                    float emissivity = 0.95;
+
+                    MLX90640_CalculateTo(frame, &amp;_params, emissivity, tr, result);
+                }
+            }
+
+        protected:
+            uint8_t _address;
+            paramsMLX90640 _params;
+            MLX90640Status _status;
+
+            /**
+             * Test if device is connected
+             * @return
+             */
+            bool isConnected() {
+                Wire.beginTransmission(_address);
+
+                if (Wire.endTransmission() == 0) {
+                    return true;
+                }
+
+                return fail(MLX90640Status::NOT_CONNECTED);
+            }
+
+            /**
+             *
+             * @return
+             */
+            bool loadParams() {
+                uint16_t ee[832];
+                int status = MLX90640_DumpEE(_address, ee);
+
+                if (status != 0)
+                    return fail(MLX90640Status::DUMP_ERROR);
+
+                status = MLX90640_ExtractParameters(ee, &amp;_params);
+
+                if (status != 0)
+                    return fail(MLX90640Status::PARAMETER_ERROR);
+
+                return true;
+            }
+
+            /**
+             * Mark a failure
+             * @param status
+             * @return
+             */
+            bool fail(MLX90640Status status) {
+                _status = status;
+
+                return false;
+            }
+        };
+    }
+}</code></pre>
+<div id="anchor-ascii-art-code"></div>
+<pre><code class="language-cpp">#pragma once
+
+#include &quot;Stream.h&quot;
+
+namespace Eloquent {
+    namespace ImageProcessing {
+
+        /**
+         *
+         * @tparam width
+         * @tparam height
+         */
+        template&lt;size_t width, size_t height&gt;
+        class AsciiArt {
+        public:
+            AsciiArt(const uint8_t *data) {
+                _data = data;
+            }
+
+            /**
+             * Get pixel at given coordinates
+             * @param x
+             * @param y
+             * @return
+             */
+            uint8_t at(size_t x, size_t y) {
+                return _data[y * width + x];
+            }
+
+            /**
+             * Print as ASCII art picture
+             * @param stream
+             */
+            void print(Stream *stream, uint8_t frameSize = 0) {
+                const char glyphs[] = &quot; .,:;xyYX&quot;;
+                const uint8_t glyphsCount = 9;
+
+                printAsciiArtHorizontalFrame(stream, frameSize);
+
+                for (size_t y = 0; y &lt; height; y++) {
+                    // vertical frame
+                    for (uint8_t k = 0; k &lt; frameSize; k++)
+                        Serial.print(&#039;|&#039;);
+
+                    for (size_t x = 0; x &lt; width; x++) {
+                        const uint8_t glyph = floor(((uint16_t) at(x, y)) * glyphsCount / 256);
+
+                        stream-&gt;print(glyphs[glyph]);
+                    }
+
+                    // vertical frame
+                    for (uint8_t k = 0; k &lt; frameSize; k++)
+                        Serial.print(&#039;|&#039;);
+
+                    stream-&gt;print(&#039;\n&#039;);
+                }
+
+                printAsciiArtHorizontalFrame(stream, frameSize);
+                stream-&gt;flush();
+            }
+
+        protected:
+            const uint8_t *_data;
+
+            /**
+             *
+             * @param stream
+             * @param frameSize
+             */
+            void printAsciiArtHorizontalFrame(Stream *stream, uint8_t frameSize) {
+                for (uint8_t i = 0; i &lt; frameSize; i++) {
+                    for (size_t j = 0; j &lt; width + 2 * frameSize; j++)
+                        stream-&gt;print(&#039;-&#039;);
+                    stream-&gt;print(&#039;\n&#039;);
+                }
+            }
+        };
+    }
+}</code></pre>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/easy-arduino-thermal-camera-with-ascii-video-streaming/">Easy Arduino thermal camera with (ASCII) video streaming</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+							<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2020/02/Thermal-ascii-speedup.mp4" length="479591" type="video/mp4" />
+			</item>
+		<item>
 		<title>Handwritten digit classification with Arduino and MicroML</title>
 		<link>https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/</link>
 				<pubDate>Sun, 23 Feb 2020 10:53:03 +0000</pubDate>
 		<dc:creator><![CDATA[simone]]></dc:creator>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[Computer vision]]></category>
+		<category><![CDATA[camera]]></category>
+		<category><![CDATA[esp32]]></category>
+		<category><![CDATA[microml]]></category>
 
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=931</guid>
 				<description><![CDATA[<p>We continue exploring the endless possibilities on the MicroML (Machine Learning for Microcontrollers) framework on Arduino and ESP32 boards: in this post we're back to image classification. In particular, we'll distinguish handwritten digits using an ESP32 camera. If this is the first time you're reading my blog, you may have missed that I'm on a [&#8230;]</p>
@@ -223,8 +519,7 @@ void loop() {
 }</code></pre>
 <p>Done.</p>
 <p>You can see a demo of my results in the video below.</p>
-<div style="width: 788px;" class="wp-video"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
-<video class="wp-video-shortcode" id="video-931-1" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4?_=1" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4</a></video></div>
+<div style="width: 788px;" class="wp-video"><video class="wp-video-shortcode" id="video-931-2" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4?_=2" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4</a></video></div>
 <h3>Project figures</h3>
 <p>My dataset is composed of 25 training samples in total and the SVM with linear kernel produced 17 support vectors.</p>
 <p>On my M5Stick camera board, the overhead for the model is 6.8 Kb of flash and the inference takes 7ms: not that bad!</p>
@@ -775,7 +1070,7 @@ Image acquisition is a very noisy process: even keeping the camera still, you wi
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange-decision-boundaries.png" alt="Apple vs Orange decision boundaries" /></p>
 <h2 id="tocreal-world-example">Real world example</h2>
 <p>If you followed all the steps above, you should now have a model capable of detecting if your camera is shotting an apple or an orange, as you can see in the following video.</p>
-<div style="width: 788px;" class="wp-video"><video class="wp-video-shortcode" id="video-820-2" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4?_=2" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4</a></video></div>
+<div style="width: 788px;" class="wp-video"><video class="wp-video-shortcode" id="video-820-3" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4?_=3" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4</a></video></div>
 <p></p>
 <p>The little white object you see at the bottom of the image is the camera, taped to the desk.</p>
 <p>Did you think it was possible to do simple image classification on your ESP32?</p>
@@ -888,7 +1183,7 @@ Image acquisition is a very noisy process: even keeping the camera still, you wi
 <p>Now the fun part. I'll show you how it performs on a real-world scenario.</p>
 <p>To keep it simple, I wrote a sketch that does only motion detection, not video streaming over HTTP. </p>
 <p>This means you won't be able to see the original image recorded from the camera. Nevertheless, I have kept the block size to a minimum to allow for the best quality possible.</p>
-<div style="width: 652px;" class="wp-video"><video class="wp-video-shortcode" id="video-779-3" width="652" height="604" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4?_=3" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4</a></video></div>
+<div style="width: 652px;" class="wp-video"><video class="wp-video-shortcode" id="video-779-4" width="652" height="604" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4?_=4" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4</a></video></div>
 <p>This is me passing my arm in front of the camera a few times.</p>
 <p>The grid you see represents the actual pixels used for the computation. Each cell corresponds to one pixel of the downscaled image.</p>
 <p>The orange cells highlight the pixels that the algorithm sees as &quot;different&quot; from one frame to the next. As you can see, some pixels are detected even if no motion is happening. That's the noise I talked about multiple times during the post.</p>
@@ -1240,7 +1535,7 @@ void loop() {
 }</code></pre>
 <p>And that's it: word classification through machine learning on your Arduino board! Say some word and see the classification result on the Serial monitor. </p>
 <p>Here's me testing the system (English is not my language, so forgive my bad pronounce). The video quality is very low, I know, but you get the point.</p>
-<div style="width: 640px;" class="wp-video"><video class="wp-video-shortcode" id="video-180-4" width="640" height="352" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4?_=4" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4</a></video></div>
+<div style="width: 640px;" class="wp-video"><video class="wp-video-shortcode" id="video-180-5" width="640" height="352" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4?_=5" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Word-classification.mp4</a></video></div>
 <div class="watchout">
 As you can hear from the video, you should be quite accurate when pronouncing the words. I have to admit there are cases where the system totally fails to classify correctly the words. Restarting helps most of the time, so I'm suspecting there could be some kind of leak that "corrupts" the inference procedure.
 </div>
@@ -1770,7 +2065,7 @@ void classify() {
 <p>Here we are: it has been a long post, but now you can classify gestures with an Arduino Nano and 2 Kb of RAM. </p>
 <hr /><p><em>No fancy Neural Networks, no Tensorflow, no 32-bit ARM processors: plain old SVM on plain old 8 bits with 97% accuracy.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fhow-to-do-gesture-identification-on-arduino%2F&#038;text=No%20fancy%20Neural%20Networks%2C%20no%20Tensorflow%2C%20no%2032-bit%20ARM%20processors%3A%20plain%20old%20SVM%20on%20plain%20old%208%20bits%20with%2097%25%20accuracy.&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
 <p>Here's a short demo of me playing 3 gestures and getting the results on the serial monitor.</p>
-<div style="width: 640px;" class="wp-video"><video class="wp-video-shortcode" id="video-35-5" width="640" height="360" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4?_=5" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4</a></video></div>
+<div style="width: 640px;" class="wp-video"><video class="wp-video-shortcode" id="video-35-6" width="640" height="360" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4?_=6" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4">https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4</a></video></div>
 <p><h4>Project figures</h4>
 <p>On my machine, the sketch targeted at the Arduino Nano (old generation) requires 25310 bytes (82%) of program space and 1228 bytes (59%) of RAM. This means you could actually run machine learning in even less space than what the Arduino Nano provides. So, the answer to the question <em>Can I run machine learning on Arduino?</em> is <strong>definetly YES</strong>.<br />
 <br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
@@ -1780,199 +2075,5 @@ void classify() {
 ]]></content:encoded>
 							<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Gesture-identification-in-action.mp4" length="1035484" type="video/mp4" />
 			</item>
-		<item>
-		<title>Eloquent pin management: the Pin class</title>
-		<link>https://eloquentarduino.github.io/2019/12/arduino-pin-class/</link>
-				<pubDate>Fri, 06 Dec 2019 16:15:13 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Eloquent library]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=167</guid>
-				<description><![CDATA[<p>Pin is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like digitalWrite(led, HIGH) and start writing led.turnOn() instead. Pin is actually an abstract class, so you won't use it directly, but through its specialized implementations: DigitalIn DigitalOut AnalogIn AnalogOut Import the library [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-pin-class/">Eloquent pin management: the Pin class</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p><code>Pin</code> is a class for pin manipulation: you can read, write, turnOn, turnOff, toggle and a lot more. Please, stop writing horrible code like <code>digitalWrite(led, HIGH)</code> and start writing <code>led.turnOn()</code> instead. </p>
-<p><span id="more-167"></span></p>
-<p><code>Pin</code> is actually an abstract class, so you won't use it directly, but through its specialized implementations:</p>
-<ol>
-<li>DigitalIn</li>
-<li>DigitalOut</li>
-<li>AnalogIn</li>
-<li>AnalogOut</li>
-</ol>
-<h2>Import the library</h2>
-<div class="watchout">To follow this tutorial along you need to first <a href="/2019/12/how-to-install-the-eloquent-library/" target="_blank" rel="noopener noreferrer">install the Eloquent library</a></div>
-<pre><code class="language-cpp">#import &lt;eIO.h&gt;
-
-using namespace Eloquent::Pin;</code></pre>
-<p>If the namespace stuff is new to you, here I'll briefly say that it is used to avoid name collisions among different libraries. This seems to be an alien topic in the Arduino world and I can't really explain why.</p>
-<p>99% of the libraries out there deal with this problem in one of two modes:</p>
-<ol>
-<li>ignoring it altogether, so you have an <code>MPU6050.h</code> library, which elects itself as the only one implementation possible to access the MPU6050 accelerometer in the world</li>
-<li>prefixing each library file, so you get the <code>Adafruit_Si7021</code> class</li>
-</ol>
-<hr /><p><em>The case for Adafruit_Si7021 should not exist in my opinion: use the damn namespaces!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Farduino-pin-class%2F&#038;text=The%20case%20for%20Adafruit_Si7021%20should%20not%20exist%20in%20my%20opinion%3A%20use%20the%20damn%20namespaces%21&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>With namespaces, it would become:</p>
-<pre><code class="language-cpp">using namespace Adafruit;
-
-Si7021 si;</code></pre>
-<h2>How to use</h2>
-<p>First of all, all the 4 implementations accept a single constructor argument: the pin number.</p>
-<pre><code class="language-cpp"> DigitalOut led(BUILTIN_LED);
- DigitalIn pushButton(10);
- AnalogIn potentiometer(A0);
- AnalogOut pwmLed(8);</code></pre>
-<p>Then it is good practice to init your pins in the setup.</p>
-<pre><code class="language-cpp"> void setup() {
-    led.begin();
-    pushButton.begin();
-    potentiometer.begin();
-    pwmLed.begin();
- }</code></pre>
-<p>All the 4 classes let you ask for the pin current value via the <code>value()</code> method:</p>
-<pre><code class="language-cpp"> void test() {
-    // DigitalIn returns the last read value, as 0/1
-    digitalIn.value();
-
-    // AnalogIn returns the last read value, in the range [0, 1024]
-    analogIn.value();
-
-    // DigitalOut returns the last written value, as 0/1
-    digitalOut.value();
-
-    // AnaloglOut returns the last written value, in the range [0, 255]
-    analogOut.value();
- }</code></pre>
-<p>At this point each class will provide its specialized methods.</p>
-<h4>DigitalIn</h4>
-<pre><code class="language-cpp">void test() {
-    // configure pin as INPUT_PULLUP
-    pin.pullup();
-
-    // configure pin as Active Low 
-    // that is, pin is ON when digitalRead() is LOW
-    pin.activeLow();
-
-    // read and update pin value
-    pin.read();
-
-    // test if pin is on (doesn&#039;t read the pin)
-    pin.isOn();
-
-    // test if pin is off (doesn&#039;t read the pin)
-    pin.isOff();
-
-    // test if pin value changed from last reading
-    pin.changed();
-}</code></pre>
-<h4>DigitalOut</h4>
-<pre><code class="language-cpp">void test() {
-    // set pin as Active Low
-    // that is, turnOn writes LOW
-    pin.activeLow();
-
-    // turn pin on
-    pin.turnOn();
-
-    // turn pin off
-    pin.turnOff();
-
-    // toggle
-    pin.toggle();
-
-    // blink N times at intervals of X milliseconds
-    pin.blink(N, X);
-}</code></pre>
-<h4>AnalogIn</h4>
-<pre><code class="language-cpp">void test() {
-    // read current pin value
-    pin.read();
-
-    // get pin previous value
-    pin.prev();
-
-    // get difference between current value and previous
-    pin.delta();
-
-    // get absolute value of delta()
-    pin.absDelta();
-}</code></pre>
-<h4>AnalogOut</h4>
-<pre><code class="language-cpp">void test() {
-    // write value X to pin
-    pin.write(X);
-}</code></pre>
-<hr />
-<p>If you don't believe a whole class is worthwhile to work with pins, I'll show a few use cases to illustrate my point.</p>
-<h4>Use case #1: active low LED</h4>
-<p>The ESP8266 has a builtin LED you can control, but it is an <em>active low</em> one: it will turn on when you write <code>LOW</code>. In this case, <code>digitalWrite(BUILTIN_LED, LOW)</code> can be misleading regarding your actual intentions. </p>
-<p>It doesn't look intuitive,  it doesn't look <em>eloquent</em>! <code>builtinLed.turnOn()</code> does, however. All you need to get it working correctly is calling <code>builtinLed.activeLow()</code> once in your setup.</p>
-<pre><code class="language-cpp">// BEFORE
-void loop() {
-    // to turn the builtin LED on
-    digitalWrite(led, LOW);
-}</code></pre>
-<pre><code class="language-cpp">// AFTER
-DigitalOut buildtinLed;
-
-void setup() {
-    builtinLed.activeLow();
-}
-
-void loop() {
-    // to turn the builtin LED on
-    builtinLed.turnOn();
-}</code></pre>
-<h4>Use case #2: toggle</h4>
-<p>If you need to toggle the current state of a digital output, you need an helper variable to keep track of the state and remember to <strong>always</strong> update that variable when you write to the output.<br />
-With a class, the state is tightly bound to the instance, so you have a <a href="https://en.wikipedia.org/wiki/Single_source_of_truth">single source of truth</a>: <code>turnOn()</code>, <code>turnOff()</code> and <code>toggle()</code> will take care of updating the inner state accordingly.</p>
-<pre><code class="language-cpp">// BEFORE
-#define LED 1
-
-bool ledState = true;
-
-loop() {
-    digitalWrite(LED, ledState);
-    ledState = !ledState
-}</code></pre>
-<pre><code class="language-cpp">// AFTER
-DigitalOut led(1);
-
-void loop() {
-    led.toggle();
-}</code></pre>
-<h4>Use case #3: analog delta</h4>
-<p>What if you have an analog input and want to know if its valued changed by at least X from your latest reading? You would need an helper variable again. </p>
-<p>Now imagine if you have 5 analog inputs you want to track: you'll end up with 10 variables and of course you have again to <strong>always</strong> keep both in sync.<br />
-<code>AnalogIn</code> conveniently provides <code>delta()</code> and <code>absDelta()</code> methods that give you the change from the previous reading and will always be in sync. Awesome!</p>
-<pre><code class="language-cpp">// BEFORE
-#define INPUT1 A1
-#define INPUT2 A2
-
-uint16_t current1, prev1;
-uint16_t current2, prev2;
-
-void loop() {
-    prev1 = current1;
-    current1 = analogRead(INPUT1);
-    prev2 = current2;
-    current2 = analogRead(INPUT2);
-
-    if (abs(current1 - prev1) &gt; THRESHOLD)
-        ...</code></pre>
-<pre><code class="language-cpp">// AFTER
-AnalogIn input1(A1), input2(A2);
-
-void loop() {
-    input1.read();
-    input2.read();
-
-    if (input1.absDelta() &gt; THRESHOLD)
-        ...
-}</code></pre>
-<br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/arduino-pin-class/">Eloquent pin management: the Pin class</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
 	</channel>
 </rss>
