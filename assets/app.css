@@ -38,7 +38,9 @@ body {
 }
 
 .post-content h2 {
-	margin-bottom: 0.5em;
+  color: #353E49;
+  margin-bottom: 0.5em;
+  text-decoration: underline;
 }
 
 .post-content p {

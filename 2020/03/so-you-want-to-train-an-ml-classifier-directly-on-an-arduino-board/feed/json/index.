@@ -1,0 +1,8 @@
+{
+    "version": "https://jsonfeed.org/version/1",
+    "user_comment": "This feed allows you to read the posts from this site in any feed reader that supports the JSON Feed format. To add this feed to your reader, copy the following URL -- https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/feed/json/ -- and add it your reader.",
+    "home_page_url": "https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/",
+    "feed_url": "https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/feed/json/",
+    "title": "Comments on: So you want to train an ML classifier directly on an Arduino board?",
+    "description": "Machine learning on Arduino, programming &amp; electronics"
+}
