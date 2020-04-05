@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 29 Mar 2020 16:43:27 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 05 Apr 2020 17:40:53 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,271 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.2</generator>
 	<item>
+		<title>Passive-aggressive classifier for embedded devices</title>
+		<link>https://eloquentarduino.github.io/2020/04/passive-aggressive-classifier-for-embedded-devices/</link>
+				<pubDate>Sun, 05 Apr 2020 17:04:10 +0000</pubDate>
+		<dc:creator><![CDATA[simone]]></dc:creator>
+				<category><![CDATA[Senza categoria]]></category>
+
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1050</guid>
+				<description><![CDATA[<p>When working with memory constrained devices you may not able to keep all the training data in memory: passive-aggressive classifiers may help solve your memory problems. Batch learning A couple weeks ago I started exploring the possibility to train a machine learning classifier directly on a microcontroller. Since I like SVM, I ported the simplified [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/passive-aggressive-classifier-for-embedded-devices/">Passive-aggressive classifier for embedded devices</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+								<content:encoded><![CDATA[<p>When working with memory constrained devices you may not able to keep all the training data in memory: passive-aggressive classifiers may help solve your memory problems.</p>
+<p><span id="more-1050"></span></p>
+<h2>Batch learning</h2>
+<p>A couple weeks ago I started exploring the possibility to train a machine learning classifier directly on a microcontroller. Since I like SVM, <a href="so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board">I ported the simplified SVM SMO (Sequential Minimal Optimization) algorithm</a> to plain C, ready to be deployed to embedded devices.</p>
+<p>Now, that kind of algorithm works in the so-called &quot;batch-mode&quot;: it needs all the training data to be available in memory to learn.</p>
+<p>This may be a limiting factor on resource-constrained devices, since it poses an upper bound to the number of samples you can train on. And when working with high-dimensional datasets, the number of samples could be not enough to achieve good accuracy.</p>
+<h2>Enter incremental learning</h2>
+<p>To solve this limitation, you need a totally different kind of learning algorithms: you need incremental (a.k.a online a.k.a out of core) learning.</p>
+<p>Incremental learning works by inspecting one training sample at a time, instead of all at once.</p>
+<p>The clear advantage is that you have a tiny memory footprint. And this is a <strong>huge</strong> advantage.</p>
+<p>The clear disadvantage is that you don't have the &quot;big picture&quot; of your data, so:</p>
+<ul>
+<li>the end result will probably be affected by the order of presentation of the samples</li>
+<li>you may not be able to achieve top accuracy</li>
+</ul>
+<h2>Passive-aggressive classifier</h2>
+<p>Passive-aggressive classification is one of the available incremental learning algorithms and it is very simple to implement, since it has a closed-form update rule.</p>
+<p>Please refer to this <a href="https://www.bonaccorso.eu/2017/10/06/ml-algorithms-addendum-passive-aggressive-algorithms/">short explanation on Passive-aggressive classifiers</a> for a nice description with images.</p>
+<p>The core concept is that the classifier adjusts it weight vector for each mis-classified training sample it receives, trying to get it correct.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/04/passive-aggressive-classifier.png" alt="Passive aggressive classifier" /></p>
+<h2>Benchmarks</h2>
+<p>I run a couple benchmark on my Esp32 to assess both accuracy and training time.</p>
+<p>First of all: <strong>it is fast!</strong>. When I say it is fast I mean it takes ~1ms to train on 400 samples x 30 features each.</p>
+<p>Talking about accuracy instead... Uhm...</p>
+<p>Accuracy vary. <strong>Greatly</strong>. </p>
+<p>You can achieve 100% on some datasets. </p>
+<p>And 40% on others. But on those same datasets you can achieve &gt;85% if training on a different number of samples. Or in a different order.</p>
+<p>I guess this is the tradeoff for such a simple and space-efficient algorithm.</p>
+<p>I report my results in the following table. It is not meant to be an exhaustive benchmark of the classifier, since those number will vary based on the order of presentation, but still you can get an idea of what it is able to achieve.</p>
+<table>
+<thead>
+<tr>
+<th>Dataset size</th>
+<th style="text-align: center;">Train samples</th>
+<th style="text-align: right;">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BREAST CANCER</td>
+<td style="text-align: center;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr>
+<td>567 samples</td>
+<td style="text-align: center;">20</td>
+<td style="text-align: right;">62</td>
+</tr>
+<tr>
+<td>30 features</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: right;">37</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">60</td>
+<td style="text-align: right;">63</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">100</td>
+<td style="text-align: right;">39</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">150</td>
+<td style="text-align: right;">38</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">200</td>
+<td style="text-align: right;">64</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">250</td>
+<td style="text-align: right;">61</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">300</td>
+<td style="text-align: right;">69</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">350</td>
+<td style="text-align: right;">73</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">400</td>
+<td style="text-align: right;">85</td>
+</tr>
+<tr>
+<td>IRIS</td>
+<td style="text-align: center;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr>
+<td>100 samples</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: right;">50</td>
+</tr>
+<tr>
+<td>4 features</td>
+<td style="text-align: center;">20</td>
+<td style="text-align: right;">51</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">40</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">60</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">80</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr>
+<td>DIGITS</td>
+<td style="text-align: center;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr>
+<td>358 samples</td>
+<td style="text-align: center;">20</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr>
+<td>64 features</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">60</td>
+<td style="text-align: right;">99</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">100</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">150</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">200</td>
+<td style="text-align: right;">99</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">250</td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">300</td>
+<td style="text-align: right;">95</td>
+</tr>
+<tr>
+<td>CLEVELAND HEART DISEASE</td>
+<td style="text-align: center;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr>
+<td>212 samples</td>
+<td style="text-align: center;">20</td>
+<td style="text-align: right;">76</td>
+</tr>
+<tr>
+<td>13 features</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: right;">24</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">60</td>
+<td style="text-align: right;">77</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">100</td>
+<td style="text-align: right;">19</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">120</td>
+<td style="text-align: right;">82</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">140</td>
+<td style="text-align: right;">78</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: center;">180</td>
+<td style="text-align: right;">88</td>
+</tr>
+</tbody>
+</table>
+<h2>Time to code</h2>
+<p>Here I'll report an extract of the example code you can find on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/PassiveAggressiveExample/PassiveAggressiveExample.ino">Github</a> for this classifier.</p>
+<pre><code class="language-c">#include &lt;EloquentPassiveAggressiveClassifier.h&gt;
+#include &lt;EloquentAccuracyScorer.h&gt;
+#include &quot;iris.h&quot;
+
+using namespace Eloquent::ML;
+
+void loop() {
+    int trainSamples;
+    PassiveAggressiveClassifier&lt;FEATURES_DIM&gt; clf;
+    AccuracyScorer scorer;
+
+    trainSamples = readSerialNumber(&quot;How many samples will you use as training?&quot;, DATASET_SIZE - 2);
+
+    if (trainSamples == 0)
+        return;
+
+    clf.setC(1);
+
+    // train
+    for (uint16_t i = 0; i &lt; trainSamples; i++)
+        clf.fitOne(X[i], y[i]);
+
+    // predict
+    for (uint16_t i = trainSamples; i &lt; DATASET_SIZE; i++) {
+        int predicted = clf.predict(X[i]);
+        int actual = y[i] &gt; 0 ? 1 : -1;
+
+        scorer.scoreOne(actual, predicted);
+    }
+
+    Serial.print(&quot;Accuracy: &quot;);
+    Serial.print(round(100 * scorer.accuracy()));
+    Serial.print(&quot;% out of &quot;);
+    Serial.print(scorer.support());
+    Serial.println(&quot; predictions&quot;);
+}</code></pre>
+<hr />
+<p>On the <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/PassiveAggressiveExample/PassiveAggressiveExample.ino">project page</a> you will find the code to reproduce these numbers.</p>
+<hr />
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/passive-aggressive-classifier-for-embedded-devices/">Passive-aggressive classifier for embedded devices</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+										</item>
+		<item>
 		<title>How to train a color classification Machine learning classifier directly on your Arduino board</title>
 		<link>https://eloquentarduino.github.io/2020/03/how-to-train-a-color-classification-machine-learning-classifier-directly-on-your-arduino-board/</link>
 				<pubDate>Sat, 28 Mar 2020 19:02:53 +0000</pubDate>
@@ -49,11 +314,13 @@
 #define MAX_TRAINING_SAMPLES 20
 #define FEATURES_DIM 3
 
+using namespace Eloquent::ML;
+
 int numSamples;
 RGB rgb(2, 3, 4);
 float X_train[MAX_TRAINING_SAMPLES][FEATURES_DIM];
 int y_train[MAX_TRAINING_SAMPLES];
-Eloquent::TinyML::SVMSMO&lt;FEATURES_DIM&gt; classifier(linearKernel);</code></pre>
+SVMSMO&lt;FEATURES_DIM&gt; classifier(linearKernel);</code></pre>
 <p>When training a classifier on your microcontroller there are some things that are mandatory:</p>
 <ol>
 <li><code>#include &lt;EloquentSVMSMO.h&gt;</code>: this is the library that implements the SVM learning algorithm</li>
@@ -149,11 +416,13 @@ Eloquent::TinyML::SVMSMO&lt;FEATURES_DIM&gt; classifier(linearKernel);</code></p
 #define MAX_TRAINING_SAMPLES 20
 #define FEATURES_DIM 3
 
+using namespace Eloquent::ML;
+
 int numSamples;
 RGB rgb(2, 3, 4);
 float X_train[MAX_TRAINING_SAMPLES][FEATURES_DIM];
 int y_train[MAX_TRAINING_SAMPLES];
-Eloquent::TinyML::SVMSMO&lt;FEATURES_DIM&gt; classifier(linearKernel);
+SVMSMO&lt;FEATURES_DIM&gt; classifier(linearKernel);
 
 void setup() {
     Serial.begin(115200);
@@ -328,11 +597,13 @@ class RGB {
 
 #define TOTAL_SAMPLES (POSITIVE_SAMPLES + NEGATIVE_SAMPLES)
 
+using namespace Eloquent::ML;
+
 float X_train[TOTAL_SAMPLES][FEATURES_DIM];
 float X_test[TOTAL_SAMPLES][FEATURES_DIM];
 int y_train[TOTAL_SAMPLES];
 int y_test[TOTAL_SAMPLES];
-Eloquent::TinyML::SVMSMO&lt;FEATURES_DIM&gt; classifier(linearKernel);</code></pre>
+SVMSMO&lt;FEATURES_DIM&gt; classifier(linearKernel);</code></pre>
 <p>First of all we need to include a couple files, namely <code>EloquentSVMSMO.h</code> for the SVM classifier and <code>iris.h</code> for the dataset.</p>
 <p><code>iris.h</code> defines a couple constants:</p>
 <ul>
@@ -1897,112 +2168,5 @@ Image acquisition is a very noisy process: even keeping the camera still, you wi
 ]]></content:encoded>
 							<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.mp4" length="1673368" type="video/mp4" />
 			</item>
-		<item>
-		<title>Embedded Machine learning on Attiny85</title>
-		<link>https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/</link>
-				<pubDate>Mon, 23 Dec 2019 16:57:15 +0000</pubDate>
-		<dc:creator><![CDATA[simone]]></dc:creator>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[microml]]></category>
-
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=688</guid>
-				<description><![CDATA[<p>You won't believe it, but you can run Machine learning on embedded systems like an Attiny85 (and many others Attiny)! When I first run a Machine learning project on my Arduino Nano (old generation), it already felt a big achievement. I mean, that board has only 32 Kb of program space and 2 Kb of [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">Embedded Machine learning on Attiny85</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-								<content:encoded><![CDATA[<p>You won't believe it, but <strong>you can run Machine learning on embedded systems like an Attiny85</strong> (and many others Attiny)!</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/attiny85_ml.png" alt="ri-elaborated from https://cyaninfinite.com/miniaturize-projects-with-attiny85/" /></p>
-<p><span id="more-688"></span></p>
-<p>When I first run a Machine learning project on my Arduino Nano (old generation), it already felt a big achievement. I mean, that board has only 32 Kb of program space and 2 Kb of RAM and you can buy a chinese clone for around 2.50 $.</p>
-<p>It already opened the path to a embedded machine learning at a new scale, given the huge amount of microcontrollers ready to become &quot;intelligent&quot;. </p>
-<p>But it was not enough for me: after all, the <a href="/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">MicroML generator</a> exports plain C that should run on any embedded system, not only on Arduino boards.</p>
-<p>So I setup to test if I could go even smaller and run it on the #1 of tiny chips: the Attiny85.</p>
-<hr /><p><em>MicroML exports plain C that could run anywhere, not only on Arduino boards.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=MicroML%20exports%20plain%20C%20that%20could%20run%20anywhere%2C%20not%20only%20on%20Arduino%20boards.&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>No, I couldn't.</p>
-<p>The generated code makes use of a variadic function, which seems to not be supported by the Attiny compiler in the Arduino IDE.</p>
-<p>So I had to come up with an alternative implementation to make it work.</p>
-<p>Fortunately I already experimented with a non-variadic version when first writing the porter, so it was a matter of refreshing that algorithm and try it out.</p>
-<p>Guess what? It compiled!</p>
-<p>So I tried porting one my earliear tutorial (the <a href="/2019/12/how-to-do-color-identification-on-arduino/">color identification</a> one) to the Attiny and...</p>
-<hr /><p><em>Boom! Machine learning on an Attiny85!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=Boom%21%20Machine%20learning%20on%20an%20Attiny85%21&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>Here's a step-by-step tutorial on how you can do it too.</p>
-<div class="watchout">
-I strongly suggest you read <a href="/2019/12/how-to-do-color-identification-on-arduino/" target="_blank" rel="noopener noreferrer">the original tutorial</a> before following this one, because I won't go into too much details on the common steps here.
-</div>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a><li><a href="#tocproject-figures">Project figures</a></ol></div></p>
-<h2 id="tocfeatures-definition">1. Features definition</h2>
-<p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be 3-dimensional, which leads to a really simple model with very high accuracy.</p>
-<div class="watchout">
-The Attiny85 has 8 Kb of flash and 512 bytes of RAM, so you won't be able to load any model that uses more than a few features (probably less than 10).
-</div>
-<h2 id="tocrecord-sample-data">2. Record sample data</h2>
-<p>You must do this step on a board with a Serial interface, like an Arduino Uno / Nano / Pro Mini. See <a href="/2019/12/how-to-do-color-identification-on-arduino/" target="_blank" rel="noopener noreferrer">the original tutorial</a> for the code of this step.</p>
-<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
-<p>This part is exactly the same as the original, except for a single parameter: you will pass <code>platform=attiny</code> to the <code>port</code> function.</p>
-<pre><code class="language-python">from sklearn.svm import SVC
-from micromlgen import port
-
-# put your samples in the dataset folder
-# one class per file
-# one feature vector per line, in CSV format
-features, classmap = load_features(&#039;dataset/&#039;)
-X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel=&#039;linear&#039;).fit(X, y)
-c_code = port(classifier, classmap=classmap, platform=&#039;attiny&#039;)
-print(c_code)</code></pre>
-<div class="watchout">
-The Attiny mode has been implemented in version 0.8 of micromlgen: if you installed an earlier version, first update
-</div>
-<p>At this point you have to copy the printed code and import it in your project, in a file called <code>model.h</code>.</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<h2 id="tocrun-the-inference">4. Run the inference</h2>
-<p>Since we don't have a Serial, we will blink a LED a number of times dependant on the prediction result.</p>
-<pre><code class="language-cpp">#include &quot;model.h&quot;
-
-#define LED 0
-
-void loop() {
-  readRGB();
-  classify();
-  delay(1000);
-}
-
-void classify() {
-    for (uint8_t times = predict(features) + 1; times &gt; 0; times--) {
-        digitalWrite(LED, HIGH);
-        delay(10);
-        digitalWrite(LED, LOW);
-        delay(10);
-    }
-}</code></pre>
-<p>Here we are: put some colored object in front of the sensor and see the LED blink.</p>
-<h2 id="tocproject-figures">Project figures</h2>
-<p>On my machine, the sketch requires 3434 bytes (41%) of program space and 21 bytes (4%) of RAM. This means you could actually run machine learning in even less space than what the Attiny85 provides. </p>
-<p>This model in particular it's so tiny you <strong>can run in even on an Attiny45, which has only 4 Kb of flash and 256 bytes of RAM</strong>.</p>
-<p>I'd like you to look at the RAM figure for a moment: <strong>21 bytes</strong>. 21 bytes is all the memory you need to run a Machine learning algorithm on a microcontroller. This is the result of the implementation I chose: the least RAM overhead possible. I challenge you to go any lower than this.</p>
-<hr /><p><em>21 bytes is all the memory you need to run a Machine learning algorithm on a microcontroller</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=21%20bytes%20is%20all%20the%20memory%20you%20need%20to%20run%20a%20Machine%20learning%20algorithm%20on%20a%20microcontroller&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p><br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
-<hr>
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlColorIdentificationAttinyExample/MicromlColorIdentificationAttinyExample.ino" target="_blank" rel="noopener noreferrer">Github</a></p></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">Embedded Machine learning on Attiny85</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-										</item>
 	</channel>
 </rss>
