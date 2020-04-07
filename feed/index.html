@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 05 Apr 2020 17:40:53 +0000</lastBuildDate>
+	<lastBuildDate>Tue, 07 Apr 2020 07:31:22 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -33,7 +33,7 @@
 								<content:encoded><![CDATA[<p>When working with memory constrained devices you may not able to keep all the training data in memory: passive-aggressive classifiers may help solve your memory problems.</p>
 <p><span id="more-1050"></span></p>
 <h2>Batch learning</h2>
-<p>A couple weeks ago I started exploring the possibility to train a machine learning classifier directly on a microcontroller. Since I like SVM, <a href="so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board">I ported the simplified SVM SMO (Sequential Minimal Optimization) algorithm</a> to plain C, ready to be deployed to embedded devices.</p>
+<p>A couple weeks ago I started exploring the possibility to train a machine learning classifier directly on a microcontroller. Since I like SVM, <a href="/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board">I ported the simplified SVM SMO (Sequential Minimal Optimization) algorithm</a> to plain C, ready to be deployed to embedded devices.</p>
 <p>Now, that kind of algorithm works in the so-called &quot;batch-mode&quot;: it needs all the training data to be available in memory to learn.</p>
 <p>This may be a limiting factor on resource-constrained devices, since it poses an upper bound to the number of samples you can train on. And when working with high-dimensional datasets, the number of samples could be not enough to achieve good accuracy.</p>
 <h2>Enter incremental learning</h2>
