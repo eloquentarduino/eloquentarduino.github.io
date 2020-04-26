@@ -1,0 +1,25 @@
+.hljs {color: #a9b7c6;background: #282b2e;display: block;overflow-x: auto;padding: .5em;}
+.hljs-bullet, .hljs-literal, .hljs-number, .hljs-symbol {color: #6897bb;}
+.hljs-deletion, .hljs-keyword, .hljs-selector-tag {color: #cc7832;}
+.hljs-link, .hljs-template-variable, .hljs-variable {color: #629755;}
+.hljs-comment, .hljs-quote {color: grey;}
+.hljs-meta {color: #bbb529;}
+.hljs-addition, .hljs-attribute, .hljs-string {color: #6a8759;}
+.hljs-section, .hljs-title, .hljs-type {color: #ffc66d;}
+.hljs-name, .hljs-selector-class, .hljs-selector-id {color: #e8bf6a;}
+.hljs-emphasis {font-style: italic;}
+.hljs-strong {font-weight: 700;}
+.wp-block-sentidoweb-snippet {position: relative;counter-reset: linenumber;white-space: pre-wrap;}
+.wp-block-sentidoweb-snippet pre {white-space: pre-wrap;}
+.wp-block-sentidoweb-snippet .sw_show_line_numbers {padding-left: 35px;}
+.wp-block-sentidoweb-snippet .sw_new_line::before {content: counter(linenumber,decimal-leading-zero);counter-increment: linenumber;position: absolute;left: 10px;font-size: .8em;opacity: .6;}
+.wp-block-sentidoweb-snippet button {position: absolute;right: 1px;text-transform: uppercase;border: 0;padding: 5px 10px;font-size: 10px;top: 1px;background: #ccc;color: #666;display: none;cursor: pointer;border-radius: 0;}
+.wp-block-sentidoweb-snippet button:hover {background: #aaa;color: #333;}
+.wp-block-sentidoweb-snippet:hover button {display: inline-block;}
+.bctt-click-to-tweet {display: block;background-color: #fff;position: relative;border: 1px solid #ddd;-moz-border-radius: 4px;border-radius: 4px;padding: 15px 15px 15px 30px;margin-bottom: 1em;margin-top: 1.75em;}
+.bctt-click-to-tweet:after {content: ".";display: block;clear: both;visibility: hidden;line-height: 0;height: 0;}
+.bctt-click-to-tweet .mce-content-body, .bctt-ctt-text a {color: #000 !important;font-size: 1.5em;line-height: 140%;font-weight: 100;text-decoration: none !important;text-transform: none !important;word-wrap: break-word;border-bottom: none !important;position: relative;font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;box-shadow: none !important;}
+.bctt-ctt-text a {padding: 15px 0;margin: 15px 0;}
+.bctt-ctt-text a:hover {text-decoration: none;color: #999 !important;}
+a.bctt-ctt-btn {border-bottom: none !important;margin: 0;padding: 11px 24px 0 0;position: relative;display: block;text-transform: uppercase;font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;font-size: .7em;font-weight: 700;color: #999 !important;float: right;text-decoration: none !important;background: url("https://eloquentarduino.github.io/wp-content/plugins/better-click-to-tweet/assets/img/birdy.png") right top 10px no-repeat;box-shadow: none !important;}
+.bctt-ctt-btn:hover {text-decoration: none;color: #666 !important;background: url("https://eloquentarduino.github.io/wp-content/plugins/better-click-to-tweet/assets/img/birdy.png") right top 8px no-repeat;}

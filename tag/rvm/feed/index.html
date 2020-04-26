@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>rvm &#8211; Eloquent Arduino Blog</title>
+	<atom:link href="https://eloquentarduino.github.io/tag/rvm/feed/" rel="self" type="application/rss+xml" />
+	<link>http://eloquentarduino.github.io/</link>
+	<description>Machine learning on Arduino, programming &#38; electronics</description>
+	<lastBuildDate>Mon, 17 Feb 2020 17:29:21 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=5.3.2</generator>
+	<item>
+		<title>Even smaller Machine learning models for your MCU: up to -82% code size</title>
+		<link>https://eloquentarduino.github.io/2020/02/even-smaller-machine-learning-models-for-your-mcu/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Sat, 15 Feb 2020 16:37:32 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[rvm]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=893</guid>
+
+					<description><![CDATA[<p>So far we've used SVM (Support Vector Machine) as our main classifier to port a Machine learning model to a microcontroller: but recently I found an interesting alternative which could be waaaay smaller, mantaining a similar accuracy. Table of contentsThe current stateA new algorithm: Relevance Vector MachinesTraining a classifierPorting to CPerformace comparisonSize comparisonDisclaimer The current [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/even-smaller-machine-learning-models-for-your-mcu/">Even smaller Machine learning models for your MCU: up to -82% code size</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>So far we've used SVM (Support Vector Machine) as our main classifier to port a Machine learning model to a microcontroller: but recently I found an interesting alternative which could be waaaay smaller, mantaining a similar accuracy.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/rvm.jpg" alt="RVM vs SVM support vectors" /></p>
+<p><span id="more-893"></span></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocthe-current-state">The current state</a><li><a href="#toca-new-algorithm-relevance-vector-machines">A new algorithm: Relevance Vector Machines</a><li><a href="#toctraining-a-classifier">Training a classifier</a><li><a href="#tocporting-to-c">Porting to C</a><li><a href="#tocperformace-comparison">Performace comparison</a><li><a href="#tocsize-comparison">Size comparison</a><li><a href="#tocdisclaimer">Disclaimer</a></ol></div></p>
+<h2 id="tocthe-current-state">The current state</h2>
+<p>I chose SVM as my main focus of intereset for the MicroML framework because I knew the support vector encoding could be very memory efficient once ported to plain C. And it really is.</p>
+<p>I was able to port many real-world models (gesture identification, wake word detection) to tiny microcontrollers like the old Arduino Nano (32 kb flash, 2 kb RAM).</p>
+<p>The tradeoff of my implementation was to sacrifice the flash space (which is usually quite big) to save as much RAM as possible, which is usually the most limiting factor.</p>
+<p>Due to this implementation, if your model grows in size (highly dimensional data or not well separable data), the generated code will still fit in the RAM, but &quot;overflow&quot; the available flash.</p>
+<p>In a couple of my previous post I warned that model selection might be a required step before being able to deploy a model to a MCU, since you should first check if it fits. If not, you must train another model hoping to get fewer support vectors, since each of them contributes to the code size increase.</p>
+<h2 id="toca-new-algorithm-relevance-vector-machines">A new algorithm: Relevance Vector Machines</h2>
+<p>It was by chance that I came across a new algorithm that I never heard of, called <a href="https://en.wikipedia.org/wiki/Relevance_vector_machine">Relevance Vector Machine</a>. It was patented by Microsoft until last year (so maybe this is the reason you don't see it in the wild), but now it is free of use as far as I can tell.</p>
+<p>Here is the <a href="https://papers.nips.cc/paper/1719-the-relevance-vector-machine.pdf">link</a> to the paper if you want to read it, it gives some insights into the development process.</p>
+<p>I'm not a mathematician, so I can't describe it accurately, but in a few words it uses the same formulation of SVM (a weightened sum of kernels), applying a Bayesan model.</p>
+<p>This serves in the first place to be able to get the probabilities of the classification results, which is something totally missing in SVM.</p>
+<p>In the second place, the algorithm tries to learn a much more sparse representation of the support vectors, as you can see in the following picture.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/rvm.jpg" alt="RVM vs SVM support vectors" /></p>
+<p>When I first read the paper my first tought was just &quot;wow&quot;! This is exactly what I need for my MicroML framework: a ultra-lightweight model which can still achieve high accuracy.</p>
+<h2 id="toctraining-a-classifier">Training a classifier</h2>
+<p>Now that I knew this algorithm, I searched for it in the <code>sklearn</code> documentation: it was not there.</p>
+<p>It seems that, since it was patented, they didn't have an implementation.</p>
+<p>Fortunately, there is <a href="https://github.com/AmazaspShumik/sklearn_bayes/">an implementation</a> which follows the sklearn paradigm. You have to install it:</p>
+<pre><code class="language-bash">pip install Cython
+pip install https://github.com/AmazaspShumik/sklearn_bayes/archive/master.zip</code></pre>
+<p>Since the interface is the usual <code>fit</code> <code>predict</code>, it is super easy to train a classifier.</p>
+<pre><code class="language-python">from sklearn.datasets import load_iris
+from skbayes.rvm_ard_models import RVC
+import warnings
+
+# I get tons of boring warnings during training, so turn it off
+warnings.filterwarnings(&quot;ignore&quot;)
+
+iris = load_iris()
+X = iris.data
+y = iris.target
+clf = RVC(kernel=&#039;rbf&#039;, gamma=0.001)
+clf.fit(X, y)
+y_predict = clf.predict(X)</code></pre>
+<p>The parameters for the constructor are similar to those of the <code>SVC</code> classifier from sklearn:</p>
+<ul>
+<li><code>kernel</code>: one of linear, poly, rbf</li>
+<li><code>degree</code>: if <code>kernel=poly</code></li>
+<li><code>gamma</code>: if <code>kernel=poly</code> or <code>kernel=rbf</code></li>
+</ul>
+<p>You can read <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html">the docs</a> from sklearn to learn more.</p>
+<h2 id="tocporting-to-c">Porting to C</h2>
+<p>Now that we have a trained classifier, we have to port it to plain C that compiles on our microcontroller of choice.</p>
+<p>I patched my package <code>micromlgen</code> to do the job for you, so you should install the latest version to get it working.</p>
+<pre><code class="language-bash"> pip install --upgrade micromlgen</code></pre>
+<p>Now the export part is almost the same as with an SVM classifier.</p>
+<pre><code class="language-python"> from micromlgen import port_rvm
+
+ clf = get_rvm_classifier()
+ c_code = port_rvm(clf)
+ print(c_code)</code></pre>
+<p>And you're done: you have plain C code you can embed in any microcontroller.</p>
+<h2 id="tocperformace-comparison">Performace comparison</h2>
+<p>To test the effectiveness of this new algorithm, I applied it to the datasets I built in my previous posts, comparing side by side the size and accuracy of both SVM and RVM.</p>
+<p>The results are summarized in the next table.</p>
+<style>
+.dataset th+th, .dataset td + td { text-align: center; }
+.dataset small { display: block; font-size: 0.8em; }
+.dataset .__h td {background: blanchedalmond !important}
+</style>
+<table class="dataset">
+<thead>
+<tr>
+<th>Dataset</th>
+<th colspan="2">SVM</th>
+<th colspan="2">RVM</th>
+<th colspan="2">Delta</th>
+</tr>
+<tr>
+<th></th>
+<th>Flash<small>(byte)</small></th>
+<th>Acc. <small>(%)</small></th>
+<th>Flash<small>(byte)</small></th>
+<th>Acc. <small>(%)</small></th>
+<th>Flash</th>
+<th>Acc.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RGB colors</td>
+<td>4584</td>
+<td>100</td>
+<td>3580</td>
+<td>100</td>
+<td>-22%</td>
+<td>-0%</td>
+</tr>
+<tr>
+<td>Accelerometer gestures<small>(linear kernel)</small></td>
+<td>36888</td>
+<td>92</td>
+<td>7056</td>
+<td>85</td>
+<td>-80%</td>
+<td>-7%</td>
+</tr>
+<tr class="__h">
+<td>Accelerometer gestures<small>(gaussian kernel)</small></td>
+<td>45348</td>
+<td>95</td>
+<td>7766</td>
+<td>95</td>
+<td>-82%</td>
+<td>-0%</td>
+</tr>
+<tr>
+<td>Wifi positioning</td>
+<td>4641</td>
+<td>100</td>
+<td>3534</td>
+<td>100</td>
+<td>-24%</td>
+<td>-0%</td>
+</tr>
+<tr>
+<td>Wake word<small>(linear kernel)</small></td>
+<td>18098</td>
+<td>86</td>
+<td>3602</td>
+<td>53</td>
+<td>-80%</td>
+<td>-33%</td>
+</tr>
+<tr>
+<td>Wake word<small>(gaussian kernel)</small></td>
+<td>21788</td>
+<td>90</td>
+<td>4826</td>
+<td>62</td>
+<td>-78%</td>
+<td>-28%</td>
+</tr>
+</tbody>
+</table>
+<p><small style="font-style: italic; font-size: 0.8em;">** the accuracy reported are with default parameters, without any tuning, averaged in 30 runs</small></p>
+<p>As you may see, the results are quite surpising:</p>
+<ul>
+<li>you can achieve <strong>up to 82% space reduction</strong> on highly dimensional dataset <strong>without any loss in accuracy</strong> (accelerometer gestures with gaussian kernel)</li>
+<li>sometimes you may not be able to achieve a decent accuracy (62% at most on the wake word dataset)</li>
+</ul>
+<p>As in any situation, you should test which one of the two algorithms works best for your use case, but there a couple of guidelines you may follow:</p>
+<ul>
+<li>if you need top accuracy, probably SVM can achieve slighter better performance if you have enough space</li>
+<li>if you need tiny space or top speed, test if RVM achieves a satisfiable accuracy</li>
+<li>if both SVM and RVM achieve comparable performace, go with RVM: it's much lighter than SVM in most cases and will run faster</li>
+</ul>
+<h2 id="tocsize-comparison">Size comparison</h2>
+<p>As a reference, here is the codes generated for an SVM classifier and an RVM one to classify the IRIS dataset.</p>
+<pre><code class="language-c">uint8_t predict_rvm(double *x) {
+    double decision[3] = { 0 };
+    decision[0] = -0.6190847299428206;
+    decision[1] = (compute_kernel(x,  6.3, 3.3, 6.0, 2.5) - 72.33233 ) * 0.228214 + -2.3609625;
+    decision[2] = (compute_kernel(x,  7.7, 2.8, 6.7, 2.0) - 81.0089166 ) * -0.29006 + -3.360963;
+    uint8_t idx = 0;
+    double val = decision[0];
+    for (uint8_t i = 1; i &lt; 3; i++) {
+        if (decision[i] &gt; val) {
+            idx = i;
+            val = decision[i];
+        }
+    }
+    return idx;
+}
+
+int predict_svm(double *x) {
+    double kernels[10] = { 0 };
+    double decisions[3] = { 0 };
+    int votes[3] = { 0 };
+        kernels[0] = compute_kernel(x,   6.7  , 3.0  , 5.0  , 1.7 );
+        kernels[1] = compute_kernel(x,   6.0  , 2.7  , 5.1  , 1.6 );
+        kernels[2] = compute_kernel(x,   5.1  , 2.5  , 3.0  , 1.1 );
+        kernels[3] = compute_kernel(x,   6.0  , 3.0  , 4.8  , 1.8 );
+        kernels[4] = compute_kernel(x,   7.2  , 3.0  , 5.8  , 1.6 );
+        kernels[5] = compute_kernel(x,   4.9  , 2.5  , 4.5  , 1.7 );
+        kernels[6] = compute_kernel(x,   6.2  , 2.8  , 4.8  , 1.8 );
+        kernels[7] = compute_kernel(x,   6.0  , 2.2  , 5.0  , 1.5 );
+        kernels[8] = compute_kernel(x,   4.8  , 3.4  , 1.9  , 0.2 );
+        kernels[9] = compute_kernel(x,   5.1  , 3.3  , 1.7  , 0.5 );
+        decisions[0] = 20.276395502
+                    + kernels[0] * 100.0
+                    + kernels[1] * 100.0
+                    + kernels[3] * -79.351629954
+                    + kernels[4] * -49.298850195
+                    + kernels[6] * -40.585178082
+                    + kernels[7] * -30.764341769
+        ;
+        decisions[1] = -0.903345464
+                    + kernels[2] * 0.743494115
+                    + kernels[9] * -0.743494115
+        ;
+        decisions[2] = -1.507856504
+                    + kernels[5] * 0.203695177
+                    + kernels[8] * -0.160020702
+                    + kernels[9] * -0.043674475
+        ;
+        votes[decisions[0] &gt; 0 ? 0 : 1] += 1;
+        votes[decisions[1] &gt; 0 ? 0 : 2] += 1;
+        votes[decisions[2] &gt; 0 ? 1 : 2] += 1;
+                int classVal = -1;
+        int classIdx = -1;
+        for (int i = 0; i &lt; 3; i++) {
+            if (votes[i] &gt; classVal) {
+                classVal = votes[i];
+                classIdx = i;
+            }
+        }
+        return classIdx;
+}</code></pre>
+<p>As you can see, RVM actually only computes 2 kernels and does 2 multiplications. SVM, on the other hand, computes 10 kernels and does 13 multiplications.</p>
+<p>This is a recurring pattern, so RVM is much much faster in the inference process.</p>
+<h2 id="tocdisclaimer">Disclaimer</h2>
+<p><code>micromlgen</code> and in particular <code>port_rvm</code> are work in progress: you may experience some glitches or it may not work in your specific case. Please report any issue <a href="https://github.com/eloquentarduino/micromlgen">on the Github repo</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/even-smaller-machine-learning-models-for-your-mcu/">Even smaller Machine learning models for your MCU: up to -82% code size</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>
