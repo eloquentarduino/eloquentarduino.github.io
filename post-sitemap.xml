@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2020-05-01T08:57:36+00:00</lastmod>
+		<lastmod>2020-05-01T09:06:05+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</loc>
@@ -217,22 +217,6 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/</loc>
-		<lastmod>2020-03-29T16:43:27+00:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png</image:loc>
-			<image:caption><![CDATA[Onboard IRIS dataset training time]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png</image:loc>
-			<image:caption><![CDATA[Onboard IRIS dataset training time. Features dim = 4]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-Breast-cancer-dataset-training-time.png</image:loc>
-			<image:caption><![CDATA[Onboard Breast cancer dataset training time. Features dim = 30]]></image:caption>
-		</image:image>
-	</url>
-	<url>
 		<loc>https://eloquentarduino.github.io/2020/03/how-to-train-a-color-classification-machine-learning-classifier-directly-on-your-arduino-board/</loc>
 		<lastmod>2020-04-05T17:01:49+00:00</lastmod>
 	</url>
@@ -274,6 +258,22 @@
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange-decision-boundaries.png</image:loc>
 			<image:caption><![CDATA[Apple vs Orange decision boundaries]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/</loc>
+		<lastmod>2020-05-01T09:06:05+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png</image:loc>
+			<image:caption><![CDATA[Onboard IRIS dataset training time]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png</image:loc>
+			<image:caption><![CDATA[Onboard IRIS dataset training time. Features dim = 4]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-Breast-cancer-dataset-training-time.png</image:loc>
+			<image:caption><![CDATA[Onboard Breast cancer dataset training time. Features dim = 30]]></image:caption>
 		</image:image>
 	</url>
 </urlset>
