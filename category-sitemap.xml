@@ -2,11 +2,11 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/category/programming/arduino-machine-learning/</loc>
-		<lastmod>2020-04-26T09:52:29+00:00</lastmod>
+		<lastmod>2020-05-01T08:57:36+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/category/programming/computer-vision/</loc>
-		<lastmod>2020-03-08T10:43:11+00:00</lastmod>
+		<lastmod>2020-05-01T08:57:36+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/category/electronics/</loc>
