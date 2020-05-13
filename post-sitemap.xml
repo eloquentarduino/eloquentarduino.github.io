@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2020-05-02T05:50:53+00:00</lastmod>
+		<lastmod>2020-05-13T18:57:56+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</loc>
@@ -193,26 +193,6 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://eloquentarduino.github.io/2020/01/motion-detection-with-esp32-cam-only-arduino-version/</loc>
-		<lastmod>2020-03-08T10:43:11+00:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.gif</image:loc>
-			<image:caption><![CDATA[ESP32 camera motion detection example]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-models.jpg</image:loc>
-			<image:caption><![CDATA[ESP32 camera models]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Image-downsampling-example.jpg</image:loc>
-			<image:caption><![CDATA[Image downsampling example]]></image:caption>
-		</image:image>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-example.jpg</image:loc>
-			<image:caption><![CDATA[ESP32 camera motion example]]></image:caption>
-		</image:image>
-	</url>
-	<url>
 		<loc>https://eloquentarduino.github.io/2020/03/how-to-train-a-color-classification-machine-learning-classifier-directly-on-your-arduino-board/</loc>
 		<lastmod>2020-04-05T17:01:49+00:00</lastmod>
 	</url>
@@ -275,6 +255,74 @@
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/</loc>
 		<lastmod>2020-05-02T05:50:53+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/01/motion-detection-with-esp32-cam-only-arduino-version/</loc>
+		<lastmod>2020-05-13T18:46:27+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.gif</image:loc>
+			<image:caption><![CDATA[ESP32 camera motion detection example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-models.jpg</image:loc>
+			<image:caption><![CDATA[ESP32 camera models]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Image-downsampling-example.jpg</image:loc>
+			<image:caption><![CDATA[Image downsampling example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-example.jpg</image:loc>
+			<image:caption><![CDATA[ESP32 camera motion example]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/</loc>
+		<lastmod>2020-05-13T18:57:56+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Faster-motion-detection.gif</image:loc>
+			<image:caption><![CDATA[Faster motion detection]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Nearest-diagram.png</image:loc>
+			<image:caption><![CDATA[Nearest diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/nn.jpg</image:loc>
+			<image:caption><![CDATA[Nearest neighbor block averaging]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Full-diagram.png</image:loc>
+			<image:caption><![CDATA[Full diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/full.jpg</image:loc>
+			<image:caption><![CDATA[Full block averaging]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Core-diagram.png</image:loc>
+			<image:caption><![CDATA[Core diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/core.jpg</image:loc>
+			<image:caption><![CDATA[Core block averaging]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Cross-diagram.png</image:loc>
+			<image:caption><![CDATA[Cross diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/cross.jpg</image:loc>
+			<image:caption><![CDATA[Cross block averaging]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Diagonal-diagram.png</image:loc>
+			<image:caption><![CDATA[Diagonal diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/diagonal.jpg</image:loc>
+			<image:caption><![CDATA[Diagonal block averaging]]></image:caption>
+		</image:image>
 	</url>
 </urlset>
 <!-- XML Sitemap generated by Yoast SEO -->

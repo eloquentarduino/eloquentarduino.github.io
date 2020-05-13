@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/tag/camera/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Fri, 01 May 2020 08:57:36 +0000</lastBuildDate>
+	<lastBuildDate>Wed, 13 May 2020 18:57:56 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,248 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.3</generator>
 	<item>
+		<title>Easier, faster pure video ESP32 cam motion detection</title>
+		<link>https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Sun, 10 May 2020 19:26:08 +0000</pubDate>
+				<category><![CDATA[Computer vision]]></category>
+		<category><![CDATA[camera]]></category>
+		<category><![CDATA[esp32]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1110</guid>
+
+					<description><![CDATA[<p>If you liked my post about ESP32 cam motion detection, you'll love this updated version: it's easier to use and blazing fast! The post about pure video ESP32 cam motion detection without an external PIR is my most successful post at the moment. Many of you are interested about this topic. One of my readers, [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">Easier, faster pure video ESP32 cam motion detection</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>If you liked my post about <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">ESP32 cam motion detection</a>, you'll love this updated version: it's easier to use and blazing fast!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Faster-motion-detection.gif" alt="Faster motion detection" /></p>
+<p><span id="more-1110"></span></p>
+<p>The post about <strong>pure video ESP32 cam motion detection</strong> without an external PIR is my most successful post at the moment. Many of you are interested about this topic.</p>
+<p>One of my readers, though, pointed out my implementation was quite slow and he only achieved bare 5 fps in his project. So he asked for a better alternative.</p>
+<p>Since the post was of great interest for many people, I took the time to revisit the code and make improvements.</p>
+<p>I came up with a 100% re-writing that is both easier to use and faster. Actually, it is <strong>blazing fast!</strong>.</p>
+<p>Let's see how it works.</p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocdownsampling">Downsampling</a><ol><li><a href="#tocnearest-neighbor">Nearest neighbor</a><li><a href="#tocfull-block-average">Full block average</a><li><a href="#toccore-block-average">Core block average</a><li><a href="#toccross-block-average">Cross block average</a><li><a href="#tocdiagonal-block-average">Diagonal block average</a><li><a href="#tocimplement-your-own">Implement your own</a></li></ol><li><a href="#tocbenchmarks">Benchmarks</a><li><a href="#tocmotion-detection">Motion detection</a><li><a href="#tocfull-code">Full code</a></ol></div></p>
+<h2 id="tocdownsampling">Downsampling</h2>
+<p>In the original post I introduced the idea of downsampling the image from the camera for a faster and more robust motion detection. I wrote the code in the main sketch to keep it self-contained.</p>
+<p>Looking back now it was a poor choice, since it cluttered the project and distracted from the main purpose, which is motion detection.</p>
+<p>Moreover, I thought that scanning the image buffer in sequential order would be the fastest approach.</p>
+<p>It turns out I was wrong.</p>
+<p>This time I scan the image buffer following the blocks that will compose the resulting image and the results are... much faster.</p>
+<p>Also, I decided to inject some more efficiency that will further speedup the computation: using different strategies for downsampling.</p>
+<p>The idea of downsampling is that you have to &quot;collapse&quot; a block of NxN from the original image to just one pixel of the resulting image.</p>
+<p>Now, there are a variety of ways you can accomplish this. The first two I present here are the most obvious, the other two are of my &quot;invention&quot;: nothing fancy nor new, but they're fast and serve the purpose well.</p>
+<h3 id="tocnearest-neighbor">Nearest neighbor</h3>
+<p>You can just pick the center of the NxN block and use its value for the output.<br />
+Of course it is fast (possibly the fastest approach), but wouldn't be very accurate. One pixel out of NxN wouldn't be representative of the overall region and will heavily suffer from noise.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Nearest-diagram.png" alt="Nearest diagram" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/nn.jpg" alt="Nearest neighbor block averaging" /></p>
+<h3 id="tocfull-block-average">Full block average</h3>
+<p>This is the most intuitive alternative: use the average of all the pixels in the block as the ouput value. This is arguabily the &quot;proper&quot; way to do it, since you're using all the pixels in the source image to compute the new one.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Full-diagram.png" alt="Full diagram" /><br />
+<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/full.jpg" alt="Full block averaging" /></p>
+<h3 id="toccore-block-average">Core block average</h3>
+<p>As a faster alternative, I thought that averaging only the &quot;core&quot; (the most internal part) of the block would have been a good-enough solution. It has no theoretical proof that this yields true, but our task here is to create a smaller <em>representation</em> of the original image, not producing an accurate smaller version.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Core-diagram.png" alt="Core diagram" /><br />
+<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/core.jpg" alt="Core block averaging" /></p>
+<p><em>I'll stress this point: the only reason we do downsampling is to compare two sequential frame and detect if they differ above a certain threshold. This downsampling doesn't have to mimic the actual image: it can transform the source in any fancy way, as long as it stays consistent and captures the variations over time.</em></p>
+<h3 id="toccross-block-average">Cross block average</h3>
+<p>This time we consider all the pixels along the vertical and horizontal central axes. The idea is that you will capture a good portion of the variation along both the axis, given quite accurate results.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Cross-diagram.png" alt="Cross diagram" /><br />
+<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/cross.jpg" alt="Cross block averaging" /></p>
+<h3 id="tocdiagonal-block-average">Diagonal block average</h3>
+<p>This alternative too came to my mind from nowhere, really. I just think it is a good alternative to capture all the block's variation, probably even better than vertical and horizontal directions.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Diagonal-diagram.png" alt="Diagonal diagram" /><br />
+<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/diagonal.jpg" alt="Diagonal block averaging" /></p>
+<h3 id="tocimplement-your-own">Implement your own</h3>
+<p>Not satisfied from the methods above? No problem, you can still implement your own.</p>
+<p>The ones presented above are just some algorithms that came to my mind: I'm not telling you they're the best.</p>
+<p>They worked for me, that's it.</p>
+<p>If you think you found a better solution, I encourage you implement it and even share it with me and the other readers, so we can all make progress on this together.</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<h2 id="tocbenchmarks">Benchmarks</h2>
+<p>So, at the very beginning I said this new implementation is blazingly fast. </p>
+<p>How much fast?</p>
+<p>As fast as it can be, arguably.</p>
+<p>I mean, so fast it won't alter your fps.</p>
+<p>Look at the results I got on my M5Stack camera.</p>
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th style="text-align: center;">Time to execute (micros)</th>
+<th style="text-align: right;">FPS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr>
+<td>Nearest neighbor</td>
+<td style="text-align: center;">160</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr>
+<td>Cross block</td>
+<td style="text-align: center;">700</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr>
+<td>Core block</td>
+<td style="text-align: center;">800</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr>
+<td>Diagonal block</td>
+<td style="text-align: center;">950</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr>
+<td>Full block</td>
+<td style="text-align: center;">4900</td>
+<td style="text-align: right;">12</td>
+</tr>
+</tbody>
+</table>
+<p>As you can see, only the full block creates a delay in the process (quite a bit of delay even): the other  methods  won't slow down your program in any noticeable way.</p>
+<p>If you test Nearest neighbor and it works for you, then you'll be extremely light on computation resources with only <strong>160 microseconds</strong> of delay.</p>
+<p>This is what I mean by <em>blazing fast</em>.</p>
+<h2 id="tocmotion-detection">Motion detection</h2>
+<p>The motion detection part hasn't changed, so I point you to <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version#tocblocks-difference-threshold">the original post</a> to read more about the Block difference threshold and the Image difference threshold.</p>
+<h2 id="tocfull-code">Full code</h2>
+<pre><code class="language-cpp">#define CAMERA_MODEL_M5STACK_WIDE
+#include &quot;EloquentVision.h&quot;
+
+#define FRAME_SIZE FRAMESIZE_QVGA
+#define SOURCE_WIDTH 320
+#define SOURCE_HEIGHT 240
+#define BLOCK_SIZE 10
+#define DEST_WIDTH (SOURCE_WIDTH / BLOCK_SIZE)
+#define DEST_HEIGHT (SOURCE_HEIGHT / BLOCK_SIZE)
+#define BLOCK_DIFF_THRESHOLD 0.2
+#define IMAGE_DIFF_THRESHOLD 0.1
+#define DEBUG 0
+
+using namespace Eloquent::Vision;
+
+ESP32Camera camera;
+uint8_t prevFrame[DEST_WIDTH * DEST_HEIGHT] = { 0 };
+uint8_t currentFrame[DEST_WIDTH * DEST_HEIGHT] = { 0 };
+
+// function prototypes
+bool motionDetect();
+void updateFrame();
+
+/**
+ *
+ */
+void setup() {
+    Serial.begin(115200);
+    camera.begin(FRAME_SIZE, PIXFORMAT_GRAYSCALE);
+}
+
+/**
+ *
+ */
+void loop() {
+    /**
+     * Algorithm:
+     *  1. grab frame
+     *  2. compare with previous to detect motion
+     *  3. update previous frame
+     */
+
+    time_t start = millis();
+    camera_fb_t *frame = camera.capture();
+
+    downscaleImage(frame-&gt;buf, currentFrame, nearest, SOURCE_WIDTH, SOURCE_HEIGHT, BLOCK_SIZE);
+
+    if (motionDetect()) {
+        Serial.print(&quot;Motion detected @ &quot;);
+        Serial.print(floor(1000.0f / (millis() - start)));
+        Serial.println(&quot; FPS&quot;);
+    }
+
+    updateFrame();
+}
+
+/**
+ * Compute the number of different blocks
+ * If there are enough, then motion happened
+ */
+bool motionDetect() {
+    uint16_t changes = 0;
+    const uint16_t blocks = DEST_WIDTH * DEST_HEIGHT;
+
+    for (int y = 0; y &lt; DEST_HEIGHT; y++) {
+        for (int x = 0; x &lt; DEST_WIDTH; x++) {
+            float current = currentFrame[y * DEST_WIDTH + x];
+            float prev = prevFrame[y * DEST_WIDTH + x];
+            float delta = abs(current - prev) / prev;
+
+            if (delta &gt;= BLOCK_DIFF_THRESHOLD)
+                changes += 1;
+        }
+    }
+
+    return (1.0 * changes / blocks) &gt; IMAGE_DIFF_THRESHOLD;
+}
+
+/**
+ * Copy current frame to previous
+ */
+void updateFrame() {
+    memcpy(prevFrame, currentFrame, DEST_WIDTH * DEST_HEIGHT);
+}</code></pre>
+<hr />
+<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentVision/blob/master/examples/FasterMotionDetection/FasterMotionDetection.ino">Github</a> and remember to star!</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">Easier, faster pure video ESP32 cam motion detection</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Handwritten digit classification with Arduino and MicroML</title>
 		<link>https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/</link>
 		
@@ -427,13 +669,14 @@ Image acquisition is a very noisy process: even keeping the camera still, you wi
 		<category><![CDATA[esp32]]></category>
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=779</guid>
 
-					<description><![CDATA[<p>Do you have an ESP32 camera? Do you want to do motion detection WITHOUT ANY external hardware? Here's a tutorial made just for you: 30 lines of code and you will know when something changes in your video stream 🎥 Table of contentsWhat is (naive) motion detection?Can't I use an external PIR?External hardwareField of ViewCold [&#8230;]</p>
+					<description><![CDATA[<p>Do you have an ESP32 camera? Do you want to do motion detection WITHOUT ANY external hardware? Here's a tutorial made just for you: 30 lines of code and you will know when something changes in your video stream 🎥 ** See the updated version of this project: it's easier to use and waaay faster: [&#8230;]</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">Motion detection with ESP32 cam only (Arduino version)</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 										<content:encoded><![CDATA[<p>Do you have an <strong>ESP32 camera</strong>? Do you want to do motion detection <em>WITHOUT ANY</em> external hardware?</p>
 <p>Here's a tutorial made just for you: <strong>30 lines of code</strong> and you will know when something changes in your video stream  <img src="https://s.w.org/images/core/emoji/12.0.0-1/72x72/1f3a5.png" alt="🎥" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.gif" alt="ESP32 camera motion detection example" /></p>
 <p><span id="more-779"></span></p>
+<p><strong> ** See the updated version of this project: it's easier to use and waaay faster: </strong> <a href="/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">Easier, faster, pure video ESP32 cam motion detection</a> **</p>
 <p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocwhat-is-naive-motion-detection">What is (naive) motion detection?</a><li><a href="#toccant-i-use-an-external-pir">Can't I use an external PIR?</a><ol><li><a href="#tocexternal-hardware">External hardware</a><li><a href="#tocfield-of-view">Field of View</a><li><a href="#toccold-objects">Cold objects</a></li></ol><li><a href="#tocwhat-do-you-need">What do you need?</a><li><a href="#tochow-does-it-work">How does it work?</a><ol><li><a href="#tocdownsampling">Downsampling</a><li><a href="#tocblocks-difference-threshold">Blocks difference threshold</a><li><a href="#tocimage-difference-threshold">Image difference threshold</a><li><a href="#toccombining-all-together">Combining all together</a></li></ol><li><a href="#tocreal-world-example">Real world example</a></ol></div></p>
 <h2 id="tocwhat-is-naive-motion-detection">What is (naive) motion detection?</h2>
 <p>Quoting from Wikipedia</p>
