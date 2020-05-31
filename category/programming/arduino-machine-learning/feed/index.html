@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/arduino-machine-learning/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Fri, 01 May 2020 09:06:05 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 31 May 2020 17:44:50 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,87 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.3</generator>
 	<item>
+		<title>Anomaly detection on your Arduino microcontroller via One Class SVM</title>
+		<link>https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Sun, 31 May 2020 16:44:36 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1156</guid>
+
+					<description><![CDATA[<p>Support Vector Machines are very often used for classification tasks: but you may not know that they're so flexible they can be used for anomaly detection and novelty detection. Thanks to the micromlgen package, you can run One Class SVM on your Arduino microcontorller. What is anomaly / novelty detection useful for? Detect noise or [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/">Anomaly detection on your Arduino microcontroller via One Class SVM</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><a href="/tag/svm/">Support Vector Machines</a> are very often used for classification tasks: but you may not know that they're so flexible they can be used for <a href="https://scikit-learn.org/stable/modules/outlier_detection.html" target="_blank" rel="noopener noreferrer"><strong>anomaly detection and novelty detection</strong></a>. Thanks to the <a href="https://github.com/eloquentarduino/micromlgen">micromlgen</a> package, you can run One Class SVM on your Arduino microcontorller.</p>
+<p><img src="https://scikit-learn.org/stable/_images/sphx_glr_plot_oneclass_001.png" alt="Novelty detection from sklearn documentation" title="Novelty detection from sklearn documentation" /><br />
+<span id="more-1156"></span></p>
+<h2>What is anomaly / novelty detection useful for?</h2>
+<h3>Detect noise or anomalies</h3>
+<p>As the name implies, anomaly detection can be used to monitor a stream of data and alert you when something unexpected happens.<br />
+Think of an Industrial IoT setup where you have a bunch of sensors monitoring the working state of a production plant: you want to know as soon as possible if something bad is gonna happen.</p>
+<p>In this case, anomaly detection tells you if your machinery is acting in a different way from the normal state so you can take action.</p>
+<h3>Ignore irrelevant data</h3>
+<p><em>(This application was suggested from two of my readers)</em><br />
+Say you're developing a super simple word classification project: you want to distinguish door bell from fire alarm (as per one of the two readers).<br />
+So you train your SVM classifier and use <a href="https://github.com/eloquentarduino/micromlgen">micromlgen</a> to run it on your Arduino microcontroller.</p>
+<p>It works well, but we have a problem: you live in a noisy environment with many sounds, so not all of them will either be door bells or fire alarms. Since your classifier is binary, it <em>has to classify all of the sounds</em> as either A or B.</p>
+<p>The solution will be <strong>novelty detection</strong>: before running the binary SVM, you run the <strong>OneClassSVM</strong> to filter known sounds (bell and alarm) from unknown ones (eg. dog barking).<br />
+If OneClassSVM predicts the sound as a novelty, you discard it since it's of no interest for you. If it predicts the sound as known, you run the binary SVM.</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<h2>How to run anomaly / novelty detection on Arduino microcontroller via OneClassSVM</h2>
+<p>Porting a <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html">OneClassSVM</a> from Python to plain C++ is as easy as a single command in the <strong>micromlgen</strong> package:</p>
+<pre><code class="language-python">from sklearn.svm import OneClassSVM
+from micromlgen import port
+
+clf = OneClassSVM(kernel=&quot;rbf&quot;, nu=0.5, gamma=0.1)
+clf.fit(X, y)
+print(port(clf))</code></pre>
+<div class="watchout">
+You will need micromlgen version 1.0.2 to port OneClassSVM. If you have an outdated version, please run <code>pip install --upgrade micromlgen</code>
+</div>
+<p>If you read <a href="/tag/svm/">my previous posts</a> about <strong>micromlgen</strong> and SVM the above snippet should be familiar: with the latest release, <code>port</code> is able to export either SVC, LinearSVC, OneClassSVC and <a href="/2020/02/even-smaller-machine-learning-models-for-your-mcu/">RVC (Relevant Vector Machines)</a> to object oriented C++.</p>
+<p>Now you can embed the generated code in your Arduino sketch.</p>
+<pre><code class="language-cpp">#include &quot;OneClassSVM.h&quot;
+
+Eloquent::ML::Port::OneClassSVM clf;
+
+void setup() {
+  Serial.begin(115200);
+  delay(2000);
+
+  for (int i = 0; i &lt; DATASET_SIZE; i++)
+    clf.predict(X[i]);
+}
+
+void loop() {}</code></pre>
+<hr />
+<p>I created an example sketch from a synthetic dataset for anomaly detection (copied from a <a href="https://scikit-learn.org/stable/auto_examples/svm/plot_oneclass.html#sphx-glr-auto-examples-svm-plot-oneclass-py">scikit-learn example</a>) you can run to get a feel of how it performs.</p>
+<p>Go checkout the <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/OneClassSVMExample/OneClassSVMExample.ino">Github repo</a></p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/">Anomaly detection on your Arduino microcontroller via One Class SVM</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Incremental multiclass classification on microcontrollers: One vs One</title>
 		<link>https://eloquentarduino.github.io/2020/04/incremental-multiclass-classification-on-microcontrollers-one-vs-one/</link>
 		
@@ -1222,6 +1303,7 @@ As <a href="http://cs229.stanford.edu/materials/smo.pdf" target="_blank" rel="no
 		<category><![CDATA[camera]]></category>
 		<category><![CDATA[esp32]]></category>
 		<category><![CDATA[microml]]></category>
+		<category><![CDATA[svm]]></category>
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=931</guid>
 
 					<description><![CDATA[<p>We continue exploring the endless possibilities on the MicroML (Machine Learning for Microcontrollers) framework on Arduino and ESP32 boards: in this post we're back to image classification. In particular, we'll distinguish handwritten digits using an ESP32 camera. If this is the first time you're reading my blog, you may have missed that I'm on a [&#8230;]</p>
@@ -1441,6 +1523,7 @@ void loop() {
 		<pubDate>Sat, 15 Feb 2020 16:37:32 +0000</pubDate>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[rvm]]></category>
+		<category><![CDATA[svm]]></category>
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=893</guid>
 
 					<description><![CDATA[<p>So far we've used SVM (Support Vector Machine) as our main classifier to port a Machine learning model to a microcontroller: but recently I found an interesting alternative which could be waaaay smaller, mantaining a similar accuracy. Table of contentsThe current stateA new algorithm: Relevance Vector MachinesTraining a classifierPorting to CPerformace comparisonSize comparisonDisclaimer The current [&#8230;]</p>
@@ -1670,16 +1753,17 @@ int predict_svm(double *x) {
 		
 			</item>
 		<item>
-		<title>Easy TinyML on ESP32 and Arduino</title>
+		<title>Easy Tensorflow TinyML on ESP32 and Arduino</title>
 		<link>https://eloquentarduino.github.io/2020/01/easy-tinyml-on-esp32-and-arduino/</link>
 		
 		<dc:creator><![CDATA[simone]]></dc:creator>
 		<pubDate>Sat, 25 Jan 2020 19:36:29 +0000</pubDate>
 				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[ml]]></category>
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=864</guid>
 
 					<description><![CDATA[<p>In this post I will show you how to easily deploy your Tensorflow Lite model to an ESP32 using the Arduino IDE without any compilation stuff. So I finally settled on giving a try to TinyML, which is a way to deploy Tensorflow Lite models to microcontrollers. As a first step, I downloaded the free [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/01/easy-tinyml-on-esp32-and-arduino/">Easy TinyML on ESP32 and Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/01/easy-tinyml-on-esp32-and-arduino/">Easy Tensorflow TinyML on ESP32 and Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 										<content:encoded><![CDATA[<p>In this post I will show you how to easily deploy your Tensorflow Lite model to an ESP32 using the Arduino IDE <strong>without any compilation stuff</strong>.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/tf-arduino-esp.png" alt="tf arduino esp" /></p>
@@ -1822,186 +1906,11 @@ ml.predict(input, output);</code></pre>
 <p>I plan to do a comparison with my MicroML framework when I get more experience in both, so staty tuned for the upcoming updates.</p>
 <h2>Disclaimer</h2>
 <p>I tested the library on both Ubuntu 18.04 and Windows 10 64 bit: if you are on a different platform and get compiling errors, please let me know in the comments so I can fix them.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/01/easy-tinyml-on-esp32-and-arduino/">Easy TinyML on ESP32 and Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/01/easy-tinyml-on-esp32-and-arduino/">Easy Tensorflow TinyML on ESP32 and Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		
 		
-			</item>
-		<item>
-		<title>Apple or Orange? Image recognition with ESP32 and Arduino</title>
-		<link>https://eloquentarduino.github.io/2020/01/image-recognition-with-esp32-and-arduino/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sun, 12 Jan 2020 10:32:08 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[Computer vision]]></category>
-		<category><![CDATA[camera]]></category>
-		<category><![CDATA[esp32]]></category>
-		<category><![CDATA[microml]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=820</guid>
-
-					<description><![CDATA[<p>Do you have an ESP32 camera? Want to do image recognition directly on your ESP32, without a PC? In this post we'll look into a very basic image recognition task: distinguish apples from oranges with machine learning. Image recognition is a very hot topic these days in the AI/ML landscape. Convolutional Neural Networks really shines [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/01/image-recognition-with-esp32-and-arduino/">Apple or Orange? Image recognition with ESP32 and Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>Do you have an ESP32 camera? </p>
-<p>Want to do image recognition directly on your ESP32, without a PC?</p>
-<p>In this post we'll look into a very basic image recognition task: <strong>distinguish apples from oranges with machine learning</strong>.</p>
-<p><img src="/wp-content/uploads/2020/01/Apple-vs-Orange.gif" alt="Apple vs Orange" /></p>
-<p><span id="more-820"></span></p>
-<p>Image recognition is a very hot topic these days in the AI/ML landscape. <a href="https://en.wikipedia.org/wiki/Convolutional_neural_network">Convolutional Neural Networks</a> really shines in this task and can achieve almost perfect accuracy on many scenarios.</p>
-<p>Sadly, you can't run CNN on your ESP32, they're just too large for a microcontroller.</p>
-<p>Since in this series about <a href="/category/programming/arduino-machine-learning/">Machine Learning on Microcontrollers</a> we're exploring the potential of Support Vector Machines (SVMs) at solving different classification tasks, we'll take a look into image classification too.</p>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocwhat-were-going-to-do">What we're going to do</a><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocextracting-rgb-components">Extracting RGB components</a><li><a href="#tocrecord-samples-image">Record samples image</a><li><a href="#toctraining-the-classifier">Training the classifier</a><li><a href="#tocreal-world-example">Real world example</a><ol><li><a href="#tocdisclaimer">Disclaimer</a></ol></div></p>
-<h2 id="tocwhat-were-going-to-do">What we're going to do</h2>
-<p>In a previous post about <a href="/2019/12/color-identification-on-arduino/">color identification with Machine learning</a>, we used an Arduino to detect the object we were pointing at with a color sensor (TCS3200) by its color: if we detected yellow, for example, we knew we had a banana in front of us.</p>
-<p>Of course such a process is not object recognition at all: yellow may be a banane, or a lemon, or an apple.</p>
-<p>Object inference, in that case, works only if you have exactly one object for a given color.</p>
-<p>The objective of this post, instead, is to investigate if we can use the MicroML framework to do simple image recognition on the images from an ESP32 camera.</p>
-<p>This is much more similar to the tasks you do on your PC with CNN or any other form of NN you are comfortable with. Sure, we will still apply some restrictions to fit the problem on a microcontroller, but this is a huge step forward compared to the simple color identification.</p>
-<div class="watchout">
-In this context, image recognition means deciding which class (from the trained ones) the current image belongs to. <b>This algorithm can't locate interesting objects in the image, neither detect if an object is present in the frame</b>. It will classify the current image based on the samples recorded during training.
-</div>
-<p>As any beginning machine learning project about image classification worth of respect, our task will be to distinguish an orange from an apple.</p>
-<h2 id="tocfeatures-definition">Features definition</h2>
-<p>I have to admit that I rarely use NN, so I may be wrong here, but from the examples I read online it looks to me that features engineering is not a fundamental task with NN.</p>
-<p>Those few times I used CNN, I always used the whole image as input, <em>as-is</em>. I didn't extracted any feature from them (e.g. color histogram): the CNN worked perfectly fine with raw images.</p>
-<p>I don't think this will work best with SVM, but in this first post we're starting as simple as possible, so we'll be using the RGB components of the image as our features. In a future post, we'll introduce additional features to try to improve our results.</p>
-<p>I said we're using the RGB components of the image. But not all of them.</p>
-<p>Even at the lowest resolution of 160x120 pixels, a raw RGB image from the camera would generate 160x120x3 = 57600 features: way too much.</p>
-<p>We need to reduce this number  to the bare minimum.</p>
-<p>How much pixels do you think are necessary to get reasonable results in this task of classifying apples from oranges?</p>
-<p>You would be surprised to know that I got 90% accuracy with an RGB image of <strong>8x6</strong>!</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Orange-and-Apple-pixelated.jpg" alt="You actually need very few pixels to do image classification" /></p>
-<p>Yes, that's all we really need to do a <em>good enough</em> classification.</p>
-<hr /><p><em>You can distinguish apples from oranges on ESP32 with 8x6 pixels only!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2020%2F01%2Fimage-recognition-with-esp32-and-arduino%2F&#038;text=You%20can%20distinguish%20apples%20from%20oranges%20on%20ESP32%20with%208x6%20pixels%20only%21&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>Of course this is a tradeoff: you can't expect to achieve 99% accuracy while mantaining the model size small enough to fit on a microcontroller. 90% is an acceptable accuracy for me in this context.</p>
-<p>You have to keep in mind, moreover, that the features vector size grows quadratically with the image size (if you keep the aspect ratio). A raw RGB image of 8x6 generates 144 features: an image of 16x12 generates 576 features. This was already causing random crashes on my ESP32.</p>
-<p>So we'll stick to 8x6 images.</p>
-<p>Now, how do you compact a 160x120 image to 8x6? With <em>downsampling</em>.</p>
-<p>This is the same tecnique we've used in the post about <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">motion detection on ESP32</a>: we define a block size and average all the pixels inside the block to get a single value (you can refer to that post for more details).</p>
-<p><img src="/wp-content/uploads/2020/01/Image-downsampling-example.jpg" alt="Image downsampling example" /></p>
-<p>This time, though, we're working with RGB images instead of grayscale, so we'll repeat the exact same process 3 times, one for each channel.</p>
-<p>This is the code excerpt that does the downsampling.</p>
-<pre><code class="language-cpp">uint16_t rgb_frame[HEIGHT / BLOCK_SIZE][WIDTH / BLOCK_SIZE][3] = { 0 };
-
-void grab_image() {
-    for (size_t i = 0; i &lt; len; i += 2) {
-        // get r, g, b from the buffer
-        // see later
-
-        const size_t j = i / 2;
-        // transform x, y in the original image to x, y in the downsampled image
-        // by dividing by BLOCK_SIZE
-        const uint16_t x = j % WIDTH;
-        const uint16_t y = floor(j / WIDTH);
-        const uint8_t block_x = floor(x / BLOCK_SIZE);
-        const uint8_t block_y = floor(y / BLOCK_SIZE);
-
-        // average pixels in block (accumulate)
-        rgb_frame[block_y][block_x][0] += r;
-        rgb_frame[block_y][block_x][1] += g;
-        rgb_frame[block_y][block_x][2] += b;
-    }
-}</code></pre>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<h2 id="tocextracting-rgb-components">Extracting RGB components</h2>
-<p>The ESP32 camera can store the image in different formats (of our interest — there are a couple more available):</p>
-<ol>
-<li><strong>grayscale</strong>: no color information, just the intensity is stored. The buffer has size HEIGHT*WIDTH</li>
-<li><strong>RGB565</strong>: stores each RGB pixel in two bytes, with 5 bit for red, 6 for green and 5 for blue. The buffer has size HEIGHT * WIDTH * 2</li>
-<li><strong>JPEG</strong>: encodes (in hardware?) the image to jpeg. The buffer has a variable length, based on the encoding results</li>
-</ol>
-<p>For our purpose, we'll use the RGB565 format and extract the 3 components from the 2 bytes with the following code.</p>
-<p><img src="https://s2.www.theimagingsource.com/application-1.1.29/documentation/ic_imaging_control_class/en_US/images/rgb565.gif" alt="taken from https://www.theimagingsource.com/support/documentation/ic-imaging-control-cpp/PixelformatRGB565.htm" /></p>
-<pre><code class="language-cpp">config.pixel_format = PIXFORMAT_RGB565;
-
-for (size_t i = 0; i &lt; len; i += 2) {
-    const uint8_t high = buf[i];
-    const uint8_t low  = buf[i+1];
-    const uint16_t pixel = (high &lt;&lt; 8) | low;
-
-    const uint8_t r = (pixel &amp; 0b1111100000000000) &gt;&gt; 11;
-    const uint8_t g = (pixel &amp; 0b0000011111100000) &gt;&gt; 6;
-    const uint8_t b = (pixel &amp; 0b0000000000011111);
-}</code></pre>
-<h2 id="tocrecord-samples-image">Record samples image</h2>
-<p>Now that we can grab the images from the camera, we'll need to take a few samples of each object we want to racognize.</p>
-<p>Before doing so, we'll linearize the image matrix to a 1-dimensional vector, because that's what our prediction function expects.</p>
-<pre><code class="language-cpp">#define H (HEIGHT / BLOCK_SIZE)
-#define W (WIDTH / BLOCK_SIZE)
-
-void linearize_features() {
-  size_t i = 0;
-  double features[H*W*3] = {0};
-
-  for (int y = 0; y &lt; H; y++) {
-    for (int x = 0; x &lt; W; x++) {
-      features[i++] = rgb_frame[y][x][0];
-      features[i++] = rgb_frame[y][x][1];
-      features[i++] = rgb_frame[y][x][2];
-    }
-  }
-
-  // print to serial
-  for (size_t i = 0; i &lt; H*W*3; i++) {
-    Serial.print(features[i]);
-    Serial.print(&#039;\t&#039;);
-  }
-
-  Serial.println();
-}</code></pre>
-<p>Now you can setup your acquisition environment and take the samples: 15-20 of each object will do the job.</p>
-<div class="watchout">
-Image acquisition is a very noisy process: even keeping the camera still, you will get fluctuating values. <br />You need to be very accurate during this phase if you want to achieve good results.<br /> I suggest you immobilize your camera with tape to a flat surface or use some kind of photographic easel.
-</div>
-<h2 id="toctraining-the-classifier">Training the classifier</h2>
-<p>To train the classifier, save the features for each object in a file, one features vector per line. Then follow the steps on <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn">how to train a ML classifier for Arduino</a> to get the exported model.</p>
-<p>You can experiment with different classifier configurations. </p>
-<p>My features were well distinguishable, so I had great results (100% accuracy) with any kernel (even linear).</p>
-<p>One odd thing happened with the RBF kernel: I had to use an extremely low gamma value (0.0000001). Does anyone can explain me why? I usually go with a default value of 0.001.</p>
-<p>The model produced 13 support vectors.</p>
-<p>I did no features scaling: you could try it if classifying more than 2 classes and having poor results.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange-decision-boundaries.png" alt="Apple vs Orange decision boundaries" /></p>
-<h2 id="tocreal-world-example">Real world example</h2>
-<p>If you followed all the steps above, you should now have a model capable of detecting if your camera is shotting an apple or an orange, as you can see in the following video.</p>
-<div style="width: 788px;" class="wp-video"><video class="wp-video-shortcode" id="video-820-2" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4?_=2" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4</a></video></div>
-<p></p>
-<p>The little white object you see at the bottom of the image is the camera, taped to the desk.</p>
-<p>Did you think it was possible to do simple image classification on your ESP32?</p>
-<h3 id="tocdisclaimer">Disclaimer</h3>
-<p>This is not full-fledged object recognition: it can't label objects while you walk as Tensorflow can do, for example.</p>
-<p>You have to carefully craft your setup and be as consistent as possible between training and inferencing.</p>
-<p>Still, I think this is a fun proof-of-concept that can have useful applications in simple scenarios where you can live with a fixed camera and don't want to use a full Raspberry Pi.</p>
-<p>In the next weeks I settled to finally try TensorFlow Lite for Microcontrollers on my ESP32, so I'll try to do a comparison between them and this example and report my results.</p>
-<p>Now that you can do image classification on your ESP32, can you think of a use case you will be able to apply this code to? </p>
-<p>Let me know in the comments, we could even try realize it together if you need some help.</p>
-<hr>
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/Apple_vs_Orange/Apple_vs_Orange.ino" target="_blank" rel="noopener noreferrer">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/01/image-recognition-with-esp32-and-arduino/">Apple or Orange? Image recognition with ESP32 and Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4" length="1642079" type="video/mp4" />
-
 			</item>
 	</channel>
 </rss>

@@ -91,10 +91,10 @@ p.image__alt {
 
 .watchout, .infobox {
 	padding: .5rem 1.5rem;
-    border-left-width: .5rem;
-    border-left-style: solid;
-    margin: 1rem 0;
-	  line-height: 1.6em;
+  border-left-width: .5rem;
+  border-left-style: solid;
+  margin: 3rem 0;
+  line-height: 1.6em;
 }
 
 .watchout {
@@ -394,7 +394,8 @@ p.image__alt {
 
   /* MailChimp Form Embed Code - Horizontal Super Slim - 12/16/2015 v10.7
 Adapted from: http://blog.heyimcat.com/universal-signup-form/ */
-
+#mc_embed_signup {margin-top: 3em;}
+#mc-embedded-subscribe { margin-left: 1em !important; }
 #mc_embed_signup form {text-align:center; padding:10px 0 10px 0;}
 .mc-field-group { display: inline-block; } /* positions input field horizontally */
 #mc_embed_signup input.email {font-family:"Open Sans","Helvetica Neue",Arial,Helvetica,Verdana,sans-serif; font-size: 15px; border: 1px solid #ABB0B2;  -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; color: #343434; background-color: #fff; box-sizing:border-box; height:32px; padding: 0px 0.4em; display: inline-block; margin: 0; width:350px; vertical-align:top;}
