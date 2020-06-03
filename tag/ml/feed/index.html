@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/tag/ml/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 17 May 2020 09:30:07 +0000</lastBuildDate>
+	<lastBuildDate>Wed, 03 Jun 2020 17:10:18 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -144,6 +144,7 @@ This is an emerging field for me, so I will need time to master it.</p>
 		<pubDate>Sat, 25 Jan 2020 19:36:29 +0000</pubDate>
 				<category><![CDATA[Arduino Machine learning]]></category>
 		<category><![CDATA[ml]]></category>
+		<category><![CDATA[tinyml]]></category>
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=864</guid>
 
 					<description><![CDATA[<p>In this post I will show you how to easily deploy your Tensorflow Lite model to an ESP32 using the Arduino IDE without any compilation stuff. So I finally settled on giving a try to TinyML, which is a way to deploy Tensorflow Lite models to microcontrollers. As a first step, I downloaded the free [&#8230;]</p>
@@ -256,7 +257,7 @@ print(c_code)</code></pre>
 // it&#039;s a trial and error process
 #define TENSOR_ARENA_SIZE 2*1024
 
-Eloquent::TinyML::TfLite\&lt;NUMBER_OF_INPUTS, NUMBER_OF_OUTPUTS, TENSOR_ARENA_SIZE&gt; ml(sine_model);
+Eloquent::TinyML::TfLite&lt;NUMBER_OF_INPUTS, NUMBER_OF_OUTPUTS, TENSOR_ARENA_SIZE&gt; ml(sine_model);
 
 void setup() {
     Serial.begin(115200);
@@ -284,6 +285,7 @@ void loop() {
 float output[5] = { 0 };
 
 ml.predict(input, output);</code></pre>
+<p>You will find the complete code on <a href="https://github.com/eloquentarduino/EloquentTinyML/blob/master/examples/SineExample/SineExample.ino">Github</a>, with the <code>sine_model.h</code> file too.</p>
 <h2>Wrapping up</h2>
 <p>I hoped this post helped you kickstart your next TinyML project on your ESP32.</p>
 <p>It served me as a foundation for the next experiments I'm willing to do on this platform which is really in its early stages, so needs a lot of investigation about its capabilities.</p>
