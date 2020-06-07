@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 31 May 2020 17:44:50 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 07 Jun 2020 09:26:25 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,281 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.3</generator>
 	<item>
+		<title>Arduino dimensionality reduction (PCA) for Machine Learning projects</title>
+		<link>https://eloquentarduino.github.io/2020/06/arduino-dimensionality-reduction-pca-for-machine-learning-projects/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Sun, 07 Jun 2020 07:24:20 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[microml]]></category>
+		<category><![CDATA[pca]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1174</guid>
+
+					<description><![CDATA[<p>When working with Machine Learning projects on microcontrollers and embedded devices the dimension of features can become a limiting factor due to the lack of RAM: dimensionality reduction (eg. PCA) will help you shrink your models and even achieve higher prediction accuracy. Why dimensionality reduction on Arduino microcontrollers? Dimensionality reduction is a tecnique you see [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/06/arduino-dimensionality-reduction-pca-for-machine-learning-projects/">Arduino dimensionality reduction (PCA) for Machine Learning projects</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>When working with <strong>Machine Learning projects</strong> on microcontrollers and embedded devices the dimension of features can become a limiting factor due to the lack of RAM: <strong>dimensionality reduction</strong> (eg. PCA) will help you shrink your models and even achieve higher prediction accuracy.</p>
+<p><a href="https://setosa.io/ev/principal-component-analysis"><img src="https://setosa.io/ev/principal-component-analysis/fb-thumb.png" alt="PCA application example" /></a></p>
+<p><span id="more-1174"></span></p>
+<h2>Why dimensionality reduction on Arduino microcontrollers?</h2>
+<p><a href="https://en.wikipedia.org/wiki/Dimensionality_reduction">Dimensionality reduction</a> is a tecnique you see often in Machine Learning projects. By stripping away &quot;unimportant&quot; or redundant information, it generally helps speeding up the training process and achieving higher classification performances.</p>
+<p>Since we now know we can run Machine Learning on Arduino boards and embedded microcontrollers, it can become a key tool at our disposal to squeeze out the most out of our boards.</p>
+<p>In the specific case of resource-constrained devices as old Arduino boards (the UNO for example, with only 2 kb of RAM), it can become a decisive turn in unlocking even more application scenarios where the high dimensionality of the input features would not allow any model to fit.</p>
+<p>Let's take the <a href="/2019/12/how-to-do-gesture-identification-on-arduino/">Gesture classification project</a> as an example: among the different classifiers we trained, only one fitted on the Arduino UNO, since most of them required too much flash memory due to the high dimension of features (90) and support vectors (25 to 61).</p>
+<p>In this post I will resume that example and see if dimensionality reduction can help reduce this gap.</p>
+<p>If you are working on a project with many features, let me know in the comments so I can create a detailed list of real world examples.</p>
+<h2>How to export PCA (Principal Component Analysis) to plain C</h2>
+<p>Among the many algorithms available for dimensionality reduction, I decided to start with <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">PCA (Principal Component Analysis)</a> because it's one of the most widespread. In the next weeks I will probably work on porting other alternatives.</p>
+<p>If you never used my Python package <a href="https://github.com/eloquentarduino/micromlgen">micromlgen</a> I first invite you to read <a href="/2019/11/you-can-run-machine-learning-on-arduino/">the introduction post</a> to get familiar with it.</p>
+<p>Always remember to install the latest version, since I publish frequent updates.</p>
+<pre><code class="language-bash">pip install --upgrade micromlgen</code></pre>
+<p>Now it is pretty straight-forward to convert a sklearn PCA transformer to plain C: you use the magic method <code>port</code>. In addition to converting SVM/RVM classifiers, it is now able to export PCA too.</p>
+<pre><code class="language-python">from sklearn.decomposition import PCA
+from sklearn.datasets import load_iris
+from micromlgen import port
+
+if __name__ == &#039;__main__&#039;:
+    X = load_iris().data
+    pca = PCA(n_components=2, whiten=False).fit(X)
+
+    print(port(pca))</code></pre>
+<h2>How to deploy PCA to Arduino</h2>
+<p>To use the exported code, we first have to include it in our sketch. Save the contents to a file (I named it <code>pca.h</code>) in the same folder of your <code>.ino</code> project and include it.</p>
+<pre><code class="language-cpp">#include &quot;pca.h&quot;
+
+// this was trained on the IRIS dataset, with 2 principal components
+Eloquent::ML::Port::PCA pca;</code></pre>
+<p>The <code>pca</code> object is now able to take an array of size N as input and return an array of size K as output, with K &lt; N usually.</p>
+<pre><code class="language-cpp">void setup() {
+    float x_input[4] = {5.1, 3.5, 1.4, 0.2};
+    float x_output[2];
+
+    pca.transform(x_input, x_output);
+}</code></pre>
+<p>That's it: now you can run your classifier on <code>x_output</code>.</p>
+<pre><code class="language-cpp">#include &quot;pca.h&quot;
+#include &quot;svm.h&quot;
+
+Eloquent::ML::Port::PCA pca;
+Eloquent::ML::Port::SVM clf;
+
+void setup() {
+    float x_input[4] = {5.1, 3.5, 1.4, 0.2};
+    float x_output[2];
+    int y_pred;
+
+    pca.transform(x_input, x_output);
+
+    y_pred = clf.predict(x_output);
+}</code></pre>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<h2>A real world example</h2>
+<p>As I anticipated, let's take a look at how PCA dimensionality reduction can help in fitting classifiers that would otherwise be too large to fit on our microcontrollers.</p>
+<p>This is the exact table from the <a href="/2019/12/how-to-do-gesture-identification-on-arduino/">Gesture classification project</a>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Kernel</th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">Gamma</th>
+<th style="text-align: center;">Degree</th>
+<th style="text-align: center;">Vectors</th>
+<th style="text-align: center;">Flash size</th>
+<th style="text-align: center;">RAM (b)</th>
+<th style="text-align: center;">Avg accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RBF</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">0.001</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">37</td>
+<td style="text-align: center;">53 Kb</td>
+<td style="text-align: center;">1228</td>
+<td style="text-align: center;">99%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Poly</strong></td>
+<td style="text-align: center;"><strong>100</strong></td>
+<td style="text-align: center;"><strong>0.001</strong></td>
+<td style="text-align: center;"><strong>2</strong></td>
+<td style="text-align: center;"><strong>12</strong></td>
+<td style="text-align: center;"><strong>25 Kb</strong></td>
+<td style="text-align: center;"><strong>1228</strong></td>
+<td style="text-align: center;"><strong>99%</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">Poly</td>
+<td style="text-align: center;">100</td>
+<td style="text-align: center;">0.001</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">40 Kb</td>
+<td style="text-align: center;">1228</td>
+<td style="text-align: center;">97%</td>
+</tr>
+<tr>
+<td style="text-align: left;">Linear</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: center;">55 Kb</td>
+<td style="text-align: center;">1228</td>
+<td style="text-align: center;">95%</td>
+</tr>
+<tr>
+<td style="text-align: left;">RBF</td>
+<td style="text-align: center;">100</td>
+<td style="text-align: center;">0.01</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">61</td>
+<td style="text-align: center;">80 Kb</td>
+<td style="text-align: center;">1228</td>
+<td style="text-align: center;">95%</td>
+</tr>
+</tbody>
+</table>
+<p>The dataset has 90 features (30 samples x 3 axes) and achieves 99% accuracy. </p>
+<p>Let's pick the <code>poly</code> kernel with degree <code>2</code> and see how much we can decrease the number of components while still achieving a good accuracy.</p>
+<table>
+<thead>
+<tr>
+<th>PCA components</th>
+<th style="text-align: center;">Accuracy</th>
+<th style="text-align: center;">Support vectors</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>90</td>
+<td style="text-align: center;">99%</td>
+<td style="text-align: center;">31</td>
+</tr>
+<tr>
+<td>50</td>
+<td style="text-align: center;">99%</td>
+<td style="text-align: center;">31</td>
+</tr>
+<tr>
+<td>40</td>
+<td style="text-align: center;">99%</td>
+<td style="text-align: center;">31</td>
+</tr>
+<tr>
+<td>30</td>
+<td style="text-align: center;">90%</td>
+<td style="text-align: center;">30</td>
+</tr>
+<tr>
+<td>20</td>
+<td style="text-align: center;">90%</td>
+<td style="text-align: center;">28</td>
+</tr>
+<tr>
+<td>15</td>
+<td style="text-align: center;">90%</td>
+<td style="text-align: center;">24</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td style="text-align: center;"><strong>99%</strong></td>
+<td style="text-align: center;"><strong>18</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td style="text-align: center;">76%</td>
+<td style="text-align: center;">28</td>
+</tr>
+</tbody>
+</table>
+<p>We clearly see a couple of things:</p>
+<ol>
+<li>we still achieve 99% accuracy even with only 40 out of 90 principal components</li>
+<li>we get a satisfactory 90% accuracy even <strong>with only 15 components</strong></li>
+<li>(this is a bit unexpected) it looks like there's a sweet spot at 10 components where the accuracy skyrockets to 99% again. <em>This could be just a contingency of this particular dataset, don't expect to replicate this results on your own dataset</em></li>
+</ol>
+<p>What do these numbers mean to you? It means your board has to do many less computations to give you a prediction and will probably be able to host a more complex model.</p>
+<p>Let's check out the figures with <code>n_components = 10</code> compared with the ones without PCA.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Kernel</th>
+<th style="text-align: center;">PCA support vectors</th>
+<th style="text-align: center;">PCA flash size</th>
+<th style="text-align: center;">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RBF C=10</td>
+<td style="text-align: center;">46 (+24%)</td>
+<td style="text-align: center;">32 Kb (-40%)</td>
+<td style="text-align: center;">99%</td>
+</tr>
+<tr>
+<td style="text-align: left;">RBF C=100</td>
+<td style="text-align: center;">28 (-54%)</td>
+<td style="text-align: center;">32 Kb (-60%)</td>
+<td style="text-align: center;">99%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Poly 2</strong></td>
+<td style="text-align: center;">13 (-48%)</td>
+<td style="text-align: center;">28 Kb (+12%)</td>
+<td style="text-align: center;">99%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Poly 3</strong></td>
+<td style="text-align: center;">24 (-4%)</td>
+<td style="text-align: center;">32 Kb (-20%)</td>
+<td style="text-align: center;">99%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Linear</strong></td>
+<td style="text-align: center;">18 (-64%)</td>
+<td style="text-align: center;">29 Kb (-47%)</td>
+<td style="text-align: center;">99%</td>
+</tr>
+</tbody>
+</table>
+<p>A couple notes:</p>
+<ol>
+<li>accuracy increased (on stayed the same) for all kernels</li>
+<li>with one exception, flash size decreased in the range 20 - 50%</li>
+<li>now we can fit 3 classifiers on our Arduino UNO instead of only one</li>
+</ol>
+<p>I will probably spend some more time investingating the usefulness of PCA for Arduino Machine Learning projects, but for now that's it: it's a good starting point in my opinion.</p>
+<hr />
+<p>There's a little example sketch on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/PCAExample/PCAExample.ino">Github</a> that applies PCA to the IRIS dataset.</p>
+<p>Tell me what you think may be a clever application of dimensionality reduction in the world of microcontrollers and see if we can build something great together.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/06/arduino-dimensionality-reduction-pca-for-machine-learning-projects/">Arduino dimensionality reduction (PCA) for Machine Learning projects</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Anomaly detection on your Arduino microcontroller via One Class SVM</title>
 		<link>https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/</link>
 		
@@ -1837,228 +2112,6 @@ namespace Eloquent {
 					
 		
 		<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2020/02/Thermal-ascii-speedup.mp4" length="479591" type="video/mp4" />
-
-			</item>
-		<item>
-		<title>Handwritten digit classification with Arduino and MicroML</title>
-		<link>https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sun, 23 Feb 2020 10:53:03 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[Computer vision]]></category>
-		<category><![CDATA[camera]]></category>
-		<category><![CDATA[esp32]]></category>
-		<category><![CDATA[microml]]></category>
-		<category><![CDATA[svm]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=931</guid>
-
-					<description><![CDATA[<p>We continue exploring the endless possibilities on the MicroML (Machine Learning for Microcontrollers) framework on Arduino and ESP32 boards: in this post we're back to image classification. In particular, we'll distinguish handwritten digits using an ESP32 camera. If this is the first time you're reading my blog, you may have missed that I'm on a [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/">Handwritten digit classification with Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>We continue exploring the endless possibilities on the MicroML (Machine Learning for Microcontrollers) framework on Arduino and ESP32 boards: in this post we're back to image classification. In particular, we'll distinguish handwritten digits using an ESP32 camera.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST.gif" alt="Arduino handwritten digit classification" /></p>
-<p><span id="more-931"></span></p>
-<p>If this is the first time you're reading my blog, you may have missed that I'm on a journey to push the limits of Machine learning on embedded devices like the Arduino boards and ESP32.</p>
-<p>I started with <a href="/2019/12/how-to-do-gesture-identification-on-arduino/">accelerometer data classification</a>, then did <a href="/2019/12/wifi-indoor-positioning-on-arduino/">Wifi indoor positioning</a> as a proof of concept.</p>
-<p>In the last weeks, though, I undertook a more difficult path that is image classification.</p>
-<p>Image classification is where Convolutional Neural Networks really shine, but I'm here to <a href="/2020/01/image-recognition-with-esp32-and-arduino/">question this settlement</a> and demostrate that it is possible to come up with much lighter alternatives.</p>
-<p>In this post we continue with the examples, replicating a &quot;benchmark&quot; dataset in Machine learning: the handwritten digits classification.</p>
-<div class="infobox">
-If you are curious about a specific image classification task you would like to see implemented, <b>let me know in the comments</b>: I'm always open to new ideas
-</div>
-<h2>The task</h2>
-<p>The objective of this example is to be able to tell what an handwritten digit is, taking as input a photo from the ESP32 camera.</p>
-<p>In particular, we have 3 handwritten numbers and the task of our model will be to distinguish which image is what number.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-examples.jpg" alt="Handwritten digits example" /></p>
-<p>I only have a single image per digit, but you're free to draw as many samples as you like: it should help improve the performance of you're classifier.</p>
-<h2>1. Feature extraction</h2>
-<p>When dealing with images, if you use a CNN this step is often overlooked: CNNs are made on purpose to handle raw pixel values, so you just throw the image in and it is handled properly.</p>
-<p>When using other types of classifiers, it could help add a bit of feature engineering to help the classifier doing its job and achieve high accuracy.</p>
-<p>But not this time.</p>
-<p>I wanted to be as &quot;light&quot; as possible in this demo, so I only took a couple steps during the feature acquisition:</p>
-<ol>
-<li>use a grayscale image</li>
-<li>downsample to a manageable size</li>
-<li>convert it to black/white with a threshold</li>
-</ol>
-<p>I would hardly call this feature engineering.</p>
-<p>This is an example of the result of this pipeline.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-feature-extraction.jpg" alt="Handwritten digit feature extraction" /></p>
-<p>The code for this pipeline is really simple and is almost the same from the example on <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">motion detection</a>.</p>
-<pre><code class="language-c">#include &quot;esp_camera.h&quot;
-
-#define PWDN_GPIO_NUM     -1
-#define RESET_GPIO_NUM    15
-#define XCLK_GPIO_NUM     27
-#define SIOD_GPIO_NUM     22
-#define SIOC_GPIO_NUM     23
-#define Y9_GPIO_NUM       19
-#define Y8_GPIO_NUM       36
-#define Y7_GPIO_NUM       18
-#define Y6_GPIO_NUM       39
-#define Y5_GPIO_NUM        5
-#define Y4_GPIO_NUM       34
-#define Y3_GPIO_NUM       35
-#define Y2_GPIO_NUM       32
-#define VSYNC_GPIO_NUM    25
-#define HREF_GPIO_NUM     26
-#define PCLK_GPIO_NUM     21
-
-#define FRAME_SIZE FRAMESIZE_QQVGA
-#define WIDTH 160
-#define HEIGHT 120
-#define BLOCK_SIZE 5
-#define W (WIDTH / BLOCK_SIZE)
-#define H (HEIGHT / BLOCK_SIZE)
-#define THRESHOLD 127
-
-double features[H*W] = { 0 };
-
-void setup() {
-    Serial.begin(115200);
-    Serial.println(setup_camera(FRAME_SIZE) ? &quot;OK&quot; : &quot;ERR INIT&quot;);
-    delay(3000);
-}
-
-void loop() {
-    if (!capture_still()) {
-        Serial.println(&quot;Failed capture&quot;);
-        delay(2000);
-        return;
-    }
-
-    print_features();
-    delay(3000);
-}
-
-bool setup_camera(framesize_t frameSize) {
-    camera_config_t config;
-
-    config.ledc_channel = LEDC_CHANNEL_0;
-    config.ledc_timer = LEDC_TIMER_0;
-    config.pin_d0 = Y2_GPIO_NUM;
-    config.pin_d1 = Y3_GPIO_NUM;
-    config.pin_d2 = Y4_GPIO_NUM;
-    config.pin_d3 = Y5_GPIO_NUM;
-    config.pin_d4 = Y6_GPIO_NUM;
-    config.pin_d5 = Y7_GPIO_NUM;
-    config.pin_d6 = Y8_GPIO_NUM;
-    config.pin_d7 = Y9_GPIO_NUM;
-    config.pin_xclk = XCLK_GPIO_NUM;
-    config.pin_pclk = PCLK_GPIO_NUM;
-    config.pin_vsync = VSYNC_GPIO_NUM;
-    config.pin_href = HREF_GPIO_NUM;
-    config.pin_sscb_sda = SIOD_GPIO_NUM;
-    config.pin_sscb_scl = SIOC_GPIO_NUM;
-    config.pin_pwdn = PWDN_GPIO_NUM;
-    config.pin_reset = RESET_GPIO_NUM;
-    config.xclk_freq_hz = 20000000;
-    config.pixel_format = PIXFORMAT_GRAYSCALE;
-    config.frame_size = frameSize;
-    config.jpeg_quality = 12;
-    config.fb_count = 1;
-
-    bool ok = esp_camera_init(&amp;config) == ESP_OK;
-
-    sensor_t *sensor = esp_camera_sensor_get();
-    sensor-&gt;set_framesize(sensor, frameSize);
-
-    return ok;
-}
-
-bool capture_still() {
-    camera_fb_t *frame = esp_camera_fb_get();
-
-    if (!frame)
-        return false;
-
-    // reset all the features
-    for (size_t i = 0; i &lt; H * W; i++)
-      features[i] = 0;
-
-    // for each pixel, compute the position in the downsampled image
-    for (size_t i = 0; i &lt; frame-&gt;len; i++) {
-      const uint16_t x = i % WIDTH;
-      const uint16_t y = floor(i / WIDTH);
-      const uint8_t block_x = floor(x / BLOCK_SIZE);
-      const uint8_t block_y = floor(y / BLOCK_SIZE);
-      const uint16_t j = block_y * W + block_x;
-
-      features[j] += frame-&gt;buf[i];
-    }
-
-    // apply threshold
-    for (size_t i = 0; i &lt; H * W; i++) {
-      features[i] = (features[i] / (BLOCK_SIZE * BLOCK_SIZE) &gt; THRESHOLD) ? 1 : 0;
-    }
-
-    return true;
-}
-
-void print_features() {
-    for (size_t i = 0; i &lt; H * W; i++) {
-        Serial.print(features[i]);
-
-        if (i != H * W - 1)
-          Serial.print(&#039;,&#039;);
-    }
-
-    Serial.println();
-}</code></pre>
-<h2>2. Samples recording</h2>
-<p>To create your own dataset, you need a collection of handwritten digits.</p>
-<p>You can do this part as you like, by using pieces of paper or a monitor. I used a tablet because it was well illuminated and I could open a bunch of tabs to keep a record of my samples.</p>
-<p>As in the <a href="/2020/01/image-recognition-with-esp32-and-arduino/">apple vs orange</a>, keep in mind that you should be consistent during both the training phase and the inference phase.</p>
-<p>This is why I used tape to fix my ESP32 camera to the desk and kept the tablet in the exact same position.</p>
-<p>If you desire, you could experiment varying slightly the capturing setup during the training and see if your classifier still achieves good accuracy: this is a test I didn't make.</p>
-<h2>3. Train and export the SVM classifier</h2>
-
-<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
-
-<p>
-<pre><code class="language-python">from sklearn.svm import SVC
-from micromlgen import port
-
-# put your samples in the dataset folder
-# one class per file
-# one feature vector per line, in CSV format
-features, classmap = load_features('dataset/')
-X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
-c_code = port(classifier, classmap=classmap)
-print(c_code)</code></pre>
-
-<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
-<h2>4. The result</h2>
-<p>Okay, at this point you should have all the working pieces to do handwritten digit image classification on your ESP32 camera. Include your model in the sketch and run the classification.</p>
-<pre><code class="language-c">#include &quot;model.h&quot;
-
-void loop() {
-    if (!capture_still()) {
-        Serial.println(&quot;Failed capture&quot;);
-        delay(2000);
-
-        return;
-    }
-
-    Serial.print(&quot;Number: &quot;);
-    Serial.println(classIdxToName(predict(features)));
-    delay(3000);
-}</code></pre>
-<p>Done.</p>
-<p>You can see a demo of my results in the video below.</p>
-<div style="width: 788px;" class="wp-video"><video class="wp-video-shortcode" id="video-931-2" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4?_=2" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4</a></video></div>
-<h3>Project figures</h3>
-<p>My dataset is composed of 25 training samples in total and the SVM with linear kernel produced 17 support vectors.</p>
-<p>On my M5Stick camera board, the overhead for the model is 6.8 Kb of flash and the inference takes 7ms: not that bad!</p>
-<hr>
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/HandwrittenDigitClassificationExample/HandwrittenDigitClassificationExample.ino" target="_blank" rel="noopener noreferrer">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/">Handwritten digit classification with Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4" length="6424809" type="video/mp4" />
 
 			</item>
 	</channel>
