@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/tag/camera/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Wed, 03 Jun 2020 11:17:09 +0000</lastBuildDate>
+	<lastBuildDate>Wed, 24 Jun 2020 18:26:23 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,142 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.4</generator>
 	<item>
+		<title>Easy ESP32 camera HTTP video streaming server</title>
+		<link>https://eloquentarduino.github.io/2020/06/easy-esp32-camera-http-video-streaming-server/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Wed, 24 Jun 2020 17:27:33 +0000</pubDate>
+				<category><![CDATA[Eloquent library]]></category>
+		<category><![CDATA[camera]]></category>
+		<category><![CDATA[esp32]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1203</guid>
+
+					<description><![CDATA[<p>This will be a short post where I introduce a new addition to the Arduino Eloquent library aimed to make video streaming from an ESP32 camera over HTTP super easy. It will be the first component of a larger project I'm going to implement. If you Google &#34;esp32 video streaming&#34; you will get a bunch [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/06/easy-esp32-camera-http-video-streaming-server/">Easy ESP32 camera HTTP video streaming server</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>This will be a short post where I introduce a new addition to the Arduino Eloquent library aimed to make video streaming from an ESP32 camera over HTTP super easy. It will be the first component of a larger project I'm going to implement.</p>
+<p><span id="more-1203"></span></p>
+<p>If you Google &quot;esp32 video streaming&quot; you will get a bunch of results that are essentialy copy-pasted from the official Espressif repo: many of them neither copy-pasted the code, just tell you to load the example sketch.</p>
+<p>And if you try to read it and try to modify just a bit for your own use-case, you won't understand much.</p>
+<p>This is the exact environment for an Eloquent component to live: make it painfully easy what's messy.</p>
+<p>I still have to find a good naming scheme for my libraries since Arduino IDE doesn't allow nested imports, so forgive me if &quot;ESP32CameraHTTPVideoStreamingServer.h&quot; was the best that came to mind.</p>
+<p>How easy is it to use?</p>
+<p>1 line of code if used in conjuction with my other library <a href="https://github.com/eloquentarduino/EloquentVision">EloquentVision</a>.</p>
+<pre><code class="language-cpp">#define CAMERA_MODEL_M5STACK_WIDE
+#include &quot;WiFi.h&quot;
+#include &quot;EloquentVision.h&quot;
+#include &quot;ESP32CameraHTTPVideoStreamingServer.h&quot;
+
+using namespace Eloquent::Vision;
+using namespace Eloquent::Vision::Camera;
+
+ESP32Camera camera;
+HTTPVideoStreamingServer server(81);
+
+/**
+ *
+ */
+void setup() {
+    Serial.begin(115200);
+    WiFi.softAP(&quot;ESP32&quot;, &quot;12345678&quot;);
+
+    camera.begin(FRAMESIZE_QVGA, PIXFORMAT_JPEG);
+    server.start();
+
+    Serial.print(&quot;Camera Ready! Use &#039;http://&quot;);
+    Serial.print(WiFi.softAPIP());
+    Serial.println(&quot;:81&#039; to stream&quot;);
+}
+
+void loop() {
+}</code></pre>
+<p><code>HTTPVideoStreamingServer</code> assumes you already initialized your camera. You can achieve this task in the way you prefer: <code>ESP32Camera</code> class makes this a breeze.</p>
+<p><code>81</code> in the server constructor is the port you want the server to be listening to.</p>
+<p>Once connected to WiFi or started in AP mode, all you have to do is call <code>start()</code>: that's it!</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<p>What else is it good for?</p>
+<p>The main reason I wrote this piece of library is because one of you reader commented on the <a href="/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">motion detection post</a> asking if it would be possible to start the video streaming once motion is detected.</p>
+<p>Of course it is.</p>
+<p>It's just a matter of composing the Eloquent pieces.</p>
+<pre><code class="language-cpp">#define CAMERA_MODEL_M5STACK_WIDE
+#include &quot;WiFi.h&quot;
+#include &quot;EloquentVision.h&quot;
+#include &quot;ESP32CameraHTTPVideoStreamingServer.h&quot;
+
+#define SOURCE_WIDTH 320
+#define SOURCE_HEIGHT 240
+#define BLOCK_SIZE 10
+#define BLOCK_DIFF_THRESHOLD 0.2
+#define IMAGE_DIFF_THRESHOLD 0.1
+
+using namespace Eloquent::Vision;
+using namespace Eloquent::Vision::Camera;
+using namespace Eloquent::Vision::ImageProcessing;
+using namespace Eloquent::Vision::ImageProcessing::Downscale;
+
+ESP32Camera camera;
+HTTPVideoStreamingServer server(81);
+MotionDetection&lt; SOURCE_WIDTH, SOURCE_HEIGHT, BLOCK_SIZE&gt; motion(nearest);
+
+/**
+ *
+ */
+void setup() {
+    Serial.begin(115200);
+    WiFi.softAP(&quot;ESP32&quot;, &quot;12345678&quot;);
+
+    camera.begin(FRAMESIZE_QVGA, PIXFORMAT_JPEG);
+
+    Serial.print(&quot;Camera Ready! Use &#039;http://&quot;);
+    Serial.print(WiFi.softAPIP());
+    Serial.println(&quot;:81&#039; to stream&quot;);
+}
+
+void loop() {
+    motion.update(camera.capture()-&gt;buf);
+
+    if (motion.detectRatio() &gt; IMAGE_DIFF_THRESHOLD) {
+        Serial.print(&quot;Motion detected&quot;);
+        // start the streaming server when motion is detected
+        // shutdown after 20 seconds if no one connects
+        server.start();
+        delay(20000);
+        server.stop();
+    }
+
+    // probably we don&#039;t need 30 fps, save some power
+    delay(300);
+}</code></pre>
+<p>Does it look good?</p>
+<p>Now the rationale behind Eloquent components should be starting to be clear to you: easy to use objects you can compose the way it fits to achieve the result you want.</p>
+<p>Would you suggest me more piece of functionality you would like to see wrapped in an Eloquent component?</p>
+<hr />
+<p>You can find the <a href="https://github.com/eloquentarduino/EloquentVision/blob/master/src/ESP32CameraHTTPVideoStreamingServer.h">class code</a> and the <a href="https://github.com/eloquentarduino/EloquentVision/blob/master/examples/ESP32CameraHTTPVideoStreamingServerExample/ESP32CameraHTTPVideoStreamingServerExample.ino">example sketch</a> on the <a href="https://github.com/eloquentarduino/EloquentVision">Github repo</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/06/easy-esp32-camera-http-video-streaming-server/">Easy ESP32 camera HTTP video streaming server</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Easier, faster pure video ESP32 cam motion detection</title>
 		<link>https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/</link>
 		
