@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/tag/microml/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 07 Jun 2020 09:26:25 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 12 Jul 2020 15:04:14 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,175 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.4</generator>
 	<item>
+		<title>SEFR: A Fast Linear-Time Classifier for Ultra-Low Power Devices</title>
+		<link>https://eloquentarduino.github.io/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Fri, 10 Jul 2020 15:09:58 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[microml]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1214</guid>
+
+					<description><![CDATA[<p>A brand new binary classifier that's tiny and accurate, perfect for embedded scenarios: easily achieve 90+ % accuracy with a minimal memory footprint! A few weeks ago I was wandering over arxiv.org looking for insipiration relative to Machine learning on microcontrollers when I found exactly what I was looking for. SEFR: A Fast Linear-Time Classifier [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/">SEFR: A Fast Linear-Time Classifier for Ultra-Low Power Devices</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>A brand new binary classifier that's tiny and accurate, perfect for embedded scenarios: easily achieve 90+ % accuracy with a minimal memory footprint!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/07/Binary-classification.png" alt="Binary classification - from https://towardsdatascience.com" /></p>
+<p><span id="more-1214"></span></p>
+<p>A few weeks ago I was wandering over <a href="https://arxiv.org/search/cs?query=microcontroller&amp;searchtype=all&amp;abstracts=show&amp;order=-announced_date_first&amp;size=50">arxiv.org</a> looking for insipiration relative to Machine learning on microcontrollers when I found exactly what I was looking for.</p>
+<p><a href="https://arxiv.org/abs/2006.04620">SEFR: A Fast Linear-Time Classifier for Ultra-Low Power Devices</a> is a paper from Hamidreza Keshavarz, Mohammad Saniee Abadeh, Reza Rawassizadeh where the authors develop a binary classifier that is:</p>
+<ul>
+<li>fast during training</li>
+<li>fast during prediction</li>
+<li>requires minimal memory</li>
+</ul>
+<p>It has been specifically designed for embedded machine learning, so no optimization is required to run in on microcontrollers: it is tiny by design. In short, it uses a combination of the averages of the features as weights plus a bias to distinguish between positive and negative class. If you read the paper you will sure understand it: it's very straightforward.</p>
+<h2>How to use</h2>
+<p>The authors both provided a <a href="https://github.com/sefr-classifier/sefr">C and Python implementation</a> on Github you can read.  I ported the C version &quot;manually&quot; to my <a href="https://github.com/eloquentarduino/EloquentMicroML">Eloquent ML library</a> and created a <a href="https://github.com/eloquentarduino/sefr">Python package called sefr</a> copy-pasting from the original repo.</p>
+<p>Here's a Python example.</p>
+<pre><code class="language-python">from sefr import SEFR
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import normalize
+from sklearn.model_selection import train_test_split
+
+if __name__ == &#039;__main__&#039;:
+    iris = load_iris()
+    X = normalize(iris.data)
+    y = iris.target
+    X = X[y &lt; 2]
+    y = y[y &lt; 2]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    clf = SEFR()
+    clf.fit(X_train, y_train)
+    print(&#039;accuracy&#039;, (clf.predict(X_test) == y_test).sum() / len(y_test))</code></pre>
+<p>How good is it?</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th style="text-align: center;">No. of features</th>
+<th style="text-align: center;">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Iris</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">100%</td>
+</tr>
+<tr>
+<td>Breast cancer</td>
+<td style="text-align: center;">30</td>
+<td style="text-align: center;">89%</td>
+</tr>
+<tr>
+<td>Wine</td>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">84%</td>
+</tr>
+<tr>
+<td>Digits</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">99%</td>
+</tr>
+</tbody>
+</table>
+<p>Considering that the model only needs 1 weight per feature, I think this results are impressive!</p>
+<h2>Micromlgen integration</h2>
+<p>The Python porting was done so I could integrate it easily in my <a href="https://github.com/eloquentarduino/micromlgen">micromlgen</a> package.</p>
+<p>How to use it?</p>
+<pre><code class="language-python">from sefr import SEFR
+from sklearn.datasets import load_iris
+from micromlgen import port
+
+if __name__ == &#039;__main__&#039;:
+    iris = load_iris()
+    X = iris.data
+    y = iris.target
+    X = X[y &lt; 2]
+    y = y[y &lt; 2]
+    clf = SEFR()
+    clf.fit(X_train, y_train)
+    print(port(clf))</code></pre>
+<p>The produced code is so compact I will report it here.</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<pre><code class="language-cpp">#pragma once
+namespace Eloquent {
+    namespace ML {
+        namespace Port {
+            class SEFR {
+                public:
+                    /**
+                    * Predict class for features vector
+                    */
+                    int predict(float *x) {
+                        return dot(x,   0.084993602632  , -0.106163278477  , 0.488989863684  , 0.687022900763 ) &lt;= 2.075 ? 0 : 1;
+                    }
+
+                protected:
+                    /**
+                    * Compute dot product between features vector and classifier weights
+                    */
+                    float dot(float *x, ...) {
+                        va_list w;
+                        va_start(w, 4);
+                        float kernel = 0.0;
+
+                        for (uint16_t i = 0; i &lt; 4; i++) {
+                            kernel += x[i] * va_arg(w, double);
+                        }
+
+                        return kernel;
+                    }
+                };
+            }
+        }
+    }</code></pre>
+<p>In your sketch:</p>
+<pre><code class="language-cpp">#include &quot;IrisSEFR.h&quot;
+#include &quot;IrisTest.h&quot;
+
+void setup() {
+    Serial.begin(115200);
+}
+
+void loop() {
+    Eloquent::ML::Port::SEFR clf;
+    Eloquent::ML::Test::IrisTestSet testSet;
+
+    testSet.test(clf);
+    Serial.println(testSet.dump());
+    delay(5000);
+}</code></pre>
+<p>You have to clone the <a href="https://github.com/eloquentarduino/EloquentMicroML/tree/master/examples/OffboardSEFRExample">Github example</a> to compile the code.</p>
+<hr />
+<p>That's all for today, I hope you will try this classifier and find a project it fits in: I'm very impressed by the easiness of implementation yet the accuracy it can achieve on benchmark datasets.</p>
+<p>In the next weeks I'm thinking in implementing a multi-class version of this and see how it performs, so stay tuned!</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/">SEFR: A Fast Linear-Time Classifier for Ultra-Low Power Devices</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Arduino dimensionality reduction (PCA) for Machine Learning projects</title>
 		<link>https://eloquentarduino.github.io/2020/06/arduino-dimensionality-reduction-pca-for-machine-learning-projects/</link>
 		
@@ -1884,118 +2053,6 @@ Image acquisition is a very noisy process: even keeping the camera still, you wi
 		
 		<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.mp4" length="1642079" type="video/mp4" />
 
-			</item>
-		<item>
-		<title>Embedded Machine learning on Attiny85</title>
-		<link>https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Mon, 23 Dec 2019 16:57:15 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[microml]]></category>
-		<category><![CDATA[svm]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=688</guid>
-
-					<description><![CDATA[<p>You won't believe it, but you can run Machine learning on embedded systems like an Attiny85 (and many others Attiny)! When I first run a Machine learning project on my Arduino Nano (old generation), it already felt a big achievement. I mean, that board has only 32 Kb of program space and 2 Kb of [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">Embedded Machine learning on Attiny85</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>You won't believe it, but <strong>you can run Machine learning on embedded systems like an Attiny85</strong> (and many others Attiny)!</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/attiny85_ml.png" alt="ri-elaborated from https://cyaninfinite.com/miniaturize-projects-with-attiny85/" /></p>
-<p><span id="more-688"></span></p>
-<p>When I first run a Machine learning project on my Arduino Nano (old generation), it already felt a big achievement. I mean, that board has only 32 Kb of program space and 2 Kb of RAM and you can buy a chinese clone for around 2.50 $.</p>
-<p>It already opened the path to a embedded machine learning at a new scale, given the huge amount of microcontrollers ready to become &quot;intelligent&quot;. </p>
-<p>But it was not enough for me: after all, the <a href="/2019/11/how-to-create-a-classifier-for-arduino-machine-learning-projects/">MicroML generator</a> exports plain C that should run on any embedded system, not only on Arduino boards.</p>
-<p>So I setup to test if I could go even smaller and run it on the #1 of tiny chips: the Attiny85.</p>
-<hr /><p><em>MicroML exports plain C that could run anywhere, not only on Arduino boards.</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=MicroML%20exports%20plain%20C%20that%20could%20run%20anywhere%2C%20not%20only%20on%20Arduino%20boards.&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>No, I couldn't.</p>
-<p>The generated code makes use of a variadic function, which seems to not be supported by the Attiny compiler in the Arduino IDE.</p>
-<p>So I had to come up with an alternative implementation to make it work.</p>
-<p>Fortunately I already experimented with a non-variadic version when first writing the porter, so it was a matter of refreshing that algorithm and try it out.</p>
-<p>Guess what? It compiled!</p>
-<p>So I tried porting one my earliear tutorial (the <a href="/2019/12/how-to-do-color-identification-on-arduino/">color identification</a> one) to the Attiny and...</p>
-<hr /><p><em>Boom! Machine learning on an Attiny85!</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=Boom%21%20Machine%20learning%20on%20an%20Attiny85%21&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p>Here's a step-by-step tutorial on how you can do it too.</p>
-<div class="watchout">
-I strongly suggest you read <a href="/2019/12/how-to-do-color-identification-on-arduino/" target="_blank" rel="noopener noreferrer">the original tutorial</a> before following this one, because I won't go into too much details on the common steps here.
-</div>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a><li><a href="#tocproject-figures">Project figures</a></ol></div></p>
-<h2 id="tocfeatures-definition">1. Features definition</h2>
-<p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be 3-dimensional, which leads to a really simple model with very high accuracy.</p>
-<div class="watchout">
-The Attiny85 has 8 Kb of flash and 512 bytes of RAM, so you won't be able to load any model that uses more than a few features (probably less than 10).
-</div>
-<h2 id="tocrecord-sample-data">2. Record sample data</h2>
-<p>You must do this step on a board with a Serial interface, like an Arduino Uno / Nano / Pro Mini. See <a href="/2019/12/how-to-do-color-identification-on-arduino/" target="_blank" rel="noopener noreferrer">the original tutorial</a> for the code of this step.</p>
-<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
-<p>This part is exactly the same as the original, except for a single parameter: you will pass <code>platform=attiny</code> to the <code>port</code> function.</p>
-<pre><code class="language-python">from sklearn.svm import SVC
-from micromlgen import port
-
-# put your samples in the dataset folder
-# one class per file
-# one feature vector per line, in CSV format
-features, classmap = load_features(&#039;dataset/&#039;)
-X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel=&#039;linear&#039;).fit(X, y)
-c_code = port(classifier, classmap=classmap, platform=&#039;attiny&#039;)
-print(c_code)</code></pre>
-<div class="watchout">
-The Attiny mode has been implemented in version 0.8 of micromlgen: if you installed an earlier version, first update
-</div>
-<p>At this point you have to copy the printed code and import it in your project, in a file called <code>model.h</code>.</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<h2 id="tocrun-the-inference">4. Run the inference</h2>
-<p>Since we don't have a Serial, we will blink a LED a number of times dependant on the prediction result.</p>
-<pre><code class="language-cpp">#include &quot;model.h&quot;
-
-#define LED 0
-
-void loop() {
-  readRGB();
-  classify();
-  delay(1000);
-}
-
-void classify() {
-    for (uint8_t times = predict(features) + 1; times &gt; 0; times--) {
-        digitalWrite(LED, HIGH);
-        delay(10);
-        digitalWrite(LED, LOW);
-        delay(10);
-    }
-}</code></pre>
-<p>Here we are: put some colored object in front of the sensor and see the LED blink.</p>
-<h2 id="tocproject-figures">Project figures</h2>
-<p>On my machine, the sketch requires 3434 bytes (41%) of program space and 21 bytes (4%) of RAM. This means you could actually run machine learning in even less space than what the Attiny85 provides. </p>
-<p>This model in particular it's so tiny you <strong>can run in even on an Attiny45, which has only 4 Kb of flash and 256 bytes of RAM</strong>.</p>
-<p>I'd like you to look at the RAM figure for a moment: <strong>21 bytes</strong>. 21 bytes is all the memory you need to run a Machine learning algorithm on a microcontroller. This is the result of the implementation I chose: the least RAM overhead possible. I challenge you to go any lower than this.</p>
-<hr /><p><em>21 bytes is all the memory you need to run a Machine learning algorithm on a microcontroller</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fmachine-learning-on-attiny85%2F&#038;text=21%20bytes%20is%20all%20the%20memory%20you%20need%20to%20run%20a%20Machine%20learning%20algorithm%20on%20a%20microcontroller&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
-<p><br><p>Did you find this tutorial useful? Was is it easy to follow or did I miss something? Let me know in the comments so I can keep improving the blog.</p><br />
-<hr>
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/MicromlColorIdentificationAttinyExample/MicromlColorIdentificationAttinyExample.ino" target="_blank" rel="noopener noreferrer">Github</a></p></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/">Embedded Machine learning on Attiny85</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
 			</item>
 	</channel>
 </rss>
