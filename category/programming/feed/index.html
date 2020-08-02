@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 02 Aug 2020 09:30:47 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 02 Aug 2020 09:36:42 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -73,6 +73,9 @@ clf = pick_best(X_train, X_test, y_train, y_test)</code></pre>
 
 clf = pick_best()
 print(port(clf))</code></pre>
+<p class="watchout">Always remember to run </p>
+<pre><code>pip install --upgrade micromlgen</code></pre>
+</p>
 <p><code>port</code> is a magic method able to port many classifiers: it will automatically detect the proper converter for you.</p>
 <p>What does the exported code looks like?</p>
 <pre><code class="language-cpp">#pragma once
