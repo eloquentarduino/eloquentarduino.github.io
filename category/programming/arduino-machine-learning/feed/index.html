@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/arduino-machine-learning/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 12 Jul 2020 15:04:14 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 02 Aug 2020 09:16:01 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,213 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.4</generator>
 	<item>
+		<title>EloquentML grows its family of classifiers: Gaussian Naive Bayes on Arduino</title>
+		<link>https://eloquentarduino.github.io/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Sun, 02 Aug 2020 08:44:36 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[microml]]></category>
+		<category><![CDATA[ml]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1225</guid>
+
+					<description><![CDATA[<p>Are you looking for a top-performer classifiers with a minimal amount of parameters to tune? Look no further: Gaussian Naive Bayes is what you're looking for. And thanks to EloquentML you can now port it to your microcontroller. (Gaussian) Naive Bayes Naive Bayes classifiers are simple models based on the probability theory that can be [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/">EloquentML grows its family of classifiers: Gaussian Naive Bayes on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Are you looking for a top-performer classifiers with a minimal amount of parameters to tune? Look no further: Gaussian Naive Bayes is what you're looking for. And thanks to EloquentML you can now port it to your microcontroller.</p>
+<p><span id="more-1225"></span></p>
+<h2>(Gaussian) Naive Bayes</h2>
+<p><a href="https://en.wikipedia.org/wiki/Naive_Bayes_classifier">Naive Bayes</a> classifiers are simple models based on the probability theory that can be used for classification.</p>
+<p>They originate from the assumption of independence among the input variables. Even though this assumption doesn't hold true in the vast majority of the cases, they often perform very good at many classification tasks, so they're quite popular.</p>
+<p>Gaussian Naive Bayes stack another (mostly wrong) assumption: that the variables exhibit a Gaussian probability distribution.</p>
+<p>I (and many others like me) will never understand how it is possible that so many wrong assumptions lead to such good performances!</p>
+<p>Nevertheless, what is important to us is that <a href="https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html">sklearn implements GaussianNB</a>, so we easily train such a classifier.<br />
+The most interesting part is that <code>GaussianNB</code> can be tuned with just a single parameter: <code>var_smoothing</code>.</p>
+<p>Don't ask me what it does in theory: in practice you change it and your accuracy can boost. This leads to an easy tuning process that doesn't involves expensive <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html">grid search</a>.</p>
+<pre><code class="language-python">import sklearn.datasets as d
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import normalize
+from sklearn.naive_bayes import GaussianNB
+
+def pick_best(X_train, X_test, y_train, y_test):
+    best = (None, 0)
+    for var_smoothing in range(-7, 1):
+        clf = GaussianNB(var_smoothing=pow(10, var_smoothing))
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        accuracy = (y_pred == y_test).sum()
+        if accuracy &gt; best[1]:
+            best = (clf, accuracy)
+    print(&#039;best accuracy&#039;, best[1] / len(y_test))
+    return best[0]
+
+iris = d.load_iris()
+X = normalize(iris.data)
+y = iris.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+clf = pick_best(X_train, X_test, y_train, y_test)</code></pre>
+<p>This simple procedure will train a bunch of classifiers with a different <code>var_smoothing</code> factor and pick the best performing one.</p>
+<h2>EloquentML integration</h2>
+<p>Once you have your trained classifier, porting it to C is as easy as always:</p>
+<pre><code class="language-python">from micromlgen import port
+
+clf = pick_best()
+print(port(clf))</code></pre>
+<p><code>port</code> is a magic method able to port many classifiers: it will automatically detect the proper converter for you.</p>
+<p>What does the exported code looks like?</p>
+<pre><code class="language-cpp">#pragma once
+namespace Eloquent {
+    namespace ML {
+        namespace Port {
+            class GaussianNB {
+                public:
+                    /**
+                    * Predict class for features vector
+                    */
+                    int predict(float *x) {
+                        float votes[3] = { 0.0f };
+                        float theta[4] = { 0 };
+                        float sigma[4] = { 0 };
+                        theta[0] = 0.801139789889; theta[1] = 0.54726920354; theta[2] = 0.234408773313; theta[3] = 0.039178084094;
+                        sigma[0] = 0.000366881742; sigma[1] = 0.000907992556; sigma[2] = 0.000740960787; sigma[3] = 0.000274925514;
+                        votes[0] = 0.333333333333 - gauss(x, theta, sigma);
+                        theta[0] = 0.748563871324; theta[1] = 0.349390892644; theta[2] = 0.536186138345; theta[3] = 0.166747384117;
+                        sigma[0] = 0.000529727082; sigma[1] = 0.000847956504; sigma[2] = 0.000690057342; sigma[3] = 0.000311828658;
+                        votes[1] = 0.333333333333 - gauss(x, theta, sigma);
+                        theta[0] = 0.704497203305; theta[1] = 0.318862439835; theta[2] = 0.593755956917; theta[3] = 0.217288784452;
+                        sigma[0] = 0.000363782089; sigma[1] = 0.000813846722; sigma[2] = 0.000415475678; sigma[3] = 0.000758478249;
+                        votes[2] = 0.333333333333 - gauss(x, theta, sigma);
+                        // return argmax of votes
+                        uint8_t classIdx = 0;
+                        float maxVotes = votes[0];
+
+                        for (uint8_t i = 1; i &lt; 3; i++) {
+                            if (votes[i] &gt; maxVotes) {
+                                classIdx = i;
+                                maxVotes = votes[i];
+                            }
+                        }
+
+                        return classIdx;
+                    }
+
+                protected:
+                    /**
+                    * Compute gaussian value
+                    */
+                    float gauss(float *x, float *theta, float *sigma) {
+                        float gauss = 0.0f;
+
+                        for (uint16_t i = 0; i &lt; 4; i++) {
+                            gauss += log(sigma[i]);
+                            gauss += pow(x[i] - theta[i], 2) / sigma[i];
+                        }
+
+                        return gauss;
+                    }
+                };
+            }
+        }
+    }</code></pre>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<p>As you can see, we need a couple of &quot;weight vectors&quot;:</p>
+<ul>
+<li><code>theta</code> is the mean of each feature</li>
+<li><code>sigma</code> is the standard deviation</li>
+</ul>
+<p>The computation is quite thin: just a couple of operations; the class with the highest score is then selected.</p>
+<h2>Benchmarks</h2>
+<p>Following there's a recap of a couple benchmarks I run on an Arduino Nano 33 Ble Sense.</p>
+<table>
+<thead>
+<tr>
+<th>Classifier</th>
+<th>Dataset</th>
+<th style="text-align: center;">Flash</th>
+<th style="text-align: center;">RAM</th>
+<th style="text-align: center;">Execution time</th>
+<th style="text-align: center;">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GaussianNB</td>
+<td>Iris (150x4)</td>
+<td style="text-align: center;">82 kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">65 ms</td>
+<td style="text-align: center;">97%</td>
+</tr>
+<tr>
+<td>LinearSVC</td>
+<td>Iris (150x4)</td>
+<td style="text-align: center;">83 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">76 ms</td>
+<td style="text-align: center;">99%</td>
+</tr>
+<tr>
+<td>GaussianNB</td>
+<td>Breast cancer (80x40)</td>
+<td style="text-align: center;">90 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">160 ms</td>
+<td style="text-align: center;">77%</td>
+</tr>
+<tr>
+<td>LinearSVC</td>
+<td>Breast cancer (80x40)</td>
+<td style="text-align: center;">112 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">378 ms</td>
+<td style="text-align: center;">73%</td>
+</tr>
+<tr>
+<td>GaussianNB</td>
+<td>Wine (100x13)</td>
+<td style="text-align: center;">85 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">130 ms</td>
+<td style="text-align: center;">97%</td>
+</tr>
+<tr>
+<td>LinearSVC</td>
+<td>Wine (100x13)</td>
+<td style="text-align: center;">89 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">125 ms</td>
+<td style="text-align: center;">99%</td>
+</tr>
+</tbody>
+</table>
+<p>We can see that the accuracy is on par with a linear SVM, reaching up to 97% on some datasets. Its semplicity shines with high-dimensional datasets (breast cancer) where execution time is half of the LinearSVC: I can see this pattern repeating with other real-world, medium-sized datasets.</p>
+<hr />
+<p>This is it, you can find the example project on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/GaussianNBClassificationExample/GaussianNBClassificationExample.ino">Github</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/">EloquentML grows its family of classifiers: Gaussian Naive Bayes on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>SEFR: A Fast Linear-Time Classifier for Ultra-Low Power Devices</title>
 		<link>https://eloquentarduino.github.io/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/</link>
 		
@@ -1735,229 +1942,6 @@ As <a href="http://cs229.stanford.edu/materials/smo.pdf" target="_blank" rel="no
 					
 		
 		
-			</item>
-		<item>
-		<title>Handwritten digit classification with Arduino and MicroML</title>
-		<link>https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sun, 23 Feb 2020 10:53:03 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[Computer vision]]></category>
-		<category><![CDATA[camera]]></category>
-		<category><![CDATA[esp32]]></category>
-		<category><![CDATA[microml]]></category>
-		<category><![CDATA[svm]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=931</guid>
-
-					<description><![CDATA[<p>We continue exploring the endless possibilities on the MicroML (Machine Learning for Microcontrollers) framework on Arduino and ESP32 boards: in this post we're back to image classification. In particular, we'll distinguish handwritten digits using an ESP32 camera. If this is the first time you're reading my blog, you may have missed that I'm on a [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/">Handwritten digit classification with Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>We continue exploring the endless possibilities on the MicroML (Machine Learning for Microcontrollers) framework on Arduino and ESP32 boards: in this post we're back to image classification. In particular, we'll distinguish handwritten digits using an ESP32 camera.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST.gif" alt="Arduino handwritten digit classification" /></p>
-<p><span id="more-931"></span></p>
-<p>If this is the first time you're reading my blog, you may have missed that I'm on a journey to push the limits of Machine learning on embedded devices like the Arduino boards and ESP32.</p>
-<p>I started with <a href="/2019/12/how-to-do-gesture-identification-on-arduino/">accelerometer data classification</a>, then did <a href="/2019/12/wifi-indoor-positioning-on-arduino/">Wifi indoor positioning</a> as a proof of concept.</p>
-<p>In the last weeks, though, I undertook a more difficult path that is image classification.</p>
-<p>Image classification is where Convolutional Neural Networks really shine, but I'm here to <a href="/2020/01/image-recognition-with-esp32-and-arduino/">question this settlement</a> and demostrate that it is possible to come up with much lighter alternatives.</p>
-<p>In this post we continue with the examples, replicating a &quot;benchmark&quot; dataset in Machine learning: the handwritten digits classification.</p>
-<div class="infobox">
-If you are curious about a specific image classification task you would like to see implemented, <b>let me know in the comments</b>: I'm always open to new ideas
-</div>
-<h2>The task</h2>
-<p>The objective of this example is to be able to tell what an handwritten digit is, taking as input a photo from the ESP32 camera.</p>
-<p>In particular, we have 3 handwritten numbers and the task of our model will be to distinguish which image is what number.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-examples.jpg" alt="Handwritten digits example" /></p>
-<p>I only have a single image per digit, but you're free to draw as many samples as you like: it should help improve the performance of you're classifier.</p>
-<h2>1. Feature extraction</h2>
-<p>When dealing with images, if you use a CNN this step is often overlooked: CNNs are made on purpose to handle raw pixel values, so you just throw the image in and it is handled properly.</p>
-<p>When using other types of classifiers, it could help add a bit of feature engineering to help the classifier doing its job and achieve high accuracy.</p>
-<p>But not this time.</p>
-<p>I wanted to be as &quot;light&quot; as possible in this demo, so I only took a couple steps during the feature acquisition:</p>
-<ol>
-<li>use a grayscale image</li>
-<li>downsample to a manageable size</li>
-<li>convert it to black/white with a threshold</li>
-</ol>
-<p>I would hardly call this feature engineering.</p>
-<p>This is an example of the result of this pipeline.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-feature-extraction.jpg" alt="Handwritten digit feature extraction" /></p>
-<p>The code for this pipeline is really simple and is almost the same from the example on <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">motion detection</a>.</p>
-<pre><code class="language-c">#include &quot;esp_camera.h&quot;
-
-#define PWDN_GPIO_NUM     -1
-#define RESET_GPIO_NUM    15
-#define XCLK_GPIO_NUM     27
-#define SIOD_GPIO_NUM     22
-#define SIOC_GPIO_NUM     23
-#define Y9_GPIO_NUM       19
-#define Y8_GPIO_NUM       36
-#define Y7_GPIO_NUM       18
-#define Y6_GPIO_NUM       39
-#define Y5_GPIO_NUM        5
-#define Y4_GPIO_NUM       34
-#define Y3_GPIO_NUM       35
-#define Y2_GPIO_NUM       32
-#define VSYNC_GPIO_NUM    25
-#define HREF_GPIO_NUM     26
-#define PCLK_GPIO_NUM     21
-
-#define FRAME_SIZE FRAMESIZE_QQVGA
-#define WIDTH 160
-#define HEIGHT 120
-#define BLOCK_SIZE 5
-#define W (WIDTH / BLOCK_SIZE)
-#define H (HEIGHT / BLOCK_SIZE)
-#define THRESHOLD 127
-
-double features[H*W] = { 0 };
-
-void setup() {
-    Serial.begin(115200);
-    Serial.println(setup_camera(FRAME_SIZE) ? &quot;OK&quot; : &quot;ERR INIT&quot;);
-    delay(3000);
-}
-
-void loop() {
-    if (!capture_still()) {
-        Serial.println(&quot;Failed capture&quot;);
-        delay(2000);
-        return;
-    }
-
-    print_features();
-    delay(3000);
-}
-
-bool setup_camera(framesize_t frameSize) {
-    camera_config_t config;
-
-    config.ledc_channel = LEDC_CHANNEL_0;
-    config.ledc_timer = LEDC_TIMER_0;
-    config.pin_d0 = Y2_GPIO_NUM;
-    config.pin_d1 = Y3_GPIO_NUM;
-    config.pin_d2 = Y4_GPIO_NUM;
-    config.pin_d3 = Y5_GPIO_NUM;
-    config.pin_d4 = Y6_GPIO_NUM;
-    config.pin_d5 = Y7_GPIO_NUM;
-    config.pin_d6 = Y8_GPIO_NUM;
-    config.pin_d7 = Y9_GPIO_NUM;
-    config.pin_xclk = XCLK_GPIO_NUM;
-    config.pin_pclk = PCLK_GPIO_NUM;
-    config.pin_vsync = VSYNC_GPIO_NUM;
-    config.pin_href = HREF_GPIO_NUM;
-    config.pin_sscb_sda = SIOD_GPIO_NUM;
-    config.pin_sscb_scl = SIOC_GPIO_NUM;
-    config.pin_pwdn = PWDN_GPIO_NUM;
-    config.pin_reset = RESET_GPIO_NUM;
-    config.xclk_freq_hz = 20000000;
-    config.pixel_format = PIXFORMAT_GRAYSCALE;
-    config.frame_size = frameSize;
-    config.jpeg_quality = 12;
-    config.fb_count = 1;
-
-    bool ok = esp_camera_init(&amp;config) == ESP_OK;
-
-    sensor_t *sensor = esp_camera_sensor_get();
-    sensor-&gt;set_framesize(sensor, frameSize);
-
-    return ok;
-}
-
-bool capture_still() {
-    camera_fb_t *frame = esp_camera_fb_get();
-
-    if (!frame)
-        return false;
-
-    // reset all the features
-    for (size_t i = 0; i &lt; H * W; i++)
-      features[i] = 0;
-
-    // for each pixel, compute the position in the downsampled image
-    for (size_t i = 0; i &lt; frame-&gt;len; i++) {
-      const uint16_t x = i % WIDTH;
-      const uint16_t y = floor(i / WIDTH);
-      const uint8_t block_x = floor(x / BLOCK_SIZE);
-      const uint8_t block_y = floor(y / BLOCK_SIZE);
-      const uint16_t j = block_y * W + block_x;
-
-      features[j] += frame-&gt;buf[i];
-    }
-
-    // apply threshold
-    for (size_t i = 0; i &lt; H * W; i++) {
-      features[i] = (features[i] / (BLOCK_SIZE * BLOCK_SIZE) &gt; THRESHOLD) ? 1 : 0;
-    }
-
-    return true;
-}
-
-void print_features() {
-    for (size_t i = 0; i &lt; H * W; i++) {
-        Serial.print(features[i]);
-
-        if (i != H * W - 1)
-          Serial.print(&#039;,&#039;);
-    }
-
-    Serial.println();
-}</code></pre>
-<h2>2. Samples recording</h2>
-<p>To create your own dataset, you need a collection of handwritten digits.</p>
-<p>You can do this part as you like, by using pieces of paper or a monitor. I used a tablet because it was well illuminated and I could open a bunch of tabs to keep a record of my samples.</p>
-<p>As in the <a href="/2020/01/image-recognition-with-esp32-and-arduino/">apple vs orange</a>, keep in mind that you should be consistent during both the training phase and the inference phase.</p>
-<p>This is why I used tape to fix my ESP32 camera to the desk and kept the tablet in the exact same position.</p>
-<p>If you desire, you could experiment varying slightly the capturing setup during the training and see if your classifier still achieves good accuracy: this is a test I didn't make.</p>
-<h2>3. Train and export the SVM classifier</h2>
-
-<p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
-
-<p>
-<pre><code class="language-python">from sklearn.svm import SVC
-from micromlgen import port
-
-# put your samples in the dataset folder
-# one class per file
-# one feature vector per line, in CSV format
-features, classmap = load_features('dataset/')
-X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
-c_code = port(classifier, classmap=classmap)
-print(c_code)</code></pre>
-
-<p>At this point you have to copy the printed code and import it in your Arduino project, in a file called <code>model.h</code>.</p>
-<h2>4. The result</h2>
-<p>Okay, at this point you should have all the working pieces to do handwritten digit image classification on your ESP32 camera. Include your model in the sketch and run the classification.</p>
-<pre><code class="language-c">#include &quot;model.h&quot;
-
-void loop() {
-    if (!capture_still()) {
-        Serial.println(&quot;Failed capture&quot;);
-        delay(2000);
-
-        return;
-    }
-
-    Serial.print(&quot;Number: &quot;);
-    Serial.println(classIdxToName(predict(features)));
-    delay(3000);
-}</code></pre>
-<p>Done.</p>
-<p>You can see a demo of my results in the video below.</p>
-<div style="width: 788px;" class="wp-video"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
-<video class="wp-video-shortcode" id="video-931-1" width="788" height="443" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4?_=1" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4</a></video></div>
-<h3>Project figures</h3>
-<p>My dataset is composed of 25 training samples in total and the SVM with linear kernel produced 17 support vectors.</p>
-<p>On my M5Stick camera board, the overhead for the model is 6.8 Kb of flash and the inference takes 7ms: not that bad!</p>
-<hr>
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentArduino/blob/master/examples/HandwrittenDigitClassificationExample/HandwrittenDigitClassificationExample.ino" target="_blank" rel="noopener noreferrer">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/">Handwritten digit classification with Arduino and MicroML</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST-mute.mp4" length="6424809" type="video/mp4" />
-
 			</item>
 	</channel>
 </rss>

@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 12 Jul 2020 15:04:14 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 02 Aug 2020 09:16:01 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,213 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.4</generator>
 	<item>
+		<title>EloquentML grows its family of classifiers: Gaussian Naive Bayes on Arduino</title>
+		<link>https://eloquentarduino.github.io/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Sun, 02 Aug 2020 08:44:36 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[microml]]></category>
+		<category><![CDATA[ml]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1225</guid>
+
+					<description><![CDATA[<p>Are you looking for a top-performer classifiers with a minimal amount of parameters to tune? Look no further: Gaussian Naive Bayes is what you're looking for. And thanks to EloquentML you can now port it to your microcontroller. (Gaussian) Naive Bayes Naive Bayes classifiers are simple models based on the probability theory that can be [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/">EloquentML grows its family of classifiers: Gaussian Naive Bayes on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Are you looking for a top-performer classifiers with a minimal amount of parameters to tune? Look no further: Gaussian Naive Bayes is what you're looking for. And thanks to EloquentML you can now port it to your microcontroller.</p>
+<p><span id="more-1225"></span></p>
+<h2>(Gaussian) Naive Bayes</h2>
+<p><a href="https://en.wikipedia.org/wiki/Naive_Bayes_classifier">Naive Bayes</a> classifiers are simple models based on the probability theory that can be used for classification.</p>
+<p>They originate from the assumption of independence among the input variables. Even though this assumption doesn't hold true in the vast majority of the cases, they often perform very good at many classification tasks, so they're quite popular.</p>
+<p>Gaussian Naive Bayes stack another (mostly wrong) assumption: that the variables exhibit a Gaussian probability distribution.</p>
+<p>I (and many others like me) will never understand how it is possible that so many wrong assumptions lead to such good performances!</p>
+<p>Nevertheless, what is important to us is that <a href="https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html">sklearn implements GaussianNB</a>, so we easily train such a classifier.<br />
+The most interesting part is that <code>GaussianNB</code> can be tuned with just a single parameter: <code>var_smoothing</code>.</p>
+<p>Don't ask me what it does in theory: in practice you change it and your accuracy can boost. This leads to an easy tuning process that doesn't involves expensive <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html">grid search</a>.</p>
+<pre><code class="language-python">import sklearn.datasets as d
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import normalize
+from sklearn.naive_bayes import GaussianNB
+
+def pick_best(X_train, X_test, y_train, y_test):
+    best = (None, 0)
+    for var_smoothing in range(-7, 1):
+        clf = GaussianNB(var_smoothing=pow(10, var_smoothing))
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        accuracy = (y_pred == y_test).sum()
+        if accuracy &gt; best[1]:
+            best = (clf, accuracy)
+    print(&#039;best accuracy&#039;, best[1] / len(y_test))
+    return best[0]
+
+iris = d.load_iris()
+X = normalize(iris.data)
+y = iris.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+clf = pick_best(X_train, X_test, y_train, y_test)</code></pre>
+<p>This simple procedure will train a bunch of classifiers with a different <code>var_smoothing</code> factor and pick the best performing one.</p>
+<h2>EloquentML integration</h2>
+<p>Once you have your trained classifier, porting it to C is as easy as always:</p>
+<pre><code class="language-python">from micromlgen import port
+
+clf = pick_best()
+print(port(clf))</code></pre>
+<p><code>port</code> is a magic method able to port many classifiers: it will automatically detect the proper converter for you.</p>
+<p>What does the exported code looks like?</p>
+<pre><code class="language-cpp">#pragma once
+namespace Eloquent {
+    namespace ML {
+        namespace Port {
+            class GaussianNB {
+                public:
+                    /**
+                    * Predict class for features vector
+                    */
+                    int predict(float *x) {
+                        float votes[3] = { 0.0f };
+                        float theta[4] = { 0 };
+                        float sigma[4] = { 0 };
+                        theta[0] = 0.801139789889; theta[1] = 0.54726920354; theta[2] = 0.234408773313; theta[3] = 0.039178084094;
+                        sigma[0] = 0.000366881742; sigma[1] = 0.000907992556; sigma[2] = 0.000740960787; sigma[3] = 0.000274925514;
+                        votes[0] = 0.333333333333 - gauss(x, theta, sigma);
+                        theta[0] = 0.748563871324; theta[1] = 0.349390892644; theta[2] = 0.536186138345; theta[3] = 0.166747384117;
+                        sigma[0] = 0.000529727082; sigma[1] = 0.000847956504; sigma[2] = 0.000690057342; sigma[3] = 0.000311828658;
+                        votes[1] = 0.333333333333 - gauss(x, theta, sigma);
+                        theta[0] = 0.704497203305; theta[1] = 0.318862439835; theta[2] = 0.593755956917; theta[3] = 0.217288784452;
+                        sigma[0] = 0.000363782089; sigma[1] = 0.000813846722; sigma[2] = 0.000415475678; sigma[3] = 0.000758478249;
+                        votes[2] = 0.333333333333 - gauss(x, theta, sigma);
+                        // return argmax of votes
+                        uint8_t classIdx = 0;
+                        float maxVotes = votes[0];
+
+                        for (uint8_t i = 1; i &lt; 3; i++) {
+                            if (votes[i] &gt; maxVotes) {
+                                classIdx = i;
+                                maxVotes = votes[i];
+                            }
+                        }
+
+                        return classIdx;
+                    }
+
+                protected:
+                    /**
+                    * Compute gaussian value
+                    */
+                    float gauss(float *x, float *theta, float *sigma) {
+                        float gauss = 0.0f;
+
+                        for (uint16_t i = 0; i &lt; 4; i++) {
+                            gauss += log(sigma[i]);
+                            gauss += pow(x[i] - theta[i], 2) / sigma[i];
+                        }
+
+                        return gauss;
+                    }
+                };
+            }
+        }
+    }</code></pre>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<p>As you can see, we need a couple of &quot;weight vectors&quot;:</p>
+<ul>
+<li><code>theta</code> is the mean of each feature</li>
+<li><code>sigma</code> is the standard deviation</li>
+</ul>
+<p>The computation is quite thin: just a couple of operations; the class with the highest score is then selected.</p>
+<h2>Benchmarks</h2>
+<p>Following there's a recap of a couple benchmarks I run on an Arduino Nano 33 Ble Sense.</p>
+<table>
+<thead>
+<tr>
+<th>Classifier</th>
+<th>Dataset</th>
+<th style="text-align: center;">Flash</th>
+<th style="text-align: center;">RAM</th>
+<th style="text-align: center;">Execution time</th>
+<th style="text-align: center;">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GaussianNB</td>
+<td>Iris (150x4)</td>
+<td style="text-align: center;">82 kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">65 ms</td>
+<td style="text-align: center;">97%</td>
+</tr>
+<tr>
+<td>LinearSVC</td>
+<td>Iris (150x4)</td>
+<td style="text-align: center;">83 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">76 ms</td>
+<td style="text-align: center;">99%</td>
+</tr>
+<tr>
+<td>GaussianNB</td>
+<td>Breast cancer (80x40)</td>
+<td style="text-align: center;">90 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">160 ms</td>
+<td style="text-align: center;">77%</td>
+</tr>
+<tr>
+<td>LinearSVC</td>
+<td>Breast cancer (80x40)</td>
+<td style="text-align: center;">112 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">378 ms</td>
+<td style="text-align: center;">73%</td>
+</tr>
+<tr>
+<td>GaussianNB</td>
+<td>Wine (100x13)</td>
+<td style="text-align: center;">85 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">130 ms</td>
+<td style="text-align: center;">97%</td>
+</tr>
+<tr>
+<td>LinearSVC</td>
+<td>Wine (100x13)</td>
+<td style="text-align: center;">89 Kb</td>
+<td style="text-align: center;">42 Kb</td>
+<td style="text-align: center;">125 ms</td>
+<td style="text-align: center;">99%</td>
+</tr>
+</tbody>
+</table>
+<p>We can see that the accuracy is on par with a linear SVM, reaching up to 97% on some datasets. Its semplicity shines with high-dimensional datasets (breast cancer) where execution time is half of the LinearSVC: I can see this pattern repeating with other real-world, medium-sized datasets.</p>
+<hr />
+<p>This is it, you can find the example project on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/GaussianNBClassificationExample/GaussianNBClassificationExample.ino">Github</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/">EloquentML grows its family of classifiers: Gaussian Naive Bayes on Arduino</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>SEFR: A Fast Linear-Time Classifier for Ultra-Low Power Devices</title>
 		<link>https://eloquentarduino.github.io/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/</link>
 		
@@ -1709,222 +1916,6 @@ class RGB {
         }
 };</code></pre>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/03/how-to-train-a-color-classification-machine-learning-classifier-directly-on-your-arduino-board/">How to train a color classification Machine learning classifier directly on your Arduino board</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
-			</item>
-		<item>
-		<title>How to train a IRIS classification Machine learning classifier directly on your Arduino board</title>
-		<link>https://eloquentarduino.github.io/2020/03/how-to-train-a-iris-classification-machine-learning-classifier-directly-on-your-arduino-board/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sat, 28 Mar 2020 18:02:09 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[microml]]></category>
-		<category><![CDATA[svm]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1008</guid>
-
-					<description><![CDATA[<p>In this hands-on guide about on-board SVM training we're going to see a classifier in action, training it on the Iris dataset and evaluating its performance. What we'll make In this demo project we're going to take a know dataset (iris flowers) and interactively train an SVM classifier on it, adjusting the number of samples [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/03/how-to-train-a-iris-classification-machine-learning-classifier-directly-on-your-arduino-board/">How to train a IRIS classification Machine learning classifier directly on your Arduino board</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>In this hands-on guide about <a href="/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board">on-board SVM training</a> we're going to see a classifier in action, training it on the Iris dataset and evaluating its performance.</p>
-<p><span id="more-1008"></span></p>
-<h2>What we'll make</h2>
-<p>In this demo project we're going to take a know dataset (<a href="https://en.wikipedia.org/wiki/Iris_flower_data_set">iris flowers</a>) and interactively train an SVM classifier on it, adjusting the number of samples to see the effects on both training time, inference time and accuracy.</p>
-<h2>Definitions</h2>
-<pre><code class="language-c">#ifdef ESP32
-#define min(a, b) (a) &lt; (b) ? (a) : (b)
-#define max(a, b) (a) &gt; (b) ? (a) : (b)
-#define abs(x) ((x) &gt; 0 ? (x) : -(x))
-#endif
-
-#include &lt;EloquentSVMSMO.h&gt;
-#include &quot;iris.h&quot;
-
-#define TOTAL_SAMPLES (POSITIVE_SAMPLES + NEGATIVE_SAMPLES)
-
-using namespace Eloquent::ML;
-
-float X_train[TOTAL_SAMPLES][FEATURES_DIM];
-float X_test[TOTAL_SAMPLES][FEATURES_DIM];
-int y_train[TOTAL_SAMPLES];
-int y_test[TOTAL_SAMPLES];
-SVMSMO&lt;FEATURES_DIM&gt; classifier(linearKernel);</code></pre>
-<p>First of all we need to include a couple files, namely <code>EloquentSVMSMO.h</code> for the SVM classifier and <code>iris.h</code> for the dataset.</p>
-<p><code>iris.h</code> defines a couple constants:</p>
-<ul>
-<li><code>FEATURES_DIM</code>: the number of features each sample has (4 in this case)</li>
-<li><code>POSITIVE_SAMPLES</code>: the number of samples that belong to the positive class (50)</li>
-<li><code>NEGATIVE_SAMPLES</code>: the number of samples that belong to the negative class (50)</li>
-</ul>
-<p>The we declare the array that hold the data: <code>X_train</code> and <code>y_train</code> for the training process, <code>X_test</code> and <code>y_test</code> for the inference process.</p>
-<h2>Setup</h2>
-<pre><code class="language-c">void setup() {
-    Serial.begin(115200);
-    delay(5000);
-
-    // configure classifier
-    classifier.setC(5);
-    classifier.setTol(1e-5);
-    classifier.setMaxIter(10000);
-}</code></pre>
-<p>Here we just set a few parameters for the classifier. You could actually skip this step in this demo, since the defaults will work well. Those lines are there so you know you can tweak them, if needed.</p>
-<p>Please refer to the <a href="/2020/03/how-to-train-a-color-classification-machine-learning-classifier-directly-on-your-arduino-board">demo for color classification</a> for an explanation of each parameter.</p>
-<h2>Interactivity</h2>
-<pre><code class="language-c">void loop() {
-    int positiveSamples = readSerialNumber(&quot;How many positive samples will you use for training? &quot;, POSITIVE_SAMPLES);
-
-    if (positiveSamples &gt; POSITIVE_SAMPLES - 1) {
-        Serial.println(&quot;Too many positive samples entered. All but one will be used instead&quot;);
-        positiveSamples = POSITIVE_SAMPLES - 1;
-    }
-
-    int negativeSamples = readSerialNumber(&quot;How many negative samples will you use for training? &quot;, NEGATIVE_SAMPLES);
-
-    if (negativeSamples &gt; NEGATIVE_SAMPLES - 1) {
-        Serial.println(&quot;Too many negative samples entered. All but one will be used instead&quot;);
-        negativeSamples = NEGATIVE_SAMPLES - 1;
-    }
-
-    loadDataset(positiveSamples, negativeSamples);
-
-    // ...
-}
-
-/**
- * Ask the user to enter a numeric value
- */
-int readSerialNumber(String prompt, int maxAllowed) {
-    Serial.print(prompt);
-    Serial.print(&quot; (&quot;);
-    Serial.print(maxAllowed);
-    Serial.print(&quot; max) &quot;);
-
-    while (!Serial.available()) delay(1);
-
-    int n = Serial.readStringUntil(&#039;\n&#039;).toInt();
-
-    Serial.println(n);
-
-    return n;
-}
-
-/**
- * Divide training and test data
- */
-void loadDataset(int positiveSamples, int negativeSamples) {
-    int positiveTestSamples = POSITIVE_SAMPLES - positiveSamples;
-
-    for (int i = 0; i &lt; positiveSamples; i++) {
-        memcpy(X_train[i], X_positive[i], FEATURES_DIM);
-        y_train[i] = 1;
-    }
-
-    for (int i = 0; i &lt; negativeSamples; i++) {
-        memcpy(X_train[i + positiveSamples], X_negative[i], FEATURES_DIM);
-        y_train[i + positiveSamples] = -1;
-    }
-
-    for (int i = 0; i &lt; positiveTestSamples; i++) {
-        memcpy(X_test[i], X_positive[i + positiveSamples], FEATURES_DIM);
-        y_test[i] = 1;
-    }
-
-    for (int i = 0; i &lt; NEGATIVE_SAMPLES - negativeSamples; i++) {
-        memcpy(X_test[i + positiveTestSamples], X_negative[i + negativeSamples], FEATURES_DIM);
-        y_test[i + positiveTestSamples] = -1;
-    }
-}</code></pre>
-<p>The code above is a preliminary step where you're asked to enter how many samples you will use for training of both positive and negative classes.</p>
-<p>This way you can have multiple run of benchmarking without the need to re-compile and re-upload the sketch.</p>
-<p>It also shows that the training process can be &quot;dynamic&quot;, in the sense that you can tweak it at runtime as per your need.</p>
-<h2>Training</h2>
-<pre><code class="language-c">time_t start = millis();
-classifier.fit(X_train, y_train, positiveSamples + negativeSamples);
-Serial.print(&quot;It took &quot;);
-Serial.print(millis() - start);
-Serial.print(&quot;ms to train on &quot;);
-Serial.print(positiveSamples + negativeSamples);
-Serial.println(&quot; samples&quot;);</code></pre>
-<p>Training is actually a one line operation. Here we'll also logging how much time it takes to train.</p>
-<h3>Predicting</h3>
-<pre><code class="language-c">void loop() {
-    // ...
-
-    int tp = 0;
-    int tn = 0;
-    int fp = 0;
-    int fn = 0;
-
-    start = millis();
-
-    for (int i = 0; i &lt; TOTAL_SAMPLES - positiveSamples - negativeSamples; i++) {
-        int y_pred = classifier.predict(X_train, X_test[i]);
-        int y_true = y_test[i];
-
-        if (y_pred == y_true &amp;&amp; y_pred ==  1) tp += 1;
-        if (y_pred == y_true &amp;&amp; y_pred == -1) tn += 1;
-        if (y_pred != y_true &amp;&amp; y_pred ==  1) fp += 1;
-        if (y_pred != y_true &amp;&amp; y_pred == -1) fn += 1;
-    }
-
-    Serial.print(&quot;It took &quot;);
-    Serial.print(millis() - start);
-    Serial.print(&quot;ms to test on &quot;);
-    Serial.print(TOTAL_SAMPLES - positiveSamples - negativeSamples);
-    Serial.println(&quot; samples&quot;);
-
-    printConfusionMatrix(tp, tn, fp, fn);
-}
-
-/**
- * Dump confusion matrix to Serial monitor
- */
-void printConfusionMatrix(int tp, int tn, int fp, int fn) {
-    Serial.print(&quot;Overall accuracy &quot;);
-    Serial.print(100.0 * (tp + tn) / (tp + tn + fp + fn));
-    Serial.println(&quot;%&quot;);
-    Serial.println(&quot;Confusion matrix&quot;);
-    Serial.print(&quot;          | Predicted 1 | Predicted -1 |\n&quot;);
-    Serial.print(&quot;----------------------------------------\n&quot;);
-    Serial.print(&quot;Actual  1 |      &quot;);
-    Serial.print(tp);
-    Serial.print(&quot;     |      &quot;);
-    Serial.print(fn);
-    Serial.print(&quot;       |\n&quot;);
-    Serial.print(&quot;----------------------------------------\n&quot;);
-    Serial.print(&quot;Actual -1 |      &quot;);
-    Serial.print(fp);
-    Serial.print(&quot;      |      &quot;);
-    Serial.print(tn);
-    Serial.print(&quot;       |\n&quot;);
-    Serial.print(&quot;----------------------------------------\n\n\n&quot;);
-}</code></pre>
-<p>Finally we can run the classification on our test set and get the overall accuracy.</p>
-<p>We also print the <a href="https://en.wikipedia.org/wiki/Confusion_matrix">confusion matrix</a> to double-check each class accuracy.</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<hr />
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/IrisClassificationTrainingExample/IrisClassificationTrainingExample.ino">Github</a> where you'll also find another dataset to test, which is characterized by a number of features much higher (30 instead of 4).</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/03/how-to-train-a-iris-classification-machine-learning-classifier-directly-on-your-arduino-board/">How to train a IRIS classification Machine learning classifier directly on your Arduino board</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		
