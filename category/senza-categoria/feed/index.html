@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/senza-categoria/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 09 Aug 2020 14:12:24 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 09 Aug 2020 14:19:32 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -161,7 +161,9 @@ A <a href="https://en.wikipedia.org/wiki/Sparse_matrix">sparse matrix</a> is a m
 <p>In the original post, this point was the one I'm unhappy with since it's not as straight-forward as I would have liked. The method I present you in this post, instead, is by far way simpler to follow.</p>
 <p>First of all, you will need a Wifi equipped board. I will use an <a href="https://store.arduino.cc/arduino-mkr-wifi-1010">Arduino MKR WiFi 1010</a>, but any ESP8266 / ESP32 or the like will work.</p>
 <p>The following sketch will do the job: it scans the visible networks at a regular interval and prints their RSSIs encoded in JSON format.</p>
-<pre><code class="language-cpp">#include &lt;WiFi.h&gt;
+<pre><code class="language-cpp">// file DataGathering.h
+
+#include &quot;WiFi.h&quot;
 
 #define print(string) Serial.print(string);
 #define quote(string) print(&#039;&quot;&#039;); print(string); print(&#039;&quot;&#039;);
@@ -400,7 +402,9 @@ namespace Eloquent {
     }</code></pre>
 <h2 id="tocwrapping-it-all-together">Wrapping it all together</h2>
 <p>Now that we have all the pieces together, we only need to merge them to get a complete working example.</p>
-<pre><code class="language-cpp">#include &lt;WiFi.h&gt;
+<pre><code class="language-cpp">// file WifiIndoorPositioning.h
+
+#include &quot;WiFi.h&quot;
 #include &quot;Converter.h&quot;
 #include &quot;Classifier.h&quot;
 
