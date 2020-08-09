@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/tag/svm/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Thu, 11 Jun 2020 11:31:17 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 09 Aug 2020 14:16:51 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -1221,12 +1221,14 @@ As you can hear from the video, you should be quite accurate when pronouncing th
 		<category><![CDATA[svm]]></category>
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=224</guid>
 
-					<description><![CDATA[<p>In this Arduno Machine learning project we're going to use the nearby WiFi access points to locate where we are. For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32. Table of contentsWhat is Wifi indoor positioning?What will we use it for?What you needHow it worksFeatures definitionRecord sample [&#8230;]</p>
+					<description><![CDATA[<p>In this Arduno Machine learning project we're going to use the nearby WiFi access points to locate where we are. For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32. I published an upgraded version of this project, with all the code and tools you need: check it [&#8230;]</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/">Wifi indoor positioning using Arduino and Machine Learning in 4 steps</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 										<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to use the nearby WiFi access points to locate where we are. For this project to work you will need a Wifi equipped board, such as ESP8266 or ESP32.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg" alt="Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/" /></p>
 <p><span id="more-224"></span></p>
+<div class="watchout">
+I published an upgraded version of this project, with all the code and tools you need: <a href="/2020/08/the-ultimate-guide-to-wifi-indoor-positioning-using-arduino-and-machine-learning/"><b>check it out</b></a></div>
 <p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocwhat-is-wifi-indoor-positioning">What is Wifi indoor positioning?</a><ol><li><a href="#tocwhat-will-we-use-it-for">What will we use it for?</a><li><a href="#tocwhat-you-need">What you need</a><li><a href="#tochow-it-works">How it works</a></li></ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#tocenumerate-the-access-points">Enumerate the access points</a><li><a href="#toccreate-an-access-point-array">Create an access point array</a><li><a href="#tocconvert-to-features-vector">Convert to features vector</a></li></ol><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
 <h2 id="tocwhat-is-wifi-indoor-positioning">What is Wifi indoor positioning?</h2>
 <p>We all are used to GPS positioning: our device will use satellites to track our position on Earth. GPS works very well and with a very high accuracy (you can expect only a few meters of error).</p>
