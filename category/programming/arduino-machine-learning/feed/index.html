@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/arduino-machine-learning/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 02 Aug 2020 09:36:42 +0000</lastBuildDate>
+	<lastBuildDate>Mon, 24 Aug 2020 18:27:19 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,331 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.4</generator>
 	<item>
+		<title>Better word classification with Arduino Nano 33 BLE Sense and Machine Learning</title>
+		<link>https://eloquentarduino.github.io/2020/08/better-word-classification-with-arduino-33-ble-sense-and-machine-learning/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Mon, 24 Aug 2020 17:04:57 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[microml]]></category>
+		<category><![CDATA[ml]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1282</guid>
+
+					<description><![CDATA[<p>Let's revamp the post I wrote about word classification using Machine Learning on Arduino, this time using a proper microphone (the MP34DT05 mounted on the Arduino Nano 33 BLE Sense) instead of a chinese, analog one: will the results improve? Table of contentsPulse-density modulation (a.k.a. PDM)Where's the FFT?Machine learning model Pulse-density modulation (a.k.a. PDM) In [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/08/better-word-classification-with-arduino-33-ble-sense-and-machine-learning/">Better word classification with Arduino Nano 33 BLE Sense and Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Let's revamp the post I wrote about <a href="/2019/12/word-classification-using-arduino/">word classification using Machine Learning on Arduino</a>, this time using a proper microphone (the MP34DT05 mounted on the Arduino Nano 33 BLE Sense) instead of a chinese, analog one: will the results improve?</p>
+<div id="attachment_653" style="width: 760px" class="wp-caption alignnone"><img aria-describedby="caption-attachment-653" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg" width="750" height="422" class="size-full wp-image-653" srcset="https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg 750w, https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord-300x169.jpg 300w" sizes="(max-width: 750px) 100vw, 750px" /><p id="caption-attachment-653" class="wp-caption-text">from https://www.udemy.com/course/learn-audio-processing-complete-engineers-course/</p></div>
+<p><span id="more-1282"></span></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocpulse-density-modulation-a-k-a-pdm">Pulse-density modulation (a.k.a. PDM)</a><ol><li><a href="#tocwheres-the-fft">Where's the FFT?</a></li></ol><li><a href="#tocmachine-learning-model">Machine learning model</a></ol></div></p>
+<h2 id="tocpulse-density-modulation-a-k-a-pdm">Pulse-density modulation (a.k.a. PDM)</h2>
+<p>In the original post, I used an analog microphone to record the audio. It is for sure the easiest way to interact with audio on a microcontroller since you only need to <code>analogRead()</code> the selected pin to get a value from the sensor.</p>
+<p>This semplicity, however, comes at the cost of a nearly inexistent signal pre-processing from the sensor itself: most of the time, you will get junk - I don't want to be rude, but that's it.</p>
+<p>The microphone mounted on the Arduino Nano 33 BLE Sense (the <a href="https://content.arduino.cc/assets/Nano_BLE_Sense_mp34dt05-a.pdf">MP34DT05</a>), gives you access to modulated signal much more suitable for our processing needs.</p>
+<p>The modulation used is Pulse-density: I won't try to explain you how this works since I'm not an expert in DSP and neither it is the main scope of this article (refer to <a href="https://en.wikipedia.org/wiki/Pulse-density_modulation">Wikipedia</a> for some more information).</p>
+<p>What matters to us is that we can grab an array of bytes from the microphone and extract its <a href="https://en.wikipedia.org/wiki/Root_mean_square">Root Mean Square</a> (a.k.a. RMS) to be used as a feature for our Machine Learning model.</p>
+<p>I had some difficulty finding examples on how to access the microphone on the Arduino Nano 33 BLE Sense board: fortunately, there's a <a href="https://github.com/DaleGia/nano-33-sense-serial-example">Github repo</a> from <em>DelaGia</em> that shows how to access all the sensors of the board.</p>
+<p>I extracted the microphone part and incapsulated it in an easy to use class, so you don't really need to dig into the implementation details if you're not interested.</p>
+<p>The following code extract highlights the steps you need to access the microphone recordings.</p>
+<pre><code class="language-cpp">// you&#039;ll find this file in the Github repo
+#include &quot;Mic.h&quot;
+
+// tune these constants to your needs
+#define SAMPLES 64
+#define SOUND_THRESHOLD 1500
+
+float features[SAMPLES];
+Mic mic;
+
+/**
+ *
+ */
+void setup() {
+    Serial.begin(115200);
+    // the PDM library is asynchronous, so we need a callback
+    PDM.onReceive(onAudio);
+    mic.begin();
+}
+
+/**
+ * PDM callback to update mic object
+ */
+void onAudio() {
+    mic.update();
+}
+
+/**
+ * Read given number of samples from mic
+ */
+bool record() {
+    if (mic.hasData() &amp;&amp; mic.pop() &gt; SOUND_THRESHOLD) {
+        for (int i = 0; i &lt; SAMPLES; i++) {
+            while (!mic.hasData()) ; // wait for data
+
+            features[i] = mic.pop();
+        }
+
+        return true;
+    }
+
+    return false;
+}</code></pre>
+<p>The things to note in the above code are:</p>
+<ul>
+<li>the <code>PDM</code> library works asynchronously: it won't block your main code waiting for data, but will report you back when data is ready calling the callback you define. In this case, the callback just instructs the <code>mic</code> object to update</li>
+<li>since the <code>PDM</code> is asynchronous, when acquiring data you will first check if it's available: this is the case for <code>while (!mic.hasData()) ;</code>, which loops awaiting for new data</li>
+</ul>
+<p>Now that we have the acquisition logic in place, it's time for you to record some samples of the words you want to classify. I advise you to record many samples for each word, varying both the distance of your mounth from the mic and the intensity with which you speak: this will produce a more robust classification model later on.</p>
+<p>As always, save each word in a different file, one feature vector per row.</p>
+<p>Here I report an extract of the features I recorded for some words (scaled and converted to int).</p>
+<pre><code>// word &quot;yes&quot;
+43,47,41,48,60,68,67,54,40,29,17,9,6,6,10,15,10,10,8,8,8,5,7,7,12,6,8,11,7,5,3,3,13,14,15,17,15,16,10,10,16,13,8,9,14,8,0,3,3,3,8,5,3,8,11,10,12,10,11,13,8,6,5,12
+34,47,50,51,60,67,65,63,54,42,30,19,25,22,28,7,6,5,7,7,5,8,6,3,3,3,6,7,3,0,0,0,3,5,5,3,5,3,3,3,0,6,3,0,0,5,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,3,0,5
+33,41,45,47,53,61,64,59,50,41,31,17,8,9,7,9,9,7,8,8,8,10,13,8,8,7,5,5,5,3,0,0,0,0,3,8,8,3,0,3,5,5,5,7,0,0,0,0,0,5,0,3,3,5,0,0,0,5,3,0,5,7,0,9
+38,44,48,55,67,74,66,65,60,48,38,19,12,12,8,8,6,7,5,6,6,6,3,3,3,3,5,3,5,3,6,5,0,3,5,0,0,0,3,0,5,3,0,3,0,0,5,6,3,5,3,5,0,0,0,5,3,0,0,0,0,0,0,0
+
+// word &quot;no&quot;
+35,47,49,55,63,65,68,64,60,59,58,41,29,22,14,8,7,5,8,6,0,3,0,0,3,3,0,3,0,0,0,5,3,0,0,0,0,0,0,0,0,0,5,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,7,5,5,3
+42,51,55,59,68,70,73,70,71,67,67,52,52,29,16,9,6,9,3,3,5,8,8,11,10,7,8,5,3,3,0,0,0,0,0,3,3,3,6,7,7,8,9,6,8,8,7,8,6,8,8,6,8,7,6,9,5,3,5,6,5,3,3,3
+56,68,78,91,84,84,84,74,69,64,57,44,33,18,12,8,5,9,15,12,12,9,12,7,3,10,12,6,3,0,0,0,0,6,3,6,10,10,8,3,9,9,9,8,9,9,11,3,8,9,8,8,8,6,7,3,3,8,5,3,0,3,0,0
+31,42,62,69,74,81,78,78,79,74,74,68,54,44,26,15,8,8,21,10,15,12,11,8,6,5,0,0,0,0,3,5,8,3,9,5,6,9,10,6,10,12,7,15,14,5,8,7,8,9,5,8,5,6,5,0,3,6,3,5,3,5,0,0
+
+// word &quot;play&quot;
+31,195,106,60,45,44,55,51,42,36,36,33,38,37,37,29,24,21,20,20,18,19,14,10,14,12,18,11,8,11,10,12,27,8,10,6,7,6,10,6,6,6,8,6,6,3,5,6,0,0,0,0,0,7,5,3,0,5,0,0,8,8,7,5
+138,158,83,64,44,34,36,41,44,39,35,29,27,26,28,33,33,30,23,19,22,18,16,15,15,13,13,14,9,10,9,7,14,8,3,9,0,0,0,3,5,3,7,7,5,0,0,0,5,0,0,3,5,0,0,0,0,10,3,3,7,7,8,3
+89,36,27,30,22,24,38,41,37,33,32,32,32,35,34,30,25,19,18,18,15,16,14,14,12,9,8,10,9,7,3,0,0,8,7,7,6,3,5,9,8,5,7,3,5,7,6,6,3,0,3,3,0,8,8,5,6,0,0,6,0,7,8,6
+71,98,51,31,27,35,48,50,45,38,34,30,31,30,36,35,28,21,20,16,15,16,16,14,12,10,12,10,8,8,6,7,5,7,12,6,10,10,10,8,8,0,0,8,7,0,5,6,3,0,5,3,0,0,3,5,8,6,5,3,10,3,6,0
+
+// word &quot;stop&quot;
+61,93,135,157,140,148,128,92,85,64,160,75,23,28,28,22,14,8,0,3,3,5,3,6,12,202,154,100,102,94,40,54,52,40,35,22,20,19,11,18,9,7,10,12,8,7,5,7,12,14,16,12,8,6,5,11,5,7,9,10,12,21,20,16
+62,84,110,111,113,99,79,70,60,95,71,22,14,19,16,16,6,12,9,7,3,0,3,6,184,209,116,50,33,49,47,45,32,28,21,16,13,13,3,0,0,8,21,14,10,19,19,15,16,15,22,14,14,14,17,14,12,10,3,9,17,11,10,12
+94,139,168,178,165,143,100,82,128,169,34,22,26,26,22,13,8,8,3,0,3,0,5,202,191,123,119,119,64,31,71,39,35,30,19,16,14,8,19,7,8,7,6,11,18,17,13,20,24,27,29,22,23,22,25,23,21,23,21,18,17,14,14,13
+121,159,181,165,170,154,134,99,75,121,51,8,27,14,18,10,7,3,5,0,5,3,6,11,152,118,160,115,68,42,29,36,53,35,38,30,26,22,19,12,7,6,0,0,0,6,11,15,17,19,18,24,22,24,23,16,15,20,22,12,10,16,21,14</code></pre>
+<h3 id="tocwheres-the-fft">Where's the FFT?</h3>
+<p>If you noticed, I didn't mention the <a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">Fast Fourier Transform</a> until now.</p>
+<p>Why?</p>
+<p>Well, it is believed (at least, I believed) that the Fourier Transform is the go-to transformation when working with audio recordings: it can extract frequency-related features useful to extract information from raw signals.</p>
+<p>For this project, I tried not to use it and I was surprised that it worked fine in spite of everything. Since I like to keep things as lean as possible, I won't apply any complex transformation to the samples.</p>
+<p>If you're having poor results, however, remember you can try to apply FFT and see if it helps improve the accuracy.</p>
+<h2 id="tocmachine-learning-model">Machine learning model</h2>
+<p>Now that we have the samples, it's time to train the classifier.</p>
+<p>This step is the same as in any other tutorial I wrote so far, so I won't spend much time on this part. Among the classifiers I tried, SVM produced the best accuracy at 96% with 32 support vectors: it's not a super-tiny model, but it's quite small nevertheless.</p>
+<pre><code class="language-python">import numpy as np
+from os.path import basename
+from glob import glob
+from sklearn.svm import SVC
+from micromlgen import port
+
+def load_features(folder):
+    dataset = None
+    classmap = {}
+    for class_idx, filename in enumerate(glob(&#039;%s/*.csv&#039; % folder)):
+        class_name = basename(filename)[:-4]
+        classmap[class_idx] = class_name
+        samples = np.loadtxt(filename, dtype=float, delimiter=&#039;,&#039;)
+        labels = np.ones((len(samples), 1)) * class_idx
+        samples = np.hstack((samples, labels))
+        dataset = samples if dataset is None else np.vstack((dataset, samples))
+    return dataset, classmap
+
+dataset, classmap = load_features(&#039;64&#039;)
+X, y = dataset[:, :-1], dataset[:, -1]
+clf = SVC(kernel=&#039;poly&#039;, degree=2, gamma=0.1, C=100)
+clf.fit(X_train, y_train)
+print(port(clf, classmap=classmap))</code></pre>
+<pre><code class="language-cpp">// The produced ouput for my SVM model
+
+#pragma once
+namespace Eloquent {
+    namespace ML {
+        namespace Port {
+            class SVM {
+            public:
+                /**
+                * Predict class for features vector
+                */
+                int predict(float *x) {
+                    float kernels[35] = { 0 };
+                    float decisions[6] = { 0 };
+                    int votes[4] = { 0 };
+                    kernels[0] = compute_kernel(x,   33.0  , 41.0  , 47.0  , 54.0  , 59.0  , 61.0  , 56.0  , 51.0  , 50.0  , 51.0  , 44.0  , 32.0  , 23.0  , 15.0  , 12.0  , 8.0  , 5.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 5.0  , 3.0  , 5.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0 );
+                    kernels[1] = compute_kernel(x,   40.0  , 50.0  , 51.0  , 60.0  , 56.0  , 57.0  , 58.0  , 53.0  , 50.0  , 45.0  , 42.0  , 34.0  , 23.0  , 16.0  , 10.0  , 7.0  , 3.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 14.0  , 3.0  , 8.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 5.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 5.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 3.0 );
+                    kernels[2] = compute_kernel(x,   56.0  , 68.0  , 78.0  , 91.0  , 84.0  , 84.0  , 84.0  , 74.0  , 69.0  , 64.0  , 57.0  , 44.0  , 33.0  , 18.0  , 12.0  , 8.0  , 5.0  , 9.0  , 15.0  , 12.0  , 12.0  , 9.0  , 12.0  , 7.0  , 3.0  , 10.0  , 12.0  , 6.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 6.0  , 3.0  , 6.0  , 10.0  , 10.0  , 8.0  , 3.0  , 9.0  , 9.0  , 9.0  , 8.0  , 9.0  , 9.0  , 11.0  , 3.0  , 8.0  , 9.0  , 8.0  , 8.0  , 8.0  , 6.0  , 7.0  , 3.0  , 3.0  , 8.0  , 5.0  , 3.0  , 0.0  , 3.0  , 0.0  , 0.0 );
+                    kernels[3] = compute_kernel(x,   33.0  , 18.0  , 26.0  , 39.0  , 46.0  , 60.0  , 66.0  , 72.0  , 82.0  , 76.0  , 82.0  , 77.0  , 78.0  , 79.0  , 76.0  , 73.0  , 63.0  , 41.0  , 33.0  , 21.0  , 13.0  , 7.0  , 3.0  , 10.0  , 3.0  , 5.0  , 6.0  , 21.0  , 21.0  , 14.0  , 5.0  , 8.0  , 5.0  , 5.0  , 0.0  , 8.0  , 8.0  , 3.0  , 0.0  , 3.0  , 3.0  , 5.0  , 0.0  , 3.0  , 8.0  , 7.0  , 6.0  , 7.0  , 8.0  , 9.0  , 9.0  , 8.0  , 8.0  , 7.0  , 17.0  , 3.0  , 3.0  , 6.0  , 6.0  , 5.0  , 3.0  , 6.0  , 6.0  , 3.0 );
+                    kernels[4] = compute_kernel(x,   54.0  , 57.0  , 62.0  , 58.0  , 61.0  , 61.0  , 59.0  , 58.0  , 57.0  , 51.0  , 34.0  , 25.0  , 18.0  , 10.0  , 6.0  , 6.0  , 10.0  , 7.0  , 5.0  , 10.0  , 5.0  , 7.0  , 8.0  , 6.0  , 5.0  , 5.0  , 5.0  , 7.0  , 3.0  , 5.0  , 0.0  , 0.0  , 0.0  , 3.0  , 3.0  , 6.0  , 0.0  , 7.0  , 0.0  , 5.0  , 6.0  , 0.0  , 0.0  , 6.0  , 7.0  , 5.0  , 3.0  , 5.0  , 6.0  , 0.0  , 0.0  , 0.0  , 12.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0 );
+                    kernels[5] = compute_kernel(x,   49.0  , 58.0  , 68.0  , 69.0  , 72.0  , 72.0  , 75.0  , 76.0  , 73.0  , 59.0  , 59.0  , 36.0  , 19.0  , 12.0  , 12.0  , 17.0  , 12.0  , 21.0  , 9.0  , 6.0  , 8.0  , 6.0  , 7.0  , 15.0  , 14.0  , 14.0  , 10.0  , 8.0  , 5.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 7.0  , 10.0  , 7.0  , 6.0  , 8.0  , 12.0  , 13.0  , 15.0  , 11.0  , 16.0  , 15.0  , 13.0  , 7.0  , 6.0  , 12.0  , 5.0  , 8.0  , 8.0  , 12.0  , 8.0  , 0.0  , 3.0  , 7.0  , 10.0  , 9.0  , 8.0  , 5.0 );
+                    kernels[6] = compute_kernel(x,   43.0  , 63.0  , 76.0  , 73.0  , 67.0  , 72.0  , 64.0  , 50.0  , 31.0  , 123.0  , 95.0  , 27.0  , 17.0  , 20.0  , 12.0  , 14.0  , 11.0  , 9.0  , 6.0  , 3.0  , 3.0  , 15.0  , 156.0  , 172.0  , 69.0  , 52.0  , 47.0  , 41.0  , 18.0  , 29.0  , 46.0  , 20.0  , 22.0  , 21.0  , 0.0  , 0.0  , 6.0  , 3.0  , 7.0  , 10.0  , 10.0  , 14.0  , 13.0  , 13.0  , 11.0  , 8.0  , 18.0  , 26.0  , 19.0  , 15.0  , 15.0  , 16.0  , 17.0  , 13.0  , 11.0  , 8.0  , 20.0  , 19.0  , 10.0  , 9.0  , 10.0  , 12.0  , 9.0  , 12.0 );
+                    kernels[7] = compute_kernel(x,   66.0  , 85.0  , 105.0  , 116.0  , 118.0  , 104.0  , 102.0  , 81.0  , 58.0  , 129.0  , 222.0  , 48.0  , 80.0  , 70.0  , 50.0  , 40.0  , 19.0  , 11.0  , 3.0  , 0.0  , 0.0  , 0.0  , 7.0  , 5.0  , 15.0  , 16.0  , 9.0  , 5.0  , 25.0  , 29.0  , 43.0  , 32.0  , 28.0  , 31.0  , 21.0  , 8.0  , 0.0  , 9.0  , 8.0  , 3.0  , 3.0  , 0.0  , 0.0  , 7.0  , 11.0  , 9.0  , 26.0  , 16.0  , 13.0  , 9.0  , 20.0  , 16.0  , 16.0  , 26.0  , 18.0  , 10.0  , 7.0  , 12.0  , 10.0  , 8.0  , 7.0  , 17.0  , 15.0  , 7.0 );
+                    kernels[8] = compute_kernel(x,   64.0  , 77.0  , 90.0  , 92.0  , 93.0  , 93.0  , 83.0  , 58.0  , 112.0  , 80.0  , 34.0  , 13.0  , 16.0  , 10.0  , 5.0  , 3.0  , 7.0  , 0.0  , 0.0  , 0.0  , 8.0  , 10.0  , 50.0  , 101.0  , 44.0  , 41.0  , 16.0  , 23.0  , 19.0  , 6.0  , 13.0  , 19.0  , 25.0  , 15.0  , 8.0  , 0.0  , 0.0  , 0.0  , 0.0  , 5.0  , 10.0  , 19.0  , 8.0  , 8.0  , 10.0  , 7.0  , 8.0  , 9.0  , 14.0  , 7.0  , 9.0  , 8.0  , 10.0  , 8.0  , 7.0  , 6.0  , 6.0  , 3.0  , 7.0  , 6.0  , 3.0  , 3.0  , 3.0  , 3.0 );
+                    kernels[9] = compute_kernel(x,   33.0  , 28.0  , 20.0  , 9.0  , 5.0  , 7.0  , 7.0  , 13.0  , 130.0  , 183.0  , 212.0  , 197.0  , 190.0  , 167.0  , 151.0  , 110.0  , 83.0  , 54.0  , 67.0  , 20.0  , 23.0  , 24.0  , 16.0  , 12.0  , 7.0  , 0.0  , 3.0  , 9.0  , 0.0  , 3.0  , 5.0  , 10.0  , 79.0  , 109.0  , 80.0  , 75.0  , 38.0  , 38.0  , 29.0  , 26.0  , 29.0  , 27.0  , 26.0  , 27.0  , 22.0  , 22.0  , 15.0  , 6.0  , 0.0  , 3.0  , 12.0  , 18.0  , 21.0  , 24.0  , 27.0  , 27.0  , 25.0  , 26.0  , 25.0  , 25.0  , 27.0  , 25.0  , 22.0  , 19.0 );
+                    kernels[10] = compute_kernel(x,   36.0  , 58.0  , 70.0  , 69.0  , 62.0  , 56.0  , 52.0  , 50.0  , 26.0  , 9.0  , 3.0  , 0.0  , 3.0  , 6.0  , 3.0  , 0.0  , 0.0  , 5.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 5.0  , 0.0  , 0.0  , 7.0  , 6.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 3.0  , 0.0  , 3.0  , 5.0  , 7.0  , 5.0  , 0.0  , 0.0  , 7.0  , 9.0  , 6.0  , 5.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 3.0  , 0.0  , 5.0  , 5.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 8.0  , 6.0 );
+                    kernels[11] = compute_kernel(x,   99.0  , 122.0  , 127.0  , 115.0  , 110.0  , 101.0  , 88.0  , 64.0  , 51.0  , 186.0  , 73.0  , 16.0  , 25.0  , 26.0  , 22.0  , 18.0  , 12.0  , 9.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 21.0  , 14.0  , 3.0  , 11.0  , 19.0  , 34.0  , 31.0  , 33.0  , 18.0  , 15.0  , 9.0  , 19.0  , 19.0  , 16.0  , 6.0  , 0.0  , 0.0  , 0.0  , 7.0  , 12.0  , 9.0  , 10.0  , 12.0  , 14.0  , 12.0  , 13.0  , 10.0  , 10.0  , 12.0  , 9.0  , 13.0  , 13.0  , 14.0  , 8.0  , 11.0  , 8.0  , 6.0  , 3.0  , 7.0  , 3.0  , 5.0 );
+                    kernels[12] = compute_kernel(x,   51.0  , 69.0  , 82.0  , 82.0  , 78.0  , 82.0  , 71.0  , 68.0  , 50.0  , 33.0  , 58.0  , 76.0  , 28.0  , 5.0  , 12.0  , 12.0  , 6.0  , 6.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 5.0  , 52.0  , 90.0  , 45.0  , 30.0  , 19.0  , 12.0  , 19.0  , 19.0  , 18.0  , 7.0  , 13.0  , 16.0  , 10.0  , 7.0  , 3.0  , 0.0  , 5.0  , 6.0  , 0.0  , 11.0  , 17.0  , 14.0  , 12.0  , 16.0  , 9.0  , 11.0  , 11.0  , 18.0  , 13.0  , 8.0  , 8.0  , 10.0  , 12.0  , 8.0  , 9.0  , 8.0  , 8.0  , 5.0  , 6.0 );
+                    kernels[13] = compute_kernel(x,   55.0  , 102.0  , 134.0  , 149.0  , 145.0  , 149.0  , 148.0  , 127.0  , 94.0  , 64.0  , 108.0  , 94.0  , 37.0  , 15.0  , 22.0  , 17.0  , 17.0  , 14.0  , 13.0  , 0.0  , 8.0  , 14.0  , 9.0  , 0.0  , 6.0  , 3.0  , 7.0  , 5.0  , 6.0  , 5.0  , 5.0  , 12.0  , 8.0  , 0.0  , 10.0  , 14.0  , 8.0  , 9.0  , 0.0  , 3.0  , 3.0  , 0.0  , 5.0  , 3.0  , 8.0  , 8.0  , 3.0  , 3.0  , 3.0  , 3.0  , 8.0  , 3.0  , 5.0  , 0.0  , 0.0  , 0.0  , 12.0  , 3.0  , 0.0  , 7.0  , 5.0  , 3.0  , 0.0  , 0.0 );
+                    kernels[14] = compute_kernel(x,   75.0  , 89.0  , 116.0  , 125.0  , 124.0  , 102.0  , 109.0  , 99.0  , 80.0  , 57.0  , 136.0  , 108.0  , 55.0  , 10.0  , 20.0  , 20.0  , 16.0  , 10.0  , 8.0  , 14.0  , 6.0  , 0.0  , 3.0  , 3.0  , 6.0  , 19.0  , 8.0  , 11.0  , 3.0  , 46.0  , 33.0  , 29.0  , 26.0  , 22.0  , 12.0  , 14.0  , 21.0  , 16.0  , 18.0  , 16.0  , 13.0  , 3.0  , 0.0  , 8.0  , 6.0  , 14.0  , 10.0  , 21.0  , 21.0  , 17.0  , 16.0  , 16.0  , 19.0  , 17.0  , 16.0  , 20.0  , 14.0  , 10.0  , 14.0  , 13.0  , 12.0  , 12.0  , 10.0  , 6.0 );
+                    kernels[15] = compute_kernel(x,   43.0  , 57.0  , 63.0  , 60.0  , 64.0  , 57.0  , 55.0  , 35.0  , 18.0  , 14.0  , 13.0  , 5.0  , 3.0  , 10.0  , 5.0  , 3.0  , 3.0  , 0.0  , 7.0  , 3.0  , 5.0  , 5.0  , 0.0  , 23.0  , 8.0  , 3.0  , 3.0  , 17.0  , 6.0  , 13.0  , 10.0  , 5.0  , 0.0  , 10.0  , 7.0  , 9.0  , 8.0  , 13.0  , 6.0  , 7.0  , 5.0  , 6.0  , 3.0  , 3.0  , 5.0  , 8.0  , 3.0  , 3.0  , 5.0  , 5.0  , 5.0  , 7.0  , 8.0  , 6.0  , 6.0  , 7.0  , 6.0  , 6.0  , 5.0  , 5.0  , 5.0  , 5.0  , 5.0  , 3.0 );
+                    kernels[16] = compute_kernel(x,   31.0  , 33.0  , 27.0  , 19.0  , 14.0  , 9.0  , 3.0  , 6.0  , 16.0  , 131.0  , 186.0  , 214.0  , 206.0  , 212.0  , 192.0  , 186.0  , 147.0  , 90.0  , 157.0  , 98.0  , 34.0  , 37.0  , 35.0  , 31.0  , 17.0  , 10.0  , 7.0  , 0.0  , 3.0  , 3.0  , 5.0  , 6.0  , 10.0  , 12.0  , 22.0  , 50.0  , 48.0  , 48.0  , 61.0  , 28.0  , 26.0  , 29.0  , 30.0  , 24.0  , 26.0  , 19.0  , 26.0  , 15.0  , 26.0  , 19.0  , 17.0  , 10.0  , 3.0  , 3.0  , 0.0  , 6.0  , 12.0  , 16.0  , 16.0  , 21.0  , 25.0  , 27.0  , 27.0  , 26.0 );
+                    kernels[17] = compute_kernel(x,   50.0  , 70.0  , 80.0  , 83.0  , 79.0  , 73.0  , 80.0  , 74.0  , 54.0  , 34.0  , 16.0  , 7.0  , 3.0  , 3.0  , 3.0  , 3.0  , 6.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 5.0  , 3.0  , 10.0  , 3.0  , 7.0  , 5.0  , 0.0  , 3.0  , 3.0  , 3.0  , 3.0  , 0.0  , 5.0  , 6.0  , 0.0  , 0.0  , 3.0  , 3.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 7.0  , 3.0  , 0.0  , 3.0  , 0.0 );
+                    kernels[18] = compute_kernel(x,   38.0  , 50.0  , 52.0  , 49.0  , 44.0  , 42.0  , 43.0  , 41.0  , 41.0  , 42.0  , 42.0  , 40.0  , 35.0  , 29.0  , 23.0  , 22.0  , 20.0  , 20.0  , 18.0  , 16.0  , 16.0  , 15.0  , 11.0  , 12.0  , 15.0  , 11.0  , 13.0  , 8.0  , 5.0  , 5.0  , 3.0  , 0.0  , 0.0  , 3.0  , 7.0  , 3.0  , 8.0  , 3.0  , 0.0  , 5.0  , 6.0  , 5.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 6.0  , 3.0  , 8.0  , 5.0  , 7.0  , 5.0  , 8.0  , 8.0  , 7.0  , 6.0  , 10.0  , 11.0  , 3.0  , 5.0 );
+                    kernels[19] = compute_kernel(x,   33.0  , 37.0  , 34.0  , 30.0  , 25.0  , 22.0  , 37.0  , 44.0  , 40.0  , 36.0  , 33.0  , 29.0  , 27.0  , 26.0  , 28.0  , 28.0  , 28.0  , 25.0  , 20.0  , 16.0  , 14.0  , 13.0  , 12.0  , 11.0  , 10.0  , 10.0  , 10.0  , 7.0  , 6.0  , 6.0  , 6.0  , 6.0  , 5.0  , 0.0  , 5.0  , 5.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0 );
+                    kernels[20] = compute_kernel(x,   43.0  , 52.0  , 49.0  , 45.0  , 44.0  , 43.0  , 43.0  , 41.0  , 43.0  , 42.0  , 36.0  , 34.0  , 28.0  , 27.0  , 21.0  , 18.0  , 19.0  , 17.0  , 16.0  , 15.0  , 13.0  , 14.0  , 14.0  , 12.0  , 13.0  , 14.0  , 10.0  , 8.0  , 7.0  , 5.0  , 3.0  , 5.0  , 8.0  , 0.0  , 0.0  , 5.0  , 8.0  , 7.0  , 3.0  , 0.0  , 3.0  , 5.0  , 3.0  , 7.0  , 6.0  , 8.0  , 0.0  , 6.0  , 3.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 7.0  , 10.0  , 8.0  , 14.0  , 7.0  , 5.0  , 11.0 );
+                    kernels[21] = compute_kernel(x,   33.0  , 28.0  , 26.0  , 21.0  , 22.0  , 31.0  , 38.0  , 35.0  , 33.0  , 32.0  , 30.0  , 28.0  , 25.0  , 28.0  , 29.0  , 30.0  , 27.0  , 25.0  , 20.0  , 16.0  , 16.0  , 15.0  , 15.0  , 13.0  , 11.0  , 10.0  , 9.0  , 8.0  , 5.0  , 6.0  , 5.0  , 0.0  , 9.0  , 12.0  , 9.0  , 12.0  , 12.0  , 9.0  , 8.0  , 13.0  , 12.0  , 10.0  , 13.0  , 7.0  , 10.0  , 16.0  , 10.0  , 16.0  , 6.0  , 0.0  , 0.0  , 8.0  , 0.0  , 6.0  , 10.0  , 8.0  , 11.0  , 10.0  , 5.0  , 8.0  , 9.0  , 8.0  , 6.0  , 6.0 );
+                    kernels[22] = compute_kernel(x,   40.0  , 49.0  , 48.0  , 45.0  , 48.0  , 47.0  , 51.0  , 55.0  , 52.0  , 43.0  , 35.0  , 30.0  , 16.0  , 8.0  , 6.0  , 8.0  , 8.0  , 7.0  , 7.0  , 9.0  , 10.0  , 8.0  , 9.0  , 8.0  , 6.0  , 8.0  , 6.0  , 5.0  , 10.0  , 7.0  , 3.0  , 3.0  , 0.0  , 3.0  , 3.0  , 0.0  , 0.0  , 5.0  , 6.0  , 8.0  , 9.0  , 14.0  , 13.0  , 14.0  , 10.0  , 10.0  , 10.0  , 8.0  , 7.0  , 0.0  , 5.0  , 0.0  , 0.0  , 3.0  , 3.0  , 10.0  , 10.0  , 0.0  , 8.0  , 14.0  , 9.0  , 12.0  , 5.0  , 14.0 );
+                    kernels[23] = compute_kernel(x,   37.0  , 42.0  , 57.0  , 68.0  , 69.0  , 75.0  , 74.0  , 67.0  , 51.0  , 38.0  , 26.0  , 13.0  , 6.0  , 13.0  , 15.0  , 14.0  , 11.0  , 10.0  , 8.0  , 12.0  , 9.0  , 8.0  , 5.0  , 8.0  , 13.0  , 8.0  , 3.0  , 3.0  , 0.0  , 0.0  , 9.0  , 9.0  , 5.0  , 7.0  , 6.0  , 3.0  , 3.0  , 5.0  , 5.0  , 7.0  , 3.0  , 6.0  , 3.0  , 6.0  , 3.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 5.0  , 0.0  , 0.0  , 3.0  , 0.0 );
+                    kernels[24] = compute_kernel(x,   42.0  , 39.0  , 41.0  , 45.0  , 46.0  , 49.0  , 46.0  , 43.0  , 35.0  , 28.0  , 18.0  , 11.0  , 7.0  , 10.0  , 8.0  , 10.0  , 8.0  , 8.0  , 7.0  , 8.0  , 8.0  , 8.0  , 8.0  , 8.0  , 6.0  , 5.0  , 6.0  , 5.0  , 6.0  , 5.0  , 0.0  , 3.0  , 5.0  , 6.0  , 0.0  , 5.0  , 3.0  , 8.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 3.0 );
+                    kernels[25] = compute_kernel(x,   45.0  , 43.0  , 45.0  , 48.0  , 56.0  , 54.0  , 54.0  , 44.0  , 35.0  , 25.0  , 19.0  , 8.0  , 6.0  , 5.0  , 6.0  , 5.0  , 5.0  , 6.0  , 5.0  , 6.0  , 6.0  , 6.0  , 5.0  , 5.0  , 3.0  , 3.0  , 5.0  , 5.0  , 6.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 7.0  , 9.0  , 5.0  , 5.0  , 0.0  , 0.0  , 0.0  , 5.0  , 3.0  , 3.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 5.0  , 6.0  , 5.0  , 0.0  , 0.0 );
+                    kernels[26] = compute_kernel(x,   31.0  , 43.0  , 66.0  , 75.0  , 75.0  , 81.0  , 89.0  , 85.0  , 79.0  , 68.0  , 50.0  , 32.0  , 22.0  , 10.0  , 8.0  , 12.0  , 10.0  , 10.0  , 12.0  , 12.0  , 11.0  , 10.0  , 10.0  , 8.0  , 8.0  , 9.0  , 8.0  , 7.0  , 7.0  , 6.0  , 3.0  , 3.0  , 3.0  , 0.0  , 0.0  , 5.0  , 8.0  , 8.0  , 6.0  , 3.0  , 7.0  , 8.0  , 11.0  , 12.0  , 12.0  , 16.0  , 9.0  , 0.0  , 0.0  , 0.0  , 3.0  , 7.0  , 7.0  , 8.0  , 6.0  , 8.0  , 12.0  , 10.0  , 8.0  , 7.0  , 5.0  , 3.0  , 6.0  , 8.0 );
+                    kernels[27] = compute_kernel(x,   33.0  , 40.0  , 41.0  , 41.0  , 43.0  , 48.0  , 49.0  , 49.0  , 47.0  , 36.0  , 27.0  , 18.0  , 9.0  , 3.0  , 5.0  , 3.0  , 5.0  , 5.0  , 5.0  , 3.0  , 3.0  , 3.0  , 3.0  , 3.0  , 3.0  , 3.0  , 3.0  , 3.0  , 3.0  , 0.0  , 3.0  , 3.0  , 7.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0 );
+                    kernels[28] = compute_kernel(x,   30.0  , 47.0  , 72.0  , 81.0  , 81.0  , 79.0  , 85.0  , 88.0  , 85.0  , 86.0  , 64.0  , 45.0  , 27.0  , 15.0  , 13.0  , 14.0  , 11.0  , 18.0  , 20.0  , 24.0  , 18.0  , 17.0  , 20.0  , 15.0  , 19.0  , 14.0  , 10.0  , 10.0  , 8.0  , 6.0  , 6.0  , 3.0  , 3.0  , 0.0  , 6.0  , 7.0  , 18.0  , 15.0  , 11.0  , 12.0  , 19.0  , 20.0  , 10.0  , 8.0  , 0.0  , 0.0  , 0.0  , 6.0  , 6.0  , 9.0  , 10.0  , 9.0  , 12.0  , 12.0  , 10.0  , 12.0  , 12.0  , 3.0  , 6.0  , 7.0  , 8.0  , 10.0  , 8.0  , 5.0 );
+                    kernels[29] = compute_kernel(x,   33.0  , 31.0  , 31.0  , 33.0  , 36.0  , 36.0  , 36.0  , 32.0  , 25.0  , 19.0  , 12.0  , 5.0  , 5.0  , 10.0  , 6.0  , 6.0  , 8.0  , 6.0  , 7.0  , 6.0  , 6.0  , 6.0  , 11.0  , 6.0  , 6.0  , 6.0  , 5.0  , 3.0  , 3.0  , 0.0  , 0.0  , 6.0  , 3.0  , 5.0  , 3.0  , 10.0  , 5.0  , 6.0  , 9.0  , 3.0  , 7.0  , 6.0  , 6.0  , 8.0  , 7.0  , 0.0  , 6.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 6.0  , 6.0  , 0.0  , 5.0  , 3.0  , 3.0  , 5.0  , 8.0  , 7.0  , 0.0 );
+                    kernels[30] = compute_kernel(x,   31.0  , 48.0  , 65.0  , 60.0  , 68.0  , 81.0  , 88.0  , 91.0  , 93.0  , 79.0  , 56.0  , 32.0  , 22.0  , 12.0  , 16.0  , 13.0  , 12.0  , 13.0  , 13.0  , 13.0  , 14.0  , 11.0  , 11.0  , 14.0  , 12.0  , 10.0  , 8.0  , 8.0  , 7.0  , 5.0  , 3.0  , 0.0  , 3.0  , 5.0  , 5.0  , 7.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 6.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 3.0  , 5.0  , 0.0  , 0.0  , 0.0 );
+                    kernels[31] = compute_kernel(x,   34.0  , 47.0  , 50.0  , 51.0  , 60.0  , 67.0  , 65.0  , 63.0  , 54.0  , 42.0  , 30.0  , 19.0  , 25.0  , 22.0  , 28.0  , 7.0  , 6.0  , 5.0  , 7.0  , 7.0  , 5.0  , 8.0  , 6.0  , 3.0  , 3.0  , 3.0  , 6.0  , 7.0  , 3.0  , 0.0  , 0.0  , 0.0  , 3.0  , 5.0  , 5.0  , 3.0  , 5.0  , 3.0  , 3.0  , 3.0  , 0.0  , 6.0  , 3.0  , 0.0  , 0.0  , 5.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 5.0 );
+                    kernels[32] = compute_kernel(x,   34.0  , 48.0  , 58.0  , 55.0  , 59.0  , 69.0  , 77.0  , 75.0  , 75.0  , 69.0  , 56.0  , 43.0  , 22.0  , 13.0  , 10.0  , 6.0  , 9.0  , 15.0  , 11.0  , 10.0  , 8.0  , 8.0  , 7.0  , 3.0  , 6.0  , 5.0  , 5.0  , 7.0  , 6.0  , 6.0  , 7.0  , 3.0  , 5.0  , 11.0  , 5.0  , 7.0  , 6.0  , 8.0  , 11.0  , 8.0  , 16.0  , 9.0  , 7.0  , 8.0  , 6.0  , 3.0  , 6.0  , 3.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 6.0  , 3.0  , 0.0  , 3.0  , 5.0  , 8.0  , 10.0  , 13.0  , 13.0 );
+                    kernels[33] = compute_kernel(x,   32.0  , 31.0  , 33.0  , 33.0  , 35.0  , 37.0  , 34.0  , 28.0  , 25.0  , 15.0  , 10.0  , 5.0  , 6.0  , 5.0  , 7.0  , 8.0  , 6.0  , 6.0  , 7.0  , 8.0  , 5.0  , 6.0  , 5.0  , 7.0  , 6.0  , 5.0  , 3.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 3.0  , 0.0  , 0.0  , 5.0  , 3.0  , 0.0  , 3.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0  , 0.0 );
+                    kernels[34] = compute_kernel(x,   44.0  , 43.0  , 48.0  , 58.0  , 59.0  , 54.0  , 55.0  , 49.0  , 48.0  , 38.0  , 26.0  , 14.0  , 8.0  , 9.0  , 14.0  , 12.0  , 7.0  , 9.0  , 10.0  , 8.0  , 9.0  , 7.0  , 6.0  , 6.0  , 6.0  , 6.0  , 6.0  , 5.0  , 6.0  , 8.0  , 6.0  , 0.0  , 0.0  , 13.0  , 8.0  , 6.0  , 17.0  , 10.0  , 8.0  , 17.0  , 13.0  , 15.0  , 13.0  , 14.0  , 8.0  , 8.0  , 11.0  , 8.0  , 8.0  , 6.0  , 5.0  , 3.0  , 5.0  , 3.0  , 8.0  , 7.0  , 6.0  , 10.0  , 9.0  , 12.0  , 13.0  , 10.0  , 7.0  , 10.0 );
+                    decisions[0] = 0.722587775297
+                                   + kernels[1] * 3.35855e-07
+                                   + kernels[2] * 1.64612e-07
+                                   + kernels[4] * 6.00056e-07
+                                   + kernels[5] * 3.5195e-08
+                                   + kernels[7] * -4.2079e-08
+                                   + kernels[8] * -4.2843e-08
+                                   + kernels[9] * -9.994e-09
+                                   + kernels[10] * -5.11065e-07
+                                   + kernels[11] * -5.979e-09
+                                   + kernels[12] * -4.4672e-08
+                                   + kernels[13] * -1.5606e-08
+                                   + kernels[14] * -1.2941e-08
+                                   + kernels[15] * -2.18903e-07
+                                   + kernels[17] * -2.31635e-07
+                            ;
+                    decisions[1] = -1.658344586719
+                                   + kernels[0] * 2.45018e-07
+                                   + kernels[1] * 4.30223e-07
+                                   + kernels[3] * 1.00277e-07
+                                   + kernels[4] * 2.16524e-07
+                                   + kernels[18] * -4.81187e-07
+                                   + kernels[20] * -5.10856e-07
+                            ;
+                    decisions[2] = -1.968607562265
+                                   + kernels[0] * 3.001833e-06
+                                   + kernels[3] * 4.5201e-08
+                                   + kernels[4] * 1.54493e-06
+                                   + kernels[5] * 2.81834e-07
+                                   + kernels[25] * -5.93581e-07
+                                   + kernels[26] * -2.89779e-07
+                                   + kernels[27] * -1.73958e-06
+                                   + kernels[28] * -1.09552e-07
+                                   + kernels[30] * -3.09126e-07
+                                   + kernels[31] * -1.294219e-06
+                                   + kernels[32] * -5.37961e-07
+                            ;
+                    decisions[3] = -0.720663029823
+                                   + kernels[6] * 1.4362e-08
+                                   + kernels[7] * 6.177e-09
+                                   + kernels[9] * 1.25e-08
+                                   + kernels[10] * 2.05478e-07
+                                   + kernels[12] * 2.501e-08
+                                   + kernels[15] * 4.363e-07
+                                   + kernels[16] * 9.147e-09
+                                   + kernels[18] * -1.82182e-07
+                                   + kernels[20] * -4.93707e-07
+                                   + kernels[21] * -3.3084e-08
+                            ;
+                    decisions[4] = -1.605747746589
+                                   + kernels[6] * 6.182e-09
+                                   + kernels[7] * 1.3853e-08
+                                   + kernels[8] * 2.12e-10
+                                   + kernels[9] * 1.1243e-08
+                                   + kernels[10] * 7.80681e-07
+                                   + kernels[15] * 8.347e-07
+                                   + kernels[17] * 1.64985e-07
+                                   + kernels[23] * -4.25014e-07
+                                   + kernels[25] * -1.134803e-06
+                                   + kernels[34] * -2.52038e-07
+                            ;
+                    decisions[5] = -0.934328303475
+                                   + kernels[19] * 3.3529e-07
+                                   + kernels[20] * 1.121946e-06
+                                   + kernels[21] * 3.44683e-07
+                                   + kernels[22] * -6.23056e-07
+                                   + kernels[24] * -1.4612e-07
+                                   + kernels[28] * -1.24025e-07
+                                   + kernels[29] * -4.31701e-07
+                                   + kernels[31] * -9.2146e-08
+                                   + kernels[33] * -3.8487e-07
+                            ;
+                    votes[decisions[0] &gt; 0 ? 0 : 1] += 1;
+                    votes[decisions[1] &gt; 0 ? 0 : 2] += 1;
+                    votes[decisions[2] &gt; 0 ? 0 : 3] += 1;
+                    votes[decisions[3] &gt; 0 ? 1 : 2] += 1;
+                    votes[decisions[4] &gt; 0 ? 1 : 3] += 1;
+                    votes[decisions[5] &gt; 0 ? 2 : 3] += 1;
+                    int val = votes[0];
+                    int idx = 0;
+
+                    for (int i = 1; i &lt; 4; i++) {
+                        if (votes[i] &gt; val) {
+                            val = votes[i];
+                            idx = i;
+                        }
+                    }
+
+                    return idx;
+                }
+
+                /**
+                * Convert class idx to readable name
+                */
+                const char* predictLabel(float *x) {
+                    switch (predict(x)) {
+                        case 0:
+                            return &quot;no&quot;;
+                        case 1:
+                            return &quot;stop&quot;;
+                        case 2:
+                            return &quot;play&quot;;
+                        case 3:
+                            return &quot;yes&quot;;
+                        default:
+                            return &quot;Houston we have a problem&quot;;
+                    }
+                }
+
+            protected:
+                /**
+                * Compute kernel between feature vector and support vector.
+                * Kernel type: poly
+                */
+                float compute_kernel(float *x, ...) {
+                    va_list w;
+                    va_start(w, 64);
+                    float kernel = 0.0;
+
+                    for (uint16_t i = 0; i &lt; 64; i++) {
+                        kernel += x[i] * va_arg(w, double);
+                    }
+
+                    return pow((0.1 * kernel) + 0.0, 2);
+                }
+            };
+        }
+    }
+}</code></pre>
+<p>Done! Deploy the sketch to your board and it should now be able to &quot;understand&quot; what you tell it!</p>
+<p>Here's a quick demo (please forgive me for the bad video quality).</p>
+<div style="width: 576px;" class="wp-video"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
+<video class="wp-video-shortcode" id="video-1282-1" width="576" height="482" preload="metadata" controls="controls"><source type="video/mp4" src="https://eloquentarduino.github.io/wp-content/uploads/2020/08/Arduino-Nano-33-BLE-Sense-Word-classification.mp4?_=1" /><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/08/Arduino-Nano-33-BLE-Sense-Word-classification.mp4">https://eloquentarduino.github.io/wp-content/uploads/2020/08/Arduino-Nano-33-BLE-Sense-Word-classification.mp4</a></video></div>
+<hr />
+<p>Link to the <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/BleSenseWordClassificationExample/BleSenseWordClassificationExample.ino">Github repo</a></p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/08/better-word-classification-with-arduino-33-ble-sense-and-machine-learning/">Better word classification with Arduino Nano 33 BLE Sense and Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		<enclosure url="https://eloquentarduino.github.io/wp-content/uploads/2020/08/Arduino-Nano-33-BLE-Sense-Word-classification.mp4" length="5594095" type="video/mp4" />
+
+			</item>
+		<item>
 		<title>EloquentML grows its family of classifiers: Gaussian Naive Bayes on Arduino</title>
 		<link>https://eloquentarduino.github.io/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/</link>
 		
@@ -1758,190 +2083,6 @@ void printConfusionMatrix(int tp, int tn, int fp, int fn) {
 <hr />
 <p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/IrisClassificationTrainingExample/IrisClassificationTrainingExample.ino">Github</a> where you'll also find another dataset to test, which is characterized by a number of features much higher (30 instead of 4).</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/03/how-to-train-a-iris-classification-machine-learning-classifier-directly-on-your-arduino-board/">How to train a IRIS classification Machine learning classifier directly on your Arduino board</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
-			</item>
-		<item>
-		<title>So you want to train an ML classifier directly on an Arduino board?</title>
-		<link>https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sat, 28 Mar 2020 17:03:35 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[Programming]]></category>
-		<category><![CDATA[microml]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=982</guid>
-
-					<description><![CDATA[<p>As of now, we know it is possible to run Machine learning inference on tiny microcontrollers thanks to Tensorflow for Micro and my very own library MicroML. What if you could train a classifier directly on the microcontroller, too? When I first started this journey in the world of Machine learning on microcontrollers, one fact [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/">So you want to train an ML classifier directly on an Arduino board?</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>As of now, we know it is possible to run Machine learning inference on tiny microcontrollers thanks to <a href="https://www.tensorflow.org/lite/microcontrollers">Tensorflow for Micro</a> and my very own library <a href="https://github.com/eloquentarduino/micromlgen">MicroML</a>. What if you could <strong>train</strong> a classifier directly on the microcontroller, too?</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png" alt="Onboard IRIS dataset training time" /></p>
-<p><span id="more-982"></span></p>
-<p>When I first started this journey in the world of Machine learning on microcontrollers, one fact was set in stone for me: you train your classifier once and for all on a PC, then deploy it to your microcontroller.</p>
-<p>As simple as this.</p>
-<p>Training is a heavy process, requires lots of computations and memory. You just want a machine as powerful as possible to carry out this task as fast as possible.</p>
-<p>Moreover, it is a one-time task: once your classifier has been trained, it needs not to be updated anymore.</p>
-<p>And this yield true until now.</p>
-<p>Until my reader <a href="https://github.com/joaocarvalhoopen">Joao Carvalho</a>, in the comments on the post about <a href="/2020/02/even-smaller-machine-learning-models-for-your-mcu/">an alternative to SVM which produces much smaller models</a> that I strongly invite you to read, challenged me with this idea of running the SVM training directly on the microcontroller. </p>
-<p>In the past I replied <em>&quot;No way&quot;</em> to people asking about this topic on forums, but Joao was so kind to link me a <a href="https://github.com/karpathy/svmjs/blob/master/lib/svm.js">Javascript implementation</a> of the <a href="https://github.com/karpathy/svmjs/blob/master/test/smo.pdf">simplified SVM SMO (Sequential Minimal Optimization) algorithm</a>.</p>
-<p>At a first glance it looked quite easy to port from Javascript to C, so I gave it a try.</p>
-<p>And in fact it only took me 30 minutes to get it working on my PC.</p>
-<p>Then I deployed it to my ESP32 and... <strong>it worked</strong>!</p>
-<p>My first try was with 10 samples from the the IRIS dataset: it only took almost no time to train.</p>
-<p>But I know SVM training and inferencing time grows rapidly with the number of training samples.</p>
-<p>Execution time will be the most limiting factor for this kind of task, so I created a benchmarking setup to evaluate the performance of the algorithm on different dataset sizes and features dimensions.<br />
-The results are summarized in the following table and plots.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align: center;">Features size</th>
-<th style="text-align: center;">Training size</th>
-<th style="text-align: center;">Training time (ms)</th>
-<th style="text-align: center;">Unit inference time (ms)</th>
-<th style="text-align: center;">Accuracy</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">10</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0,011</td>
-<td style="text-align: center;">80</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">20</td>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">0,013</td>
-<td style="text-align: center;">85</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">11</td>
-<td style="text-align: center;">0,014</td>
-<td style="text-align: center;">90</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">40</td>
-<td style="text-align: center;">38</td>
-<td style="text-align: center;">0,017</td>
-<td style="text-align: center;">91</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">50</td>
-<td style="text-align: center;">47</td>
-<td style="text-align: center;">0,020</td>
-<td style="text-align: center;">86</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">60</td>
-<td style="text-align: center;">80</td>
-<td style="text-align: center;">0,025</td>
-<td style="text-align: center;">87</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">10</td>
-<td style="text-align: center;">22</td>
-<td style="text-align: center;">0,014</td>
-<td style="text-align: center;">71</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">20</td>
-<td style="text-align: center;">1000</td>
-<td style="text-align: center;">0,017</td>
-<td style="text-align: center;">61</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">3500</td>
-<td style="text-align: center;">0,020</td>
-<td style="text-align: center;">66</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">40</td>
-<td style="text-align: center;">20000</td>
-<td style="text-align: center;">0,025</td>
-<td style="text-align: center;">85</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">50</td>
-<td style="text-align: center;">32800</td>
-<td style="text-align: center;">0,033</td>
-<td style="text-align: center;">83</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">60</td>
-<td style="text-align: center;">71400</td>
-<td style="text-align: center;">0,050</td>
-<td style="text-align: center;">80</td>
-</tr>
-</tbody>
-</table>
-<p><small>* all benchmark are obtained on an ESP32 board</small><br />
-<small>** the inference took actually sometimes less than 1ms to run for all the test samples, so it was rounded to 1ms and divided by the number of samples</small></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png" alt="Onboard IRIS dataset training time. Features dim = 4" /></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-Breast-cancer-dataset-training-time.png" alt="Onboard Breast cancer dataset training time. Features dim = 30" /></p>
-<p>We can see from the table that for the Iris dataset, which has 4-dimensional features, the training process is quite fast: 80ms to train on 60 samples.</p>
-<p>Things become much different when training on the Breast cancer dataset, with its 30 features per sample. Now we're talking abouts <em>seconds</em> to train and even minutes when increasing the number of samples to 60.</p>
-<p>Fortunately the inference time stays almost flat, so you will have real-time predictions.</p>
-<div class="watchout">I run the Iris benchmark on a Seeedstudio Xiao M0 board (32bit 48MHz processor), too. It took 7s to train on 60 samples vs 80ms it took on the ESP32. It is clear some boards are better than others for this task</div>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<h2>Downsides</h2>
-<p>Of course there're downsides: it's not a perfect world.</p>
-<h3>Convergence</h3>
-<div class="watchout">
-As <a href="http://cs229.stanford.edu/materials/smo.pdf" target="_blank" rel="noopener noreferrer">the paper</a> reported: "there is one thing to note, <b>the algorithm (the simplified version) is not guaranteed to converge".</b>
-</div>
-<p>I actually don't know, in practice, what this means. But it sounds like a bad thing.</p>
-<h3>Binary classification only</h3>
-<p>As of now this algorithm can only do binary classification.</p>
-<p>I hope to implement multi-class classification in the future with the one-vs-all approach, but I don't really know if it would be too inefficient for a microcontroller to run.</p>
-<h3>Declining accuracy</h3>
-<p>If you look at the benchmark table above, also, you'll notice the accuracy does not always increase linearly with the training samples size. It seems it reaches an optimum and then starts decreasing.</p>
-<p>If you're going to deploy your device in an autonomous scenario, you'll need to monitor your accucary every time you re-train it, or your results are going to go poor.</p>
-<p>You should keep track of the optimum you achieved and roll-back to its training set when you register a declining accuracy.</p>
-<h3>Memory</h3>
-<p>You will need to keep all your training set in memory for the classifier to both learn and predict. This means RAM will be a limiting factor and we know RAM is an expensive resource on microcontrollers.</p>
-<p>You will have to find a good enough compromise between the number of features, the number of samples and the accuracy.</p>
-<h2>Time to get your hands on</h2>
-<p>I created a sample project for you to <a href="/2020/03/how-to-train-a-color-classification-machine-learning-classifier-directly-on-your-arduino-board">train a color classifier</a> with a super simple setup: you will only need a TCS3200 (color sensor) to follow along.</p>
-<p>Dont' have a TCS3200? No problem, you can <a href="/2020/03/how-to-train-a-iris-classification-machine-learning-classifier-directly-on-your-arduino-board">train a classifier on the IRIS dataset</a></p>
-<p>If you've read so far, please consider letting me know in the comments some useful applications you can think about this new tool. It's a brand new topic for me and I'll appreciate any of your suggestion.</p>
-<hr />
-<p>Check the project repo on <a href="https://github.com/eloquentarduino/EloquentMicroML">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/">So you want to train an ML classifier directly on an Arduino board?</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		
