@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/tag/microml/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Mon, 24 Aug 2020 18:34:04 +0000</lastBuildDate>
+	<lastBuildDate>Sat, 05 Sep 2020 15:11:53 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,226 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.4</generator>
 	<item>
+		<title>&#8220;Principal&#8221; FFT components as efficient features extrator</title>
+		<link>https://eloquentarduino.github.io/2020/09/principal-fft-components-as-efficient-features-extrator/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Sat, 05 Sep 2020 08:52:02 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[microml]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1297</guid>
+
+					<description><![CDATA[<p>Fourier Transform is probably the most well known algorithm for feature extraction from time-dependent data (in particular speech data), where frequency holds a great deal of information. Sadly, computing the transform over the whole spectrum of the signal still requires O(NlogN) with the best implementation (FFT - Fast Fourier Transform); we would like to achieve [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/09/principal-fft-components-as-efficient-features-extrator/">&#8220;Principal&#8221; FFT components as efficient features extrator</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><a href="https://en.wikipedia.org/wiki/Fourier_transform">Fourier Transform</a> is probably the most well known algorithm for feature extraction from time-dependent data (in particular speech data), where frequency holds a great deal of information. Sadly, computing the transform over the whole spectrum of the signal still requires O(NlogN) with the best implementation (<a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">FFT - Fast Fourier Transform</a>); we would like to achieve faster computation on our microcontrollers.</p>
+<p>In this post I propose a partial, naive <strong>linear-time</strong> implementation of the Fourier Transform you can use to extract features from your data for Machine Learning models.</p>
+<p><span id="more-1297"></span></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#toctraining-aware-fft">Training-aware FFT</a><li><a href="#tocaccuracy-comparison">Accuracy comparison</a><li><a href="#tochow-to-use-principal-fft-in-python">How to use Principal FFT in Python</a><li><a href="#tochow-to-use-principal-fft-in-c">How to use Principal FFT in C</a><ol><li><a href="#tocbenchmarking">Benchmarking</a></ol></div></p>
+<p><strong>DISCLAIMER</strong></p>
+<p><em>The contents of this post represent my own knowledge and are not supported by any academic work (as far as I know). It may really be the case that the findings of my work don't apply to your own projects; yet, I think this idea can turn useful in solving certain kind of problems.</em></p>
+<h2 id="toctraining-aware-fft">Training-aware FFT</h2>
+<p>Fourier transform is used to describe a signal over its entire frequency range. This is useful in a number of applications, but here we're focused on the FT for the sole purpose of extracting features to be used with Machine learning models.</p>
+<p>For this reason, we don't actually need a full description of the input signal: we're only interested in extracting some kind of signature that a ML model can use to distinguish among the different classes. Noticing that in a signal spectrum most frequencies have a low magnitude (as you can see in the picture below), the idea to only keep the <em>most important</em> frequencies came to my mind as a mean to speed up the computation on resource constrained microcontrollers.</p>
+<p><img src="https://www.researchgate.net/publication/324590530/figure/fig4/AS:616761783230465@1524058876149/Fast-fourier-transform-FFT-spectrum-of-the-vibration-signal-using-a-rotation-speed-of.png" alt="FFT spectrum example" /></p>
+<p>I was thinking to a kind of PCA (Principal Component Analysis), but using FFT spectrum as features.</p>
+<p>Since we will have a training set with the raw signals, we would like to select the most prominent frequencies among all the samples and apply the computation only on those: even using the naive implementation of FFT, this will yield a linear-time implementation.</p>
+<h2 id="tocaccuracy-comparison">Accuracy comparison</h2>
+<p>How does this <em>Principal FFT</em> compare to, let's say, PCA as a dimensionality reduction algorithm w.r.t model accuracy? Let's see the numbers!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/09/FFT-vs-PCA.png" alt="FFT vs PCA accuracy comparison on various datasets" /></p>
+<p><a href="/wp-content/uploads/2020/09/Principal-FFT-benchmark.ods" title="Principal FFT benchmark spreadsheet">Download the Principal FFT benchmark spreadsheet</a></p>
+<p>I couldn't find many examples of the kind of datasets I wished to test, but in the image you can see different types of data:</p>
+<ul>
+<li>human activity classification from smartphone data</li>
+<li>gesture classification by IMU data</li>
+<li>MNIST handwritten digits image data</li>
+<li>free speech audio data</li>
+</ul>
+<p>We can note a couple findings:</p>
+<ol>
+<li>Principal FFT is almost on par with PCA after a certain number of components</li>
+<li>PrincipalFFT definitely leaves PCA behind on audio data</li>
+</ol>
+<p>From even this simple analysis you should be convinced that Principal FFT can be (under certain cases) a fast, performant features extractor for your projects that involve time-dependant data.</p>
+<h2 id="tochow-to-use-principal-fft-in-python">How to use Principal FFT in Python</h2>
+<p>I created a Python package to use Principal FFT, called <code>principal-fft</code>.</p>
+<pre><code class="language-bash">pip install principal-fft</code></pre>
+<p>The class follows the <code>Transformer</code> API from <code>scikit-learn</code>, so it has <code>fit</code> and <code>transform</code> methods.</p>
+<pre><code class="language-python">from principalfft import PrincipalFFT
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import load_digits
+from sklearn.ensemble import RandomForestClassifier
+
+mnist = load_digits()
+X, y = mnist.data, mnist.target
+Xfft = PrincipalFFT(n_components=10).fit_transform(X)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+Xfft_train, Xfft_test, y_train, y_test = train_test_split(Xfft, y, test_size=0.3)
+
+clf = RandomForestClassifier(50, min_samples_leaf=5).fit(X_train, y_train)
+print(&quot;Raw score&quot;, clf.score(X_test, y_test))
+
+clf = RandomForestClassifier(50, min_samples_leaf=5).fit(Xfft_train, y_train)
+print(&quot;FFT score&quot;, clf.score(Xfft_test, y_test))</code></pre>
+<p>My results are <code>0.09</code> for raw data and <code>0.78</code> for FFT transformed: quite a big difference!</p>
+<p>As with any dimensionality reduction, <code>n_components</code> is an hyperparameter you have to tune for your specific project: from my experiments, you shouldn't go lower than <code>8</code> to achieve a reasonable accuracy.</p>
+<h2 id="tochow-to-use-principal-fft-in-c">How to use Principal FFT in C</h2>
+<p>So, now that we tested our Principal FFT transformer in Python and achieved good results, how do we use it on our microcontroller? Of course with the <code>micromlgen</code> porter: it is now (<code>version 1.1.9</code>) able to port PrincipalFFT objects to plain C.</p>
+<pre><code class="language-bash">pip install micromlgen==1.1.9</code></pre>
+<p>What does the C code look like?</p>
+<pre><code class="language-cpp">void principalFFT(float *features, float *fft) {
+    // apply principal FFT (naive implementation for the top 10 frequencies only)
+    const int topFrequencies[] = { 0, 8, 17, 16, 1, 9, 2, 7, 15, 6 };
+
+    for (int i = 0; i &lt; 10; i++) {
+        const int k = topFrequencies[i];
+        const float harmonic = 0.09817477042468103 * k;
+        float re = 0;
+        float im = 0;
+
+        // optimized case
+        if (k == 0) {
+            for (int n = 0; n &lt; 64; n++) {
+                re += features[n];
+            }
+        }
+
+        else {
+            for (int n = 0; n &lt; 64; n++) {
+                const float harmonic_n = harmonic * n;
+                const float cos_n = cos(harmonic_n);
+                const float sin_n = sin(harmonic_n);
+                re += features[n] * cos_n;
+                im -= features[n] * sin_n;
+            }
+        }
+
+        fft[i] = sqrt(re * re + im * im);
+    }
+}</code></pre>
+<p>This is the most direct porting available.</p>
+<p>In the <em>Benchmarks</em> section, we'll see how this implementation can be speed-up with alternative implementations.</p>
+<h3 id="tocbenchmarking">Benchmarking</h3>
+<p>The following table reports the benchmark on the MNIST dataset (64 features) with 10 principal FFT components vs various tecniques to decrease the computation time at the expense of memory usage.</p>
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th style="text-align: center;">Flash (Kb)</th>
+<th style="text-align: center;">Execution time (micros)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None</td>
+<td style="text-align: center;">137420</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td>arduinoFFT library</td>
+<td style="text-align: center;">147812</td>
+<td style="text-align: center;">3200</td>
+</tr>
+<tr>
+<td>principalFFT</td>
+<td style="text-align: center;">151404</td>
+<td style="text-align: center;">4400</td>
+</tr>
+<tr>
+<td>principalFFT w/ cos+sin LUT</td>
+<td style="text-align: center;">152124</td>
+<td style="text-align: center;">900</td>
+</tr>
+<tr>
+<td>principalFFT w/ cos LUT + sin sign LUT</td>
+<td style="text-align: center;">150220</td>
+<td style="text-align: center;">1250</td>
+</tr>
+</tbody>
+</table>
+<p>*<em>all the benchmarks were run on the Arduino 33 Nano BLE Sense</em></p>
+<p>Some thoughts:</p>
+<ol start="2">
+<li><code>principalFFT w/ cos+sin LUT</code> means I pre-compute the values of <code>sin</code> and <code>cos</code> at compile time, so there's no computation on the board; of course these lookup tables will eat some memory</li>
+<li><code>principalFFT w/ cos LUT + sin sign LUT</code> means I pre-compute the <code>cos</code> values only and compute <code>sin</code> using <code>sqrt(1 - cos(x)^2)</code>; it adds some microseconds to the computation, but requires less memory</li>
+<li><code>arduinoFFT library</code> is faster than <code>principalFFT</code> in the execution time and requires less memory, even if <code>principalFFT</code> is only computing 10 frequencies: I need to investigate how it can achieve such performances</li>
+</ol>
+<p>You can activate the LUT functionality with:</p>
+<pre><code class="language-python">from micromlgen import port
+from principalfft import PrincipalFFT
+
+fft = PrincipalFFT(n_components=10).fit(X)
+
+# cos lookup, sin computed
+port(fft, lookup_cos=True)
+
+# cos + sin lookup
+port(fft, lookup_cos=True, lookup_sin=True)</code></pre>
+<p>Here's how the C code looks like with LUT.</p>
+<pre><code class="language-cpp">void principalFFT(float *features, float *fft) {
+    // apply principal FFT (naive implementation for the top N frequencies only)
+    const int topFrequencies[] = { 0, 8, 17, 16, 1, 9, 2, 7, 15, 6 };
+    const float cosLUT[10][64] = {
+        {  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0},
+        {  1.0,  0.7071,  6.1232e-17,  -0.7071,  -1.0,  -0.7071,  -1.8369e-16,  0.7071,  1.0,  0.7071,  3.0616e-16,  -0.7071,  -1.0,  -0.7071,  -4.2862e-16,  0.7071,  1.0,  0.7071,  5.5109e-16,  -0.7071,  -1.0,  -0.7071,  -2.4499e-15,  0.7071,  1.0,  0.7071,  -9.8033e-16,  -0.7071,  -1.0,  -0.7071,  -2.6948e-15,  0.7071,  1.0,  0.7071,  -7.3540e-16,  -0.7071,  -1.0,  -0.7071,  -2.9397e-15,  0.7071,  1.0,  0.7071,  -4.9047e-16,  -0.7071,  -1.0,  -0.7071,  -3.1847e-15,  0.7071,  1.0,  0.7071,  -2.4554e-16,  -0.7071,  -1.0,  -0.7071,  -3.4296e-15,  0.7071,  1.0,  0.7071,  -6.1898e-19,  -0.7071,  -1.0,  -0.7071,  -3.6745e-15,  0.7071},   ... };
+    const bool sinLUT[10][64] = {
+        {  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false},
+        {  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  false,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false},  ...};
+
+    for (int i = 0; i &lt; 10; i++) {
+        const int k = topFrequencies[i];
+        const float harmonic = 0.09817477042468103 * k;
+        float re = 0;
+        float im = 0;
+        // optimized case
+        if (k == 0) {
+            for (int n = 0; n &lt; 64; n++) {
+                re += features[n];
+            }
+        }
+
+        else {
+            for (int n = 0; n &lt; 64; n++) {
+                const float cos_n = cosLUT[i][n];
+                const float sin_n = sinLUT[i][n] ? sqrt(1 - cos_n * cos_n) : -sqrt(1 - cos_n * cos_n);
+                re += features[n] * cos_n;
+                im -= features[n] * sin_n;
+            }
+        }
+
+        fft[i] = sqrt(re * re + im * im);
+    }
+}</code></pre>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<hr />
+<p>This post required much work to be produced, so I hope I didn't forgot anything  and you found these information useful.<br />
+As always, there's a <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/PrincipalFFTExample/PrincipalFFTExample.ino">Github repo</a> with all the code of this post.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/09/principal-fft-components-as-efficient-features-extrator/">&#8220;Principal&#8221; FFT components as efficient features extrator</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Better word classification with Arduino Nano 33 BLE Sense and Machine Learning</title>
 		<link>https://eloquentarduino.github.io/2020/08/better-word-classification-with-arduino-33-ble-sense-and-machine-learning/</link>
 		
@@ -2002,190 +2222,6 @@ void printConfusionMatrix(int tp, int tn, int fp, int fn) {
 <hr />
 <p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/IrisClassificationTrainingExample/IrisClassificationTrainingExample.ino">Github</a> where you'll also find another dataset to test, which is characterized by a number of features much higher (30 instead of 4).</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/03/how-to-train-a-iris-classification-machine-learning-classifier-directly-on-your-arduino-board/">How to train a IRIS classification Machine learning classifier directly on your Arduino board</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
-			</item>
-		<item>
-		<title>So you want to train an ML classifier directly on an Arduino board?</title>
-		<link>https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sat, 28 Mar 2020 17:03:35 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[Programming]]></category>
-		<category><![CDATA[microml]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=982</guid>
-
-					<description><![CDATA[<p>As of now, we know it is possible to run Machine learning inference on tiny microcontrollers thanks to Tensorflow for Micro and my very own library MicroML. What if you could train a classifier directly on the microcontroller, too? When I first started this journey in the world of Machine learning on microcontrollers, one fact [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/">So you want to train an ML classifier directly on an Arduino board?</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>As of now, we know it is possible to run Machine learning inference on tiny microcontrollers thanks to <a href="https://www.tensorflow.org/lite/microcontrollers">Tensorflow for Micro</a> and my very own library <a href="https://github.com/eloquentarduino/micromlgen">MicroML</a>. What if you could <strong>train</strong> a classifier directly on the microcontroller, too?</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png" alt="Onboard IRIS dataset training time" /></p>
-<p><span id="more-982"></span></p>
-<p>When I first started this journey in the world of Machine learning on microcontrollers, one fact was set in stone for me: you train your classifier once and for all on a PC, then deploy it to your microcontroller.</p>
-<p>As simple as this.</p>
-<p>Training is a heavy process, requires lots of computations and memory. You just want a machine as powerful as possible to carry out this task as fast as possible.</p>
-<p>Moreover, it is a one-time task: once your classifier has been trained, it needs not to be updated anymore.</p>
-<p>And this yield true until now.</p>
-<p>Until my reader <a href="https://github.com/joaocarvalhoopen">Joao Carvalho</a>, in the comments on the post about <a href="/2020/02/even-smaller-machine-learning-models-for-your-mcu/">an alternative to SVM which produces much smaller models</a> that I strongly invite you to read, challenged me with this idea of running the SVM training directly on the microcontroller. </p>
-<p>In the past I replied <em>&quot;No way&quot;</em> to people asking about this topic on forums, but Joao was so kind to link me a <a href="https://github.com/karpathy/svmjs/blob/master/lib/svm.js">Javascript implementation</a> of the <a href="https://github.com/karpathy/svmjs/blob/master/test/smo.pdf">simplified SVM SMO (Sequential Minimal Optimization) algorithm</a>.</p>
-<p>At a first glance it looked quite easy to port from Javascript to C, so I gave it a try.</p>
-<p>And in fact it only took me 30 minutes to get it working on my PC.</p>
-<p>Then I deployed it to my ESP32 and... <strong>it worked</strong>!</p>
-<p>My first try was with 10 samples from the the IRIS dataset: it only took almost no time to train.</p>
-<p>But I know SVM training and inferencing time grows rapidly with the number of training samples.</p>
-<p>Execution time will be the most limiting factor for this kind of task, so I created a benchmarking setup to evaluate the performance of the algorithm on different dataset sizes and features dimensions.<br />
-The results are summarized in the following table and plots.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align: center;">Features size</th>
-<th style="text-align: center;">Training size</th>
-<th style="text-align: center;">Training time (ms)</th>
-<th style="text-align: center;">Unit inference time (ms)</th>
-<th style="text-align: center;">Accuracy</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">10</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0,011</td>
-<td style="text-align: center;">80</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">20</td>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">0,013</td>
-<td style="text-align: center;">85</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">11</td>
-<td style="text-align: center;">0,014</td>
-<td style="text-align: center;">90</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">40</td>
-<td style="text-align: center;">38</td>
-<td style="text-align: center;">0,017</td>
-<td style="text-align: center;">91</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">50</td>
-<td style="text-align: center;">47</td>
-<td style="text-align: center;">0,020</td>
-<td style="text-align: center;">86</td>
-</tr>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">60</td>
-<td style="text-align: center;">80</td>
-<td style="text-align: center;">0,025</td>
-<td style="text-align: center;">87</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">10</td>
-<td style="text-align: center;">22</td>
-<td style="text-align: center;">0,014</td>
-<td style="text-align: center;">71</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">20</td>
-<td style="text-align: center;">1000</td>
-<td style="text-align: center;">0,017</td>
-<td style="text-align: center;">61</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">3500</td>
-<td style="text-align: center;">0,020</td>
-<td style="text-align: center;">66</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">40</td>
-<td style="text-align: center;">20000</td>
-<td style="text-align: center;">0,025</td>
-<td style="text-align: center;">85</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">50</td>
-<td style="text-align: center;">32800</td>
-<td style="text-align: center;">0,033</td>
-<td style="text-align: center;">83</td>
-</tr>
-<tr>
-<td style="text-align: center;">30</td>
-<td style="text-align: center;">60</td>
-<td style="text-align: center;">71400</td>
-<td style="text-align: center;">0,050</td>
-<td style="text-align: center;">80</td>
-</tr>
-</tbody>
-</table>
-<p><small>* all benchmark are obtained on an ESP32 board</small><br />
-<small>** the inference took actually sometimes less than 1ms to run for all the test samples, so it was rounded to 1ms and divided by the number of samples</small></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png" alt="Onboard IRIS dataset training time. Features dim = 4" /></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-Breast-cancer-dataset-training-time.png" alt="Onboard Breast cancer dataset training time. Features dim = 30" /></p>
-<p>We can see from the table that for the Iris dataset, which has 4-dimensional features, the training process is quite fast: 80ms to train on 60 samples.</p>
-<p>Things become much different when training on the Breast cancer dataset, with its 30 features per sample. Now we're talking abouts <em>seconds</em> to train and even minutes when increasing the number of samples to 60.</p>
-<p>Fortunately the inference time stays almost flat, so you will have real-time predictions.</p>
-<div class="watchout">I run the Iris benchmark on a Seeedstudio Xiao M0 board (32bit 48MHz processor), too. It took 7s to train on 60 samples vs 80ms it took on the ESP32. It is clear some boards are better than others for this task</div>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<h2>Downsides</h2>
-<p>Of course there're downsides: it's not a perfect world.</p>
-<h3>Convergence</h3>
-<div class="watchout">
-As <a href="http://cs229.stanford.edu/materials/smo.pdf" target="_blank" rel="noopener noreferrer">the paper</a> reported: "there is one thing to note, <b>the algorithm (the simplified version) is not guaranteed to converge".</b>
-</div>
-<p>I actually don't know, in practice, what this means. But it sounds like a bad thing.</p>
-<h3>Binary classification only</h3>
-<p>As of now this algorithm can only do binary classification.</p>
-<p>I hope to implement multi-class classification in the future with the one-vs-all approach, but I don't really know if it would be too inefficient for a microcontroller to run.</p>
-<h3>Declining accuracy</h3>
-<p>If you look at the benchmark table above, also, you'll notice the accuracy does not always increase linearly with the training samples size. It seems it reaches an optimum and then starts decreasing.</p>
-<p>If you're going to deploy your device in an autonomous scenario, you'll need to monitor your accucary every time you re-train it, or your results are going to go poor.</p>
-<p>You should keep track of the optimum you achieved and roll-back to its training set when you register a declining accuracy.</p>
-<h3>Memory</h3>
-<p>You will need to keep all your training set in memory for the classifier to both learn and predict. This means RAM will be a limiting factor and we know RAM is an expensive resource on microcontrollers.</p>
-<p>You will have to find a good enough compromise between the number of features, the number of samples and the accuracy.</p>
-<h2>Time to get your hands on</h2>
-<p>I created a sample project for you to <a href="/2020/03/how-to-train-a-color-classification-machine-learning-classifier-directly-on-your-arduino-board">train a color classifier</a> with a super simple setup: you will only need a TCS3200 (color sensor) to follow along.</p>
-<p>Dont' have a TCS3200? No problem, you can <a href="/2020/03/how-to-train-a-iris-classification-machine-learning-classifier-directly-on-your-arduino-board">train a classifier on the IRIS dataset</a></p>
-<p>If you've read so far, please consider letting me know in the comments some useful applications you can think about this new tool. It's a brand new topic for me and I'll appreciate any of your suggestion.</p>
-<hr />
-<p>Check the project repo on <a href="https://github.com/eloquentarduino/EloquentMicroML">Github</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/">So you want to train an ML classifier directly on an Arduino board?</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		

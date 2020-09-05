@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Mon, 24 Aug 2020 18:34:04 +0000</lastBuildDate>
+	<lastBuildDate>Sat, 05 Sep 2020 15:11:53 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,226 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.4</generator>
 	<item>
+		<title>&#8220;Principal&#8221; FFT components as efficient features extrator</title>
+		<link>https://eloquentarduino.github.io/2020/09/principal-fft-components-as-efficient-features-extrator/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Sat, 05 Sep 2020 08:52:02 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<category><![CDATA[microml]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1297</guid>
+
+					<description><![CDATA[<p>Fourier Transform is probably the most well known algorithm for feature extraction from time-dependent data (in particular speech data), where frequency holds a great deal of information. Sadly, computing the transform over the whole spectrum of the signal still requires O(NlogN) with the best implementation (FFT - Fast Fourier Transform); we would like to achieve [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/09/principal-fft-components-as-efficient-features-extrator/">&#8220;Principal&#8221; FFT components as efficient features extrator</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><a href="https://en.wikipedia.org/wiki/Fourier_transform">Fourier Transform</a> is probably the most well known algorithm for feature extraction from time-dependent data (in particular speech data), where frequency holds a great deal of information. Sadly, computing the transform over the whole spectrum of the signal still requires O(NlogN) with the best implementation (<a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">FFT - Fast Fourier Transform</a>); we would like to achieve faster computation on our microcontrollers.</p>
+<p>In this post I propose a partial, naive <strong>linear-time</strong> implementation of the Fourier Transform you can use to extract features from your data for Machine Learning models.</p>
+<p><span id="more-1297"></span></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#toctraining-aware-fft">Training-aware FFT</a><li><a href="#tocaccuracy-comparison">Accuracy comparison</a><li><a href="#tochow-to-use-principal-fft-in-python">How to use Principal FFT in Python</a><li><a href="#tochow-to-use-principal-fft-in-c">How to use Principal FFT in C</a><ol><li><a href="#tocbenchmarking">Benchmarking</a></ol></div></p>
+<p><strong>DISCLAIMER</strong></p>
+<p><em>The contents of this post represent my own knowledge and are not supported by any academic work (as far as I know). It may really be the case that the findings of my work don't apply to your own projects; yet, I think this idea can turn useful in solving certain kind of problems.</em></p>
+<h2 id="toctraining-aware-fft">Training-aware FFT</h2>
+<p>Fourier transform is used to describe a signal over its entire frequency range. This is useful in a number of applications, but here we're focused on the FT for the sole purpose of extracting features to be used with Machine learning models.</p>
+<p>For this reason, we don't actually need a full description of the input signal: we're only interested in extracting some kind of signature that a ML model can use to distinguish among the different classes. Noticing that in a signal spectrum most frequencies have a low magnitude (as you can see in the picture below), the idea to only keep the <em>most important</em> frequencies came to my mind as a mean to speed up the computation on resource constrained microcontrollers.</p>
+<p><img src="https://www.researchgate.net/publication/324590530/figure/fig4/AS:616761783230465@1524058876149/Fast-fourier-transform-FFT-spectrum-of-the-vibration-signal-using-a-rotation-speed-of.png" alt="FFT spectrum example" /></p>
+<p>I was thinking to a kind of PCA (Principal Component Analysis), but using FFT spectrum as features.</p>
+<p>Since we will have a training set with the raw signals, we would like to select the most prominent frequencies among all the samples and apply the computation only on those: even using the naive implementation of FFT, this will yield a linear-time implementation.</p>
+<h2 id="tocaccuracy-comparison">Accuracy comparison</h2>
+<p>How does this <em>Principal FFT</em> compare to, let's say, PCA as a dimensionality reduction algorithm w.r.t model accuracy? Let's see the numbers!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/09/FFT-vs-PCA.png" alt="FFT vs PCA accuracy comparison on various datasets" /></p>
+<p><a href="/wp-content/uploads/2020/09/Principal-FFT-benchmark.ods" title="Principal FFT benchmark spreadsheet">Download the Principal FFT benchmark spreadsheet</a></p>
+<p>I couldn't find many examples of the kind of datasets I wished to test, but in the image you can see different types of data:</p>
+<ul>
+<li>human activity classification from smartphone data</li>
+<li>gesture classification by IMU data</li>
+<li>MNIST handwritten digits image data</li>
+<li>free speech audio data</li>
+</ul>
+<p>We can note a couple findings:</p>
+<ol>
+<li>Principal FFT is almost on par with PCA after a certain number of components</li>
+<li>PrincipalFFT definitely leaves PCA behind on audio data</li>
+</ol>
+<p>From even this simple analysis you should be convinced that Principal FFT can be (under certain cases) a fast, performant features extractor for your projects that involve time-dependant data.</p>
+<h2 id="tochow-to-use-principal-fft-in-python">How to use Principal FFT in Python</h2>
+<p>I created a Python package to use Principal FFT, called <code>principal-fft</code>.</p>
+<pre><code class="language-bash">pip install principal-fft</code></pre>
+<p>The class follows the <code>Transformer</code> API from <code>scikit-learn</code>, so it has <code>fit</code> and <code>transform</code> methods.</p>
+<pre><code class="language-python">from principalfft import PrincipalFFT
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import load_digits
+from sklearn.ensemble import RandomForestClassifier
+
+mnist = load_digits()
+X, y = mnist.data, mnist.target
+Xfft = PrincipalFFT(n_components=10).fit_transform(X)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+Xfft_train, Xfft_test, y_train, y_test = train_test_split(Xfft, y, test_size=0.3)
+
+clf = RandomForestClassifier(50, min_samples_leaf=5).fit(X_train, y_train)
+print(&quot;Raw score&quot;, clf.score(X_test, y_test))
+
+clf = RandomForestClassifier(50, min_samples_leaf=5).fit(Xfft_train, y_train)
+print(&quot;FFT score&quot;, clf.score(Xfft_test, y_test))</code></pre>
+<p>My results are <code>0.09</code> for raw data and <code>0.78</code> for FFT transformed: quite a big difference!</p>
+<p>As with any dimensionality reduction, <code>n_components</code> is an hyperparameter you have to tune for your specific project: from my experiments, you shouldn't go lower than <code>8</code> to achieve a reasonable accuracy.</p>
+<h2 id="tochow-to-use-principal-fft-in-c">How to use Principal FFT in C</h2>
+<p>So, now that we tested our Principal FFT transformer in Python and achieved good results, how do we use it on our microcontroller? Of course with the <code>micromlgen</code> porter: it is now (<code>version 1.1.9</code>) able to port PrincipalFFT objects to plain C.</p>
+<pre><code class="language-bash">pip install micromlgen==1.1.9</code></pre>
+<p>What does the C code look like?</p>
+<pre><code class="language-cpp">void principalFFT(float *features, float *fft) {
+    // apply principal FFT (naive implementation for the top 10 frequencies only)
+    const int topFrequencies[] = { 0, 8, 17, 16, 1, 9, 2, 7, 15, 6 };
+
+    for (int i = 0; i &lt; 10; i++) {
+        const int k = topFrequencies[i];
+        const float harmonic = 0.09817477042468103 * k;
+        float re = 0;
+        float im = 0;
+
+        // optimized case
+        if (k == 0) {
+            for (int n = 0; n &lt; 64; n++) {
+                re += features[n];
+            }
+        }
+
+        else {
+            for (int n = 0; n &lt; 64; n++) {
+                const float harmonic_n = harmonic * n;
+                const float cos_n = cos(harmonic_n);
+                const float sin_n = sin(harmonic_n);
+                re += features[n] * cos_n;
+                im -= features[n] * sin_n;
+            }
+        }
+
+        fft[i] = sqrt(re * re + im * im);
+    }
+}</code></pre>
+<p>This is the most direct porting available.</p>
+<p>In the <em>Benchmarks</em> section, we'll see how this implementation can be speed-up with alternative implementations.</p>
+<h3 id="tocbenchmarking">Benchmarking</h3>
+<p>The following table reports the benchmark on the MNIST dataset (64 features) with 10 principal FFT components vs various tecniques to decrease the computation time at the expense of memory usage.</p>
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th style="text-align: center;">Flash (Kb)</th>
+<th style="text-align: center;">Execution time (micros)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None</td>
+<td style="text-align: center;">137420</td>
+<td style="text-align: center;">-</td>
+</tr>
+<tr>
+<td>arduinoFFT library</td>
+<td style="text-align: center;">147812</td>
+<td style="text-align: center;">3200</td>
+</tr>
+<tr>
+<td>principalFFT</td>
+<td style="text-align: center;">151404</td>
+<td style="text-align: center;">4400</td>
+</tr>
+<tr>
+<td>principalFFT w/ cos+sin LUT</td>
+<td style="text-align: center;">152124</td>
+<td style="text-align: center;">900</td>
+</tr>
+<tr>
+<td>principalFFT w/ cos LUT + sin sign LUT</td>
+<td style="text-align: center;">150220</td>
+<td style="text-align: center;">1250</td>
+</tr>
+</tbody>
+</table>
+<p>*<em>all the benchmarks were run on the Arduino 33 Nano BLE Sense</em></p>
+<p>Some thoughts:</p>
+<ol start="2">
+<li><code>principalFFT w/ cos+sin LUT</code> means I pre-compute the values of <code>sin</code> and <code>cos</code> at compile time, so there's no computation on the board; of course these lookup tables will eat some memory</li>
+<li><code>principalFFT w/ cos LUT + sin sign LUT</code> means I pre-compute the <code>cos</code> values only and compute <code>sin</code> using <code>sqrt(1 - cos(x)^2)</code>; it adds some microseconds to the computation, but requires less memory</li>
+<li><code>arduinoFFT library</code> is faster than <code>principalFFT</code> in the execution time and requires less memory, even if <code>principalFFT</code> is only computing 10 frequencies: I need to investigate how it can achieve such performances</li>
+</ol>
+<p>You can activate the LUT functionality with:</p>
+<pre><code class="language-python">from micromlgen import port
+from principalfft import PrincipalFFT
+
+fft = PrincipalFFT(n_components=10).fit(X)
+
+# cos lookup, sin computed
+port(fft, lookup_cos=True)
+
+# cos + sin lookup
+port(fft, lookup_cos=True, lookup_sin=True)</code></pre>
+<p>Here's how the C code looks like with LUT.</p>
+<pre><code class="language-cpp">void principalFFT(float *features, float *fft) {
+    // apply principal FFT (naive implementation for the top N frequencies only)
+    const int topFrequencies[] = { 0, 8, 17, 16, 1, 9, 2, 7, 15, 6 };
+    const float cosLUT[10][64] = {
+        {  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0},
+        {  1.0,  0.7071,  6.1232e-17,  -0.7071,  -1.0,  -0.7071,  -1.8369e-16,  0.7071,  1.0,  0.7071,  3.0616e-16,  -0.7071,  -1.0,  -0.7071,  -4.2862e-16,  0.7071,  1.0,  0.7071,  5.5109e-16,  -0.7071,  -1.0,  -0.7071,  -2.4499e-15,  0.7071,  1.0,  0.7071,  -9.8033e-16,  -0.7071,  -1.0,  -0.7071,  -2.6948e-15,  0.7071,  1.0,  0.7071,  -7.3540e-16,  -0.7071,  -1.0,  -0.7071,  -2.9397e-15,  0.7071,  1.0,  0.7071,  -4.9047e-16,  -0.7071,  -1.0,  -0.7071,  -3.1847e-15,  0.7071,  1.0,  0.7071,  -2.4554e-16,  -0.7071,  -1.0,  -0.7071,  -3.4296e-15,  0.7071,  1.0,  0.7071,  -6.1898e-19,  -0.7071,  -1.0,  -0.7071,  -3.6745e-15,  0.7071},   ... };
+    const bool sinLUT[10][64] = {
+        {  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false},
+        {  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false,  false,  true,  true,  true,  false,  false,  false,  false,  false,  true,  true,  true,  true,  false,  false,  false},  ...};
+
+    for (int i = 0; i &lt; 10; i++) {
+        const int k = topFrequencies[i];
+        const float harmonic = 0.09817477042468103 * k;
+        float re = 0;
+        float im = 0;
+        // optimized case
+        if (k == 0) {
+            for (int n = 0; n &lt; 64; n++) {
+                re += features[n];
+            }
+        }
+
+        else {
+            for (int n = 0; n &lt; 64; n++) {
+                const float cos_n = cosLUT[i][n];
+                const float sin_n = sinLUT[i][n] ? sqrt(1 - cos_n * cos_n) : -sqrt(1 - cos_n * cos_n);
+                re += features[n] * cos_n;
+                im -= features[n] * sin_n;
+            }
+        }
+
+        fft[i] = sqrt(re * re + im * im);
+    }
+}</code></pre>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<hr />
+<p>This post required much work to be produced, so I hope I didn't forgot anything  and you found these information useful.<br />
+As always, there's a <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/PrincipalFFTExample/PrincipalFFTExample.ino">Github repo</a> with all the code of this post.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/09/principal-fft-components-as-efficient-features-extrator/">&#8220;Principal&#8221; FFT components as efficient features extrator</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Better word classification with Arduino Nano 33 BLE Sense and Machine Learning</title>
 		<link>https://eloquentarduino.github.io/2020/08/better-word-classification-with-arduino-33-ble-sense-and-machine-learning/</link>
 		
@@ -2006,122 +2226,6 @@ This is an emerging field for me, so I will need time to master it.</p>
 <hr />
 <p>As always, you can find the examle on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/OvOExample/OvOExample.ino">Github</a> with a the dataset to experiment with.</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/incremental-multiclass-classification-on-microcontrollers-one-vs-one/">Incremental multiclass classification on microcontrollers: One vs One</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
-			</item>
-		<item>
-		<title>Stochastic Gradient Descent on your microcontroller</title>
-		<link>https://eloquentarduino.github.io/2020/04/stochastic-gradient-descent-on-your-microcontroller/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Fri, 10 Apr 2020 17:43:45 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[microml]]></category>
-		<category><![CDATA[online-learning]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1062</guid>
-
-					<description><![CDATA[<p>Stochastic gradient descent is a well know algorithm to train classifiers in an incremental fashion: that is, as training samples become available. This saves you critical memory on tiny devices while still achieving top performance! Now you can use it on your microcontroller with ease. A brief recap on Stochastic Gradient Descent If you ever [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/stochastic-gradient-descent-on-your-microcontroller/">Stochastic Gradient Descent on your microcontroller</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>Stochastic gradient descent is a well know algorithm to train classifiers in an incremental fashion: that is, as training samples become available. This saves you critical memory on tiny devices while still achieving <strong>top performance</strong>! Now you can use it on your microcontroller with ease.</p>
-<p><span id="more-1062"></span></p>
-<h2>A brief recap on Stochastic Gradient Descent</h2>
-<p>If you ever worked with Machine learning, you surely know about <a href="https://en.wikipedia.org/wiki/Gradient_descent">Gradient descent</a>: it is an iterative algorithm to optimize a loss function. </p>
-<p>It is much general-purpose, in the sense that it is not bound to a particular application, but it has been heavily used in Neural networks in the recent years.</p>
-<p>Yet, it can be used as a classifier on its own if you set its loss function as the classification error.</p>
-<p><img src="https://mccormickml.com/assets/GradientDescent/GradientDescentOfMSETable.png" alt="Update rule of Gradient descent" /></p>
-<p>This is the core update rule of Gradient descent: quite simple.</p>
-<p>As you see, there's a summation in the formula: this means we need to cycle through the entire training set to compute the update to the weights.</p>
-<p>In case of large datasets, this can be slow or not possible at all.</p>
-<p>And requires a lot of memory.</p>
-<p>And we don't have memory on microcontrollers.</p>
-<p>So we need <a href="https://en.wikipedia.org/wiki/Stochastic_gradient_descent">Stochastic gradient descent</a>.</p>
-<p>Stochastic gradient descent has the same exact update rule, but it is applied on the single training sample.</p>
-<p>Imagine the summation goes from 1 to 1, instead of m.</p>
-<p>That's it.</p>
-<div class="heateor_sss_sharing_container heateor_sss_horizontal_sharing" ss-offset="0" heateor-sss-data-href='https://eloquentarduino.github.io/2020/04/stochastic-gradient-descent-on-your-microcontroller/'><ul class="heateor_sss_sharing_ul"><li class="heateorSssSharingRound"><i style="width:35px;height:35px;border-radius:999px;" alt="Facebook" Title="Facebook" class="heateorSssSharing heateorSssFacebookBackground" onclick='heateorSssPopup("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Feloquent.blog%2F2020%2F04%2Fstochastic-gradient-descent-on-your-microcontroller%2F")'><ss style="display:block;border-radius:999px;" class="heateorSssSharingSvg heateorSssFacebookSvg"></ss></i></li><li class="heateorSssSharingRound"><i style="width:35px;height:35px;border-radius:999px;" alt="Twitter" Title="Twitter" class="heateorSssSharing heateorSssTwitterBackground" onclick='heateorSssPopup("http://twitter.com/intent/tweet?via=ArduinoEloquent&text=Stochastic%20Gradient%20Descent%20on%20your%20microcontroller&url=http%3A%2F%2Feloquent.blog%2F2020%2F04%2Fstochastic-gradient-descent-on-your-microcontroller%2F")'><ss style="display:block;border-radius:999px;" class="heateorSssSharingSvg heateorSssTwitterSvg"></ss></i></li><li class="heateorSssSharingRound"><i style="width:35px;height:35px;border-radius:999px;" alt="Linkedin" Title="Linkedin" class="heateorSssSharing heateorSssLinkedinBackground" onclick='heateorSssPopup("http://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Feloquent.blog%2F2020%2F04%2Fstochastic-gradient-descent-on-your-microcontroller%2F&title=Stochastic%20Gradient%20Descent%20on%20your%20microcontroller")'><ss style="display:block;border-radius:999px;" class="heateorSssSharingSvg heateorSssLinkedinSvg"></ss></i></li><li class="heateorSssSharingRound"><i style="width:35px;height:35px;border-radius:999px;" title="More" alt="More" class="heateorSssSharing heateorSssMoreBackground" onclick="heateorSssMoreSharingPopup(this, 'https://eloquentarduino.github.io/2020/04/stochastic-gradient-descent-on-your-microcontroller/', 'Stochastic%20Gradient%20Descent%20on%20your%20microcontroller', '' )" ><ss style="display:block" class="heateorSssSharingSvg heateorSssMoreSvg"></ss></i></li></ul><div class="heateorSssClear"></div></div>
-<h2>How to use</h2>
-<p>The pattern of use is similar to that of the <a href="/2020/04/passive-aggressive-classifier-for-embedded-devices/">Passive Aggressive classifier</a>: you have the <code>fitOne</code> and <code>predict</code> methods.</p>
-<p>First of all, <a href="https://github.com/eloquentarduino/EloquentMicroML">download the library from Github</a>.</p>
-<pre><code class="language-c">#include &lt;EloquentSGD.h&gt;
-#include &lt;EloquentAccuracyScorer.h&gt;
-#include &quot;iris.h&quot;
-
-#define VERBOSE
-
-using namespace Eloquent::ML;
-
-void setup() {
-    Serial.begin(115200);
-    delay(3000);
-}
-
-void loop() {
-    int trainSamples;
-    int retrainingCycles;
-    SGD&lt;FEATURES_DIM&gt; clf;
-    AccuracyScorer scorer;
-
-    // ....
-
-    // train
-    for (uint16_t cycle = 0; cycle &lt; retrainingCycles; cycle++)
-        for (uint16_t i = 0; i &lt; trainSamples; i++)
-            clf.fitOne(X[i], y[i]);
-
-    // predict
-    for (uint16_t i = trainSamples; i &lt; DATASET_SIZE; i++) {
-        int predicted = clf.predict(X[i]);
-        int actual = y[i];
-
-        scorer.scoreOne(actual, predicted);
-    }
-
-    Serial.print(&quot;Accuracy: &quot;);
-    Serial.print(round(100 * scorer.accuracy()));
-    Serial.print(&quot;% out of &quot;);
-    Serial.print(scorer.support());
-    Serial.println(&quot; predictions&quot;);
-}</code></pre>
-<p>In this case we're working with known datasets, so we cycle through them for the training, but if you're learning &quot;on-line&quot;, from samples generated over time, it will work exactly the same.</p>
-<h2>A bit of momentum</h2>
-<p>Stochastic gradient descent works quite well out of the box in most cases.</p>
-<p>Sometimes, however, its updates can start &quot;oscillating&quot;.</p>
-<p><img src="https://media.springernature.com/original/springer-static/image/chp%3A10.1007%2F978-1-4842-4470-8_33/MediaObjects/463852_1_En_33_Fig1_HTML.jpg" alt="SGD with and without momentum" /></p>
-<p>To solve this problem, it <a href="https://doi.org/10.1038%2F323533a0">has been proposed</a> the <strong>momentum</strong> technique, which can both speed up learning and increase the accuracy.</p>
-<p>In my personal tests, I was able to achieve up to +5% in accuracy on the majority of datasets.</p>
-<p>To use it, you only need to set a <em>decay factor</em> between 0 and 1.</p>
-<pre><code class="language-c">SGD clf;
-
-clf.momentum(0.5);</code></pre>
-<h2>Run on your own</h2>
-<p>On <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/SGDExample/SGDExample.ino">Github</a> you can find the full example with some benchmark datasets to try on your own.</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<p>The example is interactive an will ask you how many samples to use for the training and how many times to cycle through them.</p>
-<p>This is something you should consider: if you have a training set and can store it somehow (in memory or on Flash for example), re-presenting the same samples to the SGD classifier could (and probably will) increase its performance if done correctly.</p>
-<p>This happens because the algorithm needs some time to converge and if it doesn't receive enough samples it won't learn properly.</p>
-<p>Of course, if you re-use the same samples over and over again, you're likely to overfit.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/stochastic-gradient-descent-on-your-microcontroller/">Stochastic Gradient Descent on your microcontroller</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		
