@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/arduino-machine-learning/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sat, 05 Sep 2020 15:11:53 +0000</lastBuildDate>
+	<lastBuildDate>Sat, 05 Sep 2020 15:14:34 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -34,14 +34,14 @@
 ]]></description>
 										<content:encoded><![CDATA[<p><a href="https://en.wikipedia.org/wiki/Fourier_transform">Fourier Transform</a> is probably the most well known algorithm for feature extraction from time-dependent data (in particular speech data), where frequency holds a great deal of information. Sadly, computing the transform over the whole spectrum of the signal still requires O(NlogN) with the best implementation (<a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">FFT - Fast Fourier Transform</a>); we would like to achieve faster computation on our microcontrollers.</p>
 <p>In this post I propose a partial, naive <strong>linear-time</strong> implementation of the Fourier Transform you can use to extract features from your data for Machine Learning models.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/09/FFT-spectrum.png" alt="FFT spectrum example" /></p>
 <p><span id="more-1297"></span></p>
 <p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#toctraining-aware-fft">Training-aware FFT</a><li><a href="#tocaccuracy-comparison">Accuracy comparison</a><li><a href="#tochow-to-use-principal-fft-in-python">How to use Principal FFT in Python</a><li><a href="#tochow-to-use-principal-fft-in-c">How to use Principal FFT in C</a><ol><li><a href="#tocbenchmarking">Benchmarking</a></ol></div></p>
 <p><strong>DISCLAIMER</strong></p>
 <p><em>The contents of this post represent my own knowledge and are not supported by any academic work (as far as I know). It may really be the case that the findings of my work don't apply to your own projects; yet, I think this idea can turn useful in solving certain kind of problems.</em></p>
 <h2 id="toctraining-aware-fft">Training-aware FFT</h2>
 <p>Fourier transform is used to describe a signal over its entire frequency range. This is useful in a number of applications, but here we're focused on the FT for the sole purpose of extracting features to be used with Machine learning models.</p>
-<p>For this reason, we don't actually need a full description of the input signal: we're only interested in extracting some kind of signature that a ML model can use to distinguish among the different classes. Noticing that in a signal spectrum most frequencies have a low magnitude (as you can see in the picture below), the idea to only keep the <em>most important</em> frequencies came to my mind as a mean to speed up the computation on resource constrained microcontrollers.</p>
-<p><img src="https://www.researchgate.net/publication/324590530/figure/fig4/AS:616761783230465@1524058876149/Fast-fourier-transform-FFT-spectrum-of-the-vibration-signal-using-a-rotation-speed-of.png" alt="FFT spectrum example" /></p>
+<p>For this reason, we don't actually need a full description of the input signal: we're only interested in extracting some kind of signature that a ML model can use to distinguish among the different classes. Noticing that in a signal spectrum most frequencies have a low magnitude (as you can see in the picture above), the idea to only keep the <em>most important</em> frequencies came to my mind as a mean to speed up the computation on resource constrained microcontrollers.</p>
 <p>I was thinking to a kind of PCA (Principal Component Analysis), but using FFT spectrum as features.</p>
 <p>Since we will have a training set with the raw signals, we would like to select the most prominent frequencies among all the samples and apply the computation only on those: even using the naive implementation of FFT, this will yield a linear-time implementation.</p>
 <h2 id="tocaccuracy-comparison">Accuracy comparison</h2>
