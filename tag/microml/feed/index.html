@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/tag/microml/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sat, 17 Oct 2020 15:19:27 +0000</lastBuildDate>
+	<lastBuildDate>Sat, 17 Oct 2020 15:26:01 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -250,13 +250,13 @@ As always, there's a <a href="https://github.com/eloquentarduino/EloquentMicroML
 		<category><![CDATA[ml]]></category>
 		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1282</guid>
 
-					<description><![CDATA[<p>Let's revamp the post I wrote about word classification using Machine Learning on Arduino, this time using a proper microphone (the MP34DT05 mounted on the Arduino Nano 33 BLE Sense) instead of a chinese, analog one: will the results improve? Update on 16 October 2020: step by step explanation of the process with ready-made sketch [&#8230;]</p>
+					<description><![CDATA[<p>Let's revamp the post I wrote about word classification using Machine Learning on Arduino, this time using a proper microphone (the MP34DT05 mounted on the Arduino Nano 33 BLE Sense) instead of a chinese, analog one: will the results improve? Updated on 16 October 2020: step by step explanation of the process with ready-made sketch [&#8230;]</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/08/better-word-classification-with-arduino-33-ble-sense-and-machine-learning/">Better word classification with Arduino Nano 33 BLE Sense and Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></description>
 										<content:encoded><![CDATA[<p>Let's revamp the post I wrote about <a href="/2019/12/word-classification-using-arduino/">word classification using Machine Learning on Arduino</a>, this time using a proper microphone (the MP34DT05 mounted on the Arduino Nano 33 BLE Sense) instead of a chinese, analog one: will the results improve?</p>
 <div id="attachment_653" style="width: 760px" class="wp-caption alignnone"><img aria-describedby="caption-attachment-653" src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg" width="750" height="422" class="size-full wp-image-653" srcset="https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg 750w, https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord-300x169.jpg 300w" sizes="(max-width: 750px) 100vw, 750px" /><p id="caption-attachment-653" class="wp-caption-text">from https://www.udemy.com/course/learn-audio-processing-complete-engineers-course/</p></div>
 <p><span id="more-1282"></span></p>
-<p><strong>Update on 16 October 2020: step by step explanation of the process with ready-made sketch code</strong></p>
+<p><strong>Updated on 16 October 2020: step by step explanation of the process with ready-made sketch code</strong></p>
 <p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocwhat-youll-learn">What you'll learn</a><li><a href="#tocwhat-youll-need">What you'll need</a><li><a href="#tocstep-1-capture-audio-samples">Step 1. Capture audio samples</a><ol><li><a href="#toctheory-pulse-density-modulation-a-k-a-pdm">Theory: Pulse-density modulation (a.k.a. PDM)</a><li><a href="#tocpractice-the-code-to-capture-the-samples">Practice: the code to capture the samples</a><li><a href="#tocaction-capture-the-words-examples">Action: capture the words examples</a></li></ol><li><a href="#tocstep-2-train-the-machine-learning-model">Step 2. Train the machine learning model</a><li><a href="#tocstep-3-deploy-to-your-microcontroller">Step 3. Deploy to your microcontroller</a></ol></div></p>
 <h2 id="tocwhat-youll-learn">What you'll learn</h2>
 <p>This tutorial will teach you how to capture audio from the Arduino Nano 33 BLE Sense microphone and classify it: at the end of this post, you will have a trained model able to detect in real-time the word you tell, among the ones that you trained it to recognize. The classification will occur directly on your Arduino board.</p>
