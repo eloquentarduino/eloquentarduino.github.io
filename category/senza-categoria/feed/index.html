@@ -12,14 +12,211 @@
 	<atom:link href="https://eloquentarduino.github.io/category/senza-categoria/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 09 Aug 2020 14:19:32 +0000</lastBuildDate>
+	<lastBuildDate>Tue, 10 Nov 2020 17:58:14 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
 	<sy:updateFrequency>
 	1	</sy:updateFrequency>
-	<generator>https://wordpress.org/?v=5.3.4</generator>
+	<generator>https://wordpress.org/?v=5.3.6</generator>
 	<item>
+		<title>TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</title>
+		<link>https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Tue, 10 Nov 2020 16:37:13 +0000</pubDate>
+				<category><![CDATA[Senza categoria]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1365</guid>
+
+					<description><![CDATA[<p>Are you fascinated by TinyML and Tensorflow for microcontrollers? Do you want to run a CNN (Convolutional Neural Network) on your Arduino and STM32 boards? Do you want to do it without pain? EloquentTinyML is the library for you! EloquentTinyML, my library to easily run Tensorflow Lite neural networks on Arduino microcontrollers, is gaining some [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/">TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Are you fascinated by TinyML and Tensorflow for microcontrollers? </p>
+<p>Do you want to run a CNN (Convolutional Neural Network) on your Arduino and STM32 boards? </p>
+<p>Do you want to do it without pain? </p>
+<p>EloquentTinyML is the library for you!</p>
+<p><img src="https://miro.medium.com/max/1040/1*3BRLw4lsANPEfGgimG3YVQ.png" alt="Convolutional neural network topology" /></p>
+<p><span id="more-1365"></span></p>
+<p><a href="https://github.com/eloquentarduino/EloquentTinyML">EloquentTinyML</a>, my library to easily run Tensorflow Lite neural networks on Arduino microcontrollers, is gaining some popularity so I think it's time for a good tutorial on the topic.</p>
+<p>If you're a seasoned follower of my blog, you may know that I don't really like Tensorflow on microcontrollers, because it is often <em>&quot;over-sized&quot;</em> for the project at hand and there are <a href="/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/">leaner</a>, <a href="/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/">faster</a> <a href="/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/">alternatives</a>.</p>
+<p>Nonetheless, Tensorflow is gaining much popularity in the embedded world so I'll try to give my contribute too.</p>
+<p>In this tutorial, I'm going to show you <strong>step by step</strong> how to train a CNN in Tensorflow and deploy it to you board: I tested the code both on the <strong>Arduino Nano 33 BLE Sense</strong> and the <strong>STM32 Nucleus L432KC</strong>.</p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tochow-to-train-a-cnn-in-tensorflow">How to train a CNN in Tensorflow</a><ol><li><a href="#tocstep-1-import-the-libraries">Step 1. Import the libraries</a><li><a href="#tocstep-2-generate-train-validation-and-test-data">Step 2. Generate train, validation and test data</a><li><a href="#tocstep-3-create-and-train-the-model">Step 3. Create and train the model</a><li><a href="#tocstep-4-testing-the-model-accuracy">Step 4. Testing the model accuracy</a><li><a href="#tocstep-5-exporting-the-model">Step 5. Exporting the model</a></li></ol><li><a href="#tochow-to-run-a-cnn-on-arduino-and-stm32-boards-with-eloquenttinyml">How to run a CNN on Arduino and STM32 boards with EloquentTinyML</a><ol><li><a href="#toccnn-on-arduino-and-stm32-figures">CNN on Arduino and STM32 figures</a></li></ol><li><a href="#tocand-you">And you?</a></ol></div></p>
+<h2 id="tochow-to-train-a-cnn-in-tensorflow">How to train a CNN in Tensorflow</h2>
+<p>I'm not an expert either in Tensorflow nor Convolutional Neural Networks, so I kept the project as simple as possible. I used an <em>image-like</em> dataset to create a setup where CNN should perform well: the dataset is the <a href="http://yann.lecun.com/exdb/mnist/">MNIST handwritten digits</a> one.</p>
+<p><img src="https://miro.medium.com/max/800/1*LyRlX__08q40UJohhJG9Ow.png" alt="MNIST dataset example" /></p>
+<p>It is composed by <strong>8x8</strong> images of handwritten digits, from 0 to 9 and can be easily imported via the <code>scikit-learn</code> Python package.</p>
+<p>Regarding the CNN topology, I wanted to stay as lean as possible: the goal of this tutorial is to teach you how to deploy your own network, not about achieving 100% accuracy.</p>
+<p>Let's see step by step how to produce a usable model.</p>
+<h3 id="tocstep-1-import-the-libraries">Step 1. Import the libraries</h3>
+<p>We will need <code>numpy</code> and <code>Tensorflow</code>, of course, plus <code>scikit-learn</code> to load the dataset and <a href="https://github.com/eloquentarduino/tinymlgen">tinymlgen</a> to port the CNN to plain C.</p>
+<pre><code class="language-python">import numpy as np
+from sklearn.datasets import load_digits
+import tensorflow as tf
+from tensorflow.keras import layers
+from tinymlgen import port</code></pre>
+<h3 id="tocstep-2-generate-train-validation-and-test-data">Step 2. Generate train, validation and test data</h3>
+<p>To train the network, we need:</p>
+<ul>
+<li><code>training data</code>: this is the data the network uses to learn its weights</li>
+<li><code>validation data</code>: this is the data the network uses to understand if it's doing well during learning</li>
+<li><code>test data</code>: this is the data we use to test the network accuracy once it's done learning</li>
+</ul>
+<pre><code class="language-python">def get_data():
+    np.random.seed(1337)
+    x_values, y_values = load_digits(return_X_y=True)
+    x_values /= x_values.max()
+    # reshape to (8 x 8 x 1)
+    x_values = x_values.reshape((len(x_values), 8, 8, 1))
+
+    # split into train, validation, test
+    TRAIN_SPLIT = int(0.6 * len(x_values))
+    TEST_SPLIT = int(0.2 * len(x_values) + TRAIN_SPLIT)
+    x_train, x_test, x_validate = np.split(x_values, [TRAIN_SPLIT, TEST_SPLIT])
+    y_train, y_test, y_validate = np.split(y_values, [TRAIN_SPLIT, TEST_SPLIT])
+
+    return x_train, x_test, x_validate, y_train, y_test, y_validate</code></pre>
+<h3 id="tocstep-3-create-and-train-the-model">Step 3. Create and train the model</h3>
+<p>Now we have to create our network topology.</p>
+<p>As I stated earlier, I wanted to keep this as simple as possible (also considering that we're using a toy dataset): I added a single convolution layer (without even max pooling) followed by the output layer.</p>
+<pre><code class="language-python">def get_model():
+    x_train, x_test, x_validate, y_train, y_test, y_validate = get_data()
+
+    # create a CNN
+    model = tf.keras.Sequential()
+    model.add(layers.Conv2D(8, (3, 3), activation=&#039;relu&#039;, input_shape=(8, 8, 1)))
+    # model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(len(np.unique(y_train))))
+
+    model.compile(optimizer=&#039;adam&#039;, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=[&#039;accuracy&#039;])
+    model.fit(x_train, y_train, epochs=50, batch_size=16,
+                        validation_data=(x_validate, y_validate))
+    return model, x_test, y_test</code></pre>
+<h3 id="tocstep-4-testing-the-model-accuracy">Step 4. Testing the model accuracy</h3>
+<p>Do you think this topology is too simple to learn something useful in so few epochs?</p>
+<p>Think again: it achieved <strong>97%</strong> accuracy!</p>
+<p>Not bad.</p>
+<pre><code class="language-python">def test_model(model, x_test, y_test):
+    x_test = (x_test / x_test.max()).reshape((len(x_test), 8, 8, 1))
+    y_pred = model.predict(x_test).argmax(axis=1)
+
+    print(&#039;ACCURACY&#039;, (y_pred == y_test).sum() / len(y_test))</code></pre>
+<h3 id="tocstep-5-exporting-the-model">Step 5. Exporting the model</h3>
+<p>Once we have a trained model that performs well, we want to deploy it to our microcontroller. Thanks to the <code>tinymlgen</code> packages, is as easy as a one-liner.</p>
+<pre><code class="language-python">if __name__ == &#039;__main__&#039;:
+    model, x_test, y_test = get_model()
+    test_model(model, x_test, y_test)
+    c_code = port(model, variable_name=&#039;digits_model&#039;, pretty_print=True)
+    print(c_code)</code></pre>
+<h2 id="tochow-to-run-a-cnn-on-arduino-and-stm32-boards-with-eloquenttinyml">How to run a CNN on Arduino and STM32 boards with EloquentTinyML</h2>
+<p>Ok, now we have the content we need to create an Arduino sketch to run the CNN on our microcontroller.</p>
+<p>We will use the <code>EloquentTinyML</code> library to do this without pain.</p>
+<p>This is a library to run TinyML models on your microcontroller without messing around with complex compilation procedures and esoteric errors.</p>
+<p>You must first install the library at its latest version (0.0.5 or 0.0.4 if not available), either via the Library Manager or directly from Github.</p>
+<pre><code class="language-cpp">#include &lt;EloquentTinyML.h&gt;
+
+// copy the printed code from tinymlgen into this file
+#include &quot;digits_model.h&quot;
+
+#define NUMBER_OF_INPUTS 64
+#define NUMBER_OF_OUTPUTS 10
+#define TENSOR_ARENA_SIZE 8*1024
+
+Eloquent::TinyML::TfLite&lt;NUMBER_OF_INPUTS, NUMBER_OF_OUTPUTS, TENSOR_ARENA_SIZE&gt; ml;
+
+void setup() {
+    Serial.begin(115200);
+    ml.begin(digits_model);
+}
+
+void loop() {
+    // a random sample from the MNIST dataset (precisely the last one)
+    float x_test[64] = { 0., 0. , 0.625 , 0.875 , 0.5   , 0.0625, 0. , 0. ,
+                    0. , 0.125 , 1. , 0.875 , 0.375 , 0.0625, 0. , 0. ,
+                    0. , 0. , 0.9375, 0.9375, 0.5   , 0.9375, 0. , 0. ,
+                    0. , 0. , 0.3125, 1. , 1. , 0.625 , 0. , 0. ,
+                    0. , 0. , 0.75  , 0.9375, 0.9375, 0.75  , 0. , 0. ,
+                    0. , 0.25  , 1. , 0.375 , 0.25  , 1. , 0.375 , 0. ,
+                    0. , 0.5   , 1. , 0.625 , 0.5   , 1. , 0.5   , 0. ,
+                    0. , 0.0625, 0.5   , 0.75  , 0.875 , 0.75  , 0.0625, 0. };
+    // the output vector for the model predictions
+    float y_pred[10] = {0};
+    // the actual class of the sample
+    int y_test = 8;
+
+    // let&#039;s see how long it takes to classify the sample
+    uint32_t start = micros();
+
+    ml.predict(x_test, y_pred);
+
+    uint32_t timeit = micros() - start;
+
+    Serial.print(&quot;It took &quot;);
+    Serial.print(timeit);
+    Serial.println(&quot; micros to run inference&quot;);
+
+    // let&#039;s print the raw predictions for all the classes
+    // these values are not directly interpretable as probabilities!
+    Serial.print(&quot;Test output is: &quot;);
+    Serial.println(y_test);
+    Serial.print(&quot;Predicted proba are: &quot;);
+
+    for (int i = 0; i &lt; 10; i++) {
+        Serial.print(y_pred[i]);
+        Serial.print(i == 9 ? &#039;\n&#039; : &#039;,&#039;);
+    }
+
+    // let&#039;s print the &quot;most probable&quot; class
+    // you can either use probaToClass() if you also want to use all the probabilities
+    Serial.print(&quot;Predicted class is: &quot;);
+    Serial.println(ml.probaToClass(y_pred));
+    // or you can skip the predict() method and call directly predictClass()
+    Serial.print(&quot;Sanity check: &quot;);
+    Serial.println(ml.predictClass(x_test));
+
+    delay(1000);
+}</code></pre>
+<p>That's it: if everything went fine, you should see that the predicted class is <code>8</code>.</p>
+<h3 id="toccnn-on-arduino-and-stm32-figures">CNN on Arduino and STM32 figures</h3>
+<p>I'll report the figures I get for compiling and running this project on the two boards I used.</p>
+<table>
+<thead>
+<tr>
+<th>Board</th>
+<th style="text-align: right;">Flash</th>
+<th style="text-align: right;">RAM</th>
+<th style="text-align: right;">Inference time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nucleus  L432KC</td>
+<td style="text-align: right;">154560</td>
+<td style="text-align: right;">not available*</td>
+<td style="text-align: right;">7187</td>
+</tr>
+<tr>
+<td>Arduino Nano 33 BLE Sense</td>
+<td style="text-align: right;">197656</td>
+<td style="text-align: right;">56160</td>
+<td style="text-align: right;">9400</td>
+</tr>
+</tbody>
+</table>
+<p><em>I used the Grumpyoldpizza compiler for the Nucleus, which doesn't report back the RAM usage</em></p>
+<h2 id="tocand-you">And you?</h2>
+<p>Were you able to deploy a CNN to your microcontroller thanks to this tutorial? Or are you having troubles?</p>
+<p>Let me know in the comment and I will help you or share your experience with us.</p>
+<hr />
+<p>You can find the whole code on <a href="https://github.com/eloquentarduino/EloquentTinyML/tree/master/examples/DigitsExample">Github</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/">TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>The Ultimate Guide to Wifi Indoor Positioning using Arduino and Machine Learning</title>
 		<link>https://eloquentarduino.github.io/2020/08/the-ultimate-guide-to-wifi-indoor-positioning-using-arduino-and-machine-learning/</link>
 		

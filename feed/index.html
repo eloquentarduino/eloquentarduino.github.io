@@ -12,14 +12,211 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Wed, 21 Oct 2020 11:59:20 +0000</lastBuildDate>
+	<lastBuildDate>Tue, 10 Nov 2020 17:58:14 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
 	<sy:updateFrequency>
 	1	</sy:updateFrequency>
-	<generator>https://wordpress.org/?v=5.3.4</generator>
+	<generator>https://wordpress.org/?v=5.3.6</generator>
 	<item>
+		<title>TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</title>
+		<link>https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Tue, 10 Nov 2020 16:37:13 +0000</pubDate>
+				<category><![CDATA[Senza categoria]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1365</guid>
+
+					<description><![CDATA[<p>Are you fascinated by TinyML and Tensorflow for microcontrollers? Do you want to run a CNN (Convolutional Neural Network) on your Arduino and STM32 boards? Do you want to do it without pain? EloquentTinyML is the library for you! EloquentTinyML, my library to easily run Tensorflow Lite neural networks on Arduino microcontrollers, is gaining some [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/">TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Are you fascinated by TinyML and Tensorflow for microcontrollers? </p>
+<p>Do you want to run a CNN (Convolutional Neural Network) on your Arduino and STM32 boards? </p>
+<p>Do you want to do it without pain? </p>
+<p>EloquentTinyML is the library for you!</p>
+<p><img src="https://miro.medium.com/max/1040/1*3BRLw4lsANPEfGgimG3YVQ.png" alt="Convolutional neural network topology" /></p>
+<p><span id="more-1365"></span></p>
+<p><a href="https://github.com/eloquentarduino/EloquentTinyML">EloquentTinyML</a>, my library to easily run Tensorflow Lite neural networks on Arduino microcontrollers, is gaining some popularity so I think it's time for a good tutorial on the topic.</p>
+<p>If you're a seasoned follower of my blog, you may know that I don't really like Tensorflow on microcontrollers, because it is often <em>&quot;over-sized&quot;</em> for the project at hand and there are <a href="/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/">leaner</a>, <a href="/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/">faster</a> <a href="/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/">alternatives</a>.</p>
+<p>Nonetheless, Tensorflow is gaining much popularity in the embedded world so I'll try to give my contribute too.</p>
+<p>In this tutorial, I'm going to show you <strong>step by step</strong> how to train a CNN in Tensorflow and deploy it to you board: I tested the code both on the <strong>Arduino Nano 33 BLE Sense</strong> and the <strong>STM32 Nucleus L432KC</strong>.</p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tochow-to-train-a-cnn-in-tensorflow">How to train a CNN in Tensorflow</a><ol><li><a href="#tocstep-1-import-the-libraries">Step 1. Import the libraries</a><li><a href="#tocstep-2-generate-train-validation-and-test-data">Step 2. Generate train, validation and test data</a><li><a href="#tocstep-3-create-and-train-the-model">Step 3. Create and train the model</a><li><a href="#tocstep-4-testing-the-model-accuracy">Step 4. Testing the model accuracy</a><li><a href="#tocstep-5-exporting-the-model">Step 5. Exporting the model</a></li></ol><li><a href="#tochow-to-run-a-cnn-on-arduino-and-stm32-boards-with-eloquenttinyml">How to run a CNN on Arduino and STM32 boards with EloquentTinyML</a><ol><li><a href="#toccnn-on-arduino-and-stm32-figures">CNN on Arduino and STM32 figures</a></li></ol><li><a href="#tocand-you">And you?</a></ol></div></p>
+<h2 id="tochow-to-train-a-cnn-in-tensorflow">How to train a CNN in Tensorflow</h2>
+<p>I'm not an expert either in Tensorflow nor Convolutional Neural Networks, so I kept the project as simple as possible. I used an <em>image-like</em> dataset to create a setup where CNN should perform well: the dataset is the <a href="http://yann.lecun.com/exdb/mnist/">MNIST handwritten digits</a> one.</p>
+<p><img src="https://miro.medium.com/max/800/1*LyRlX__08q40UJohhJG9Ow.png" alt="MNIST dataset example" /></p>
+<p>It is composed by <strong>8x8</strong> images of handwritten digits, from 0 to 9 and can be easily imported via the <code>scikit-learn</code> Python package.</p>
+<p>Regarding the CNN topology, I wanted to stay as lean as possible: the goal of this tutorial is to teach you how to deploy your own network, not about achieving 100% accuracy.</p>
+<p>Let's see step by step how to produce a usable model.</p>
+<h3 id="tocstep-1-import-the-libraries">Step 1. Import the libraries</h3>
+<p>We will need <code>numpy</code> and <code>Tensorflow</code>, of course, plus <code>scikit-learn</code> to load the dataset and <a href="https://github.com/eloquentarduino/tinymlgen">tinymlgen</a> to port the CNN to plain C.</p>
+<pre><code class="language-python">import numpy as np
+from sklearn.datasets import load_digits
+import tensorflow as tf
+from tensorflow.keras import layers
+from tinymlgen import port</code></pre>
+<h3 id="tocstep-2-generate-train-validation-and-test-data">Step 2. Generate train, validation and test data</h3>
+<p>To train the network, we need:</p>
+<ul>
+<li><code>training data</code>: this is the data the network uses to learn its weights</li>
+<li><code>validation data</code>: this is the data the network uses to understand if it's doing well during learning</li>
+<li><code>test data</code>: this is the data we use to test the network accuracy once it's done learning</li>
+</ul>
+<pre><code class="language-python">def get_data():
+    np.random.seed(1337)
+    x_values, y_values = load_digits(return_X_y=True)
+    x_values /= x_values.max()
+    # reshape to (8 x 8 x 1)
+    x_values = x_values.reshape((len(x_values), 8, 8, 1))
+
+    # split into train, validation, test
+    TRAIN_SPLIT = int(0.6 * len(x_values))
+    TEST_SPLIT = int(0.2 * len(x_values) + TRAIN_SPLIT)
+    x_train, x_test, x_validate = np.split(x_values, [TRAIN_SPLIT, TEST_SPLIT])
+    y_train, y_test, y_validate = np.split(y_values, [TRAIN_SPLIT, TEST_SPLIT])
+
+    return x_train, x_test, x_validate, y_train, y_test, y_validate</code></pre>
+<h3 id="tocstep-3-create-and-train-the-model">Step 3. Create and train the model</h3>
+<p>Now we have to create our network topology.</p>
+<p>As I stated earlier, I wanted to keep this as simple as possible (also considering that we're using a toy dataset): I added a single convolution layer (without even max pooling) followed by the output layer.</p>
+<pre><code class="language-python">def get_model():
+    x_train, x_test, x_validate, y_train, y_test, y_validate = get_data()
+
+    # create a CNN
+    model = tf.keras.Sequential()
+    model.add(layers.Conv2D(8, (3, 3), activation=&#039;relu&#039;, input_shape=(8, 8, 1)))
+    # model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(len(np.unique(y_train))))
+
+    model.compile(optimizer=&#039;adam&#039;, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=[&#039;accuracy&#039;])
+    model.fit(x_train, y_train, epochs=50, batch_size=16,
+                        validation_data=(x_validate, y_validate))
+    return model, x_test, y_test</code></pre>
+<h3 id="tocstep-4-testing-the-model-accuracy">Step 4. Testing the model accuracy</h3>
+<p>Do you think this topology is too simple to learn something useful in so few epochs?</p>
+<p>Think again: it achieved <strong>97%</strong> accuracy!</p>
+<p>Not bad.</p>
+<pre><code class="language-python">def test_model(model, x_test, y_test):
+    x_test = (x_test / x_test.max()).reshape((len(x_test), 8, 8, 1))
+    y_pred = model.predict(x_test).argmax(axis=1)
+
+    print(&#039;ACCURACY&#039;, (y_pred == y_test).sum() / len(y_test))</code></pre>
+<h3 id="tocstep-5-exporting-the-model">Step 5. Exporting the model</h3>
+<p>Once we have a trained model that performs well, we want to deploy it to our microcontroller. Thanks to the <code>tinymlgen</code> packages, is as easy as a one-liner.</p>
+<pre><code class="language-python">if __name__ == &#039;__main__&#039;:
+    model, x_test, y_test = get_model()
+    test_model(model, x_test, y_test)
+    c_code = port(model, variable_name=&#039;digits_model&#039;, pretty_print=True)
+    print(c_code)</code></pre>
+<h2 id="tochow-to-run-a-cnn-on-arduino-and-stm32-boards-with-eloquenttinyml">How to run a CNN on Arduino and STM32 boards with EloquentTinyML</h2>
+<p>Ok, now we have the content we need to create an Arduino sketch to run the CNN on our microcontroller.</p>
+<p>We will use the <code>EloquentTinyML</code> library to do this without pain.</p>
+<p>This is a library to run TinyML models on your microcontroller without messing around with complex compilation procedures and esoteric errors.</p>
+<p>You must first install the library at its latest version (0.0.5 or 0.0.4 if not available), either via the Library Manager or directly from Github.</p>
+<pre><code class="language-cpp">#include &lt;EloquentTinyML.h&gt;
+
+// copy the printed code from tinymlgen into this file
+#include &quot;digits_model.h&quot;
+
+#define NUMBER_OF_INPUTS 64
+#define NUMBER_OF_OUTPUTS 10
+#define TENSOR_ARENA_SIZE 8*1024
+
+Eloquent::TinyML::TfLite&lt;NUMBER_OF_INPUTS, NUMBER_OF_OUTPUTS, TENSOR_ARENA_SIZE&gt; ml;
+
+void setup() {
+    Serial.begin(115200);
+    ml.begin(digits_model);
+}
+
+void loop() {
+    // a random sample from the MNIST dataset (precisely the last one)
+    float x_test[64] = { 0., 0. , 0.625 , 0.875 , 0.5   , 0.0625, 0. , 0. ,
+                    0. , 0.125 , 1. , 0.875 , 0.375 , 0.0625, 0. , 0. ,
+                    0. , 0. , 0.9375, 0.9375, 0.5   , 0.9375, 0. , 0. ,
+                    0. , 0. , 0.3125, 1. , 1. , 0.625 , 0. , 0. ,
+                    0. , 0. , 0.75  , 0.9375, 0.9375, 0.75  , 0. , 0. ,
+                    0. , 0.25  , 1. , 0.375 , 0.25  , 1. , 0.375 , 0. ,
+                    0. , 0.5   , 1. , 0.625 , 0.5   , 1. , 0.5   , 0. ,
+                    0. , 0.0625, 0.5   , 0.75  , 0.875 , 0.75  , 0.0625, 0. };
+    // the output vector for the model predictions
+    float y_pred[10] = {0};
+    // the actual class of the sample
+    int y_test = 8;
+
+    // let&#039;s see how long it takes to classify the sample
+    uint32_t start = micros();
+
+    ml.predict(x_test, y_pred);
+
+    uint32_t timeit = micros() - start;
+
+    Serial.print(&quot;It took &quot;);
+    Serial.print(timeit);
+    Serial.println(&quot; micros to run inference&quot;);
+
+    // let&#039;s print the raw predictions for all the classes
+    // these values are not directly interpretable as probabilities!
+    Serial.print(&quot;Test output is: &quot;);
+    Serial.println(y_test);
+    Serial.print(&quot;Predicted proba are: &quot;);
+
+    for (int i = 0; i &lt; 10; i++) {
+        Serial.print(y_pred[i]);
+        Serial.print(i == 9 ? &#039;\n&#039; : &#039;,&#039;);
+    }
+
+    // let&#039;s print the &quot;most probable&quot; class
+    // you can either use probaToClass() if you also want to use all the probabilities
+    Serial.print(&quot;Predicted class is: &quot;);
+    Serial.println(ml.probaToClass(y_pred));
+    // or you can skip the predict() method and call directly predictClass()
+    Serial.print(&quot;Sanity check: &quot;);
+    Serial.println(ml.predictClass(x_test));
+
+    delay(1000);
+}</code></pre>
+<p>That's it: if everything went fine, you should see that the predicted class is <code>8</code>.</p>
+<h3 id="toccnn-on-arduino-and-stm32-figures">CNN on Arduino and STM32 figures</h3>
+<p>I'll report the figures I get for compiling and running this project on the two boards I used.</p>
+<table>
+<thead>
+<tr>
+<th>Board</th>
+<th style="text-align: right;">Flash</th>
+<th style="text-align: right;">RAM</th>
+<th style="text-align: right;">Inference time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nucleus  L432KC</td>
+<td style="text-align: right;">154560</td>
+<td style="text-align: right;">not available*</td>
+<td style="text-align: right;">7187</td>
+</tr>
+<tr>
+<td>Arduino Nano 33 BLE Sense</td>
+<td style="text-align: right;">197656</td>
+<td style="text-align: right;">56160</td>
+<td style="text-align: right;">9400</td>
+</tr>
+</tbody>
+</table>
+<p><em>I used the Grumpyoldpizza compiler for the Nucleus, which doesn't report back the RAM usage</em></p>
+<h2 id="tocand-you">And you?</h2>
+<p>Were you able to deploy a CNN to your microcontroller thanks to this tutorial? Or are you having troubles?</p>
+<p>Let me know in the comment and I will help you or share your experience with us.</p>
+<hr />
+<p>You can find the whole code on <a href="https://github.com/eloquentarduino/EloquentTinyML/tree/master/examples/DigitsExample">Github</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/">TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Decision Tree, Random Forest and XGBoost on Arduino</title>
 		<link>https://eloquentarduino.github.io/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/</link>
 		
@@ -2235,248 +2432,6 @@ void loop() {}</code></pre>
 <p>I created an example sketch from a synthetic dataset for anomaly detection (copied from a <a href="https://scikit-learn.org/stable/auto_examples/svm/plot_oneclass.html#sphx-glr-auto-examples-svm-plot-oneclass-py">scikit-learn example</a>) you can run to get a feel of how it performs.</p>
 <p>Go checkout the <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/OneClassSVMExample/OneClassSVMExample.ino">Github repo</a></p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/">Anomaly detection on your Arduino microcontroller via One Class SVM</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
-			</item>
-		<item>
-		<title>Easier, faster pure video ESP32 cam motion detection</title>
-		<link>https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sun, 10 May 2020 19:26:08 +0000</pubDate>
-				<category><![CDATA[Computer vision]]></category>
-		<category><![CDATA[camera]]></category>
-		<category><![CDATA[esp32]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1110</guid>
-
-					<description><![CDATA[<p>If you liked my post about ESP32 cam motion detection, you'll love this updated version: it's easier to use and blazing fast! The post about pure video ESP32 cam motion detection without an external PIR is my most successful post at the moment. Many of you are interested about this topic. One of my readers, [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">Easier, faster pure video ESP32 cam motion detection</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>If you liked my post about <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">ESP32 cam motion detection</a>, you'll love this updated version: it's easier to use and blazing fast!</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Faster-motion-detection.gif" alt="Faster motion detection" /></p>
-<p><span id="more-1110"></span></p>
-<p>The post about <strong>pure video ESP32 cam motion detection</strong> without an external PIR is my most successful post at the moment. Many of you are interested about this topic.</p>
-<p>One of my readers, though, pointed out my implementation was quite slow and he only achieved bare 5 fps in his project. So he asked for a better alternative.</p>
-<p>Since the post was of great interest for many people, I took the time to revisit the code and make improvements.</p>
-<p>I came up with a 100% re-writing that is both easier to use and faster. Actually, it is <strong>blazing fast!</strong>.</p>
-<p>Let's see how it works.</p>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocdownsampling">Downsampling</a><ol><li><a href="#tocnearest-neighbor">Nearest neighbor</a><li><a href="#tocfull-block-average">Full block average</a><li><a href="#toccore-block-average">Core block average</a><li><a href="#toccross-block-average">Cross block average</a><li><a href="#tocdiagonal-block-average">Diagonal block average</a><li><a href="#tocimplement-your-own">Implement your own</a></li></ol><li><a href="#tocbenchmarks">Benchmarks</a><li><a href="#tocmotion-detection">Motion detection</a><li><a href="#tocfull-code">Full code</a></ol></div></p>
-<h2 id="tocdownsampling">Downsampling</h2>
-<p>In the original post I introduced the idea of downsampling the image from the camera for a faster and more robust motion detection. I wrote the code in the main sketch to keep it self-contained.</p>
-<p>Looking back now it was a poor choice, since it cluttered the project and distracted from the main purpose, which is motion detection.</p>
-<p>Moreover, I thought that scanning the image buffer in sequential order would be the fastest approach.</p>
-<p>It turns out I was wrong.</p>
-<p>This time I scan the image buffer following the blocks that will compose the resulting image and the results are... much faster.</p>
-<p>Also, I decided to inject some more efficiency that will further speedup the computation: using different strategies for downsampling.</p>
-<p>The idea of downsampling is that you have to &quot;collapse&quot; a block of NxN from the original image to just one pixel of the resulting image.</p>
-<p>Now, there are a variety of ways you can accomplish this. The first two I present here are the most obvious, the other two are of my &quot;invention&quot;: nothing fancy nor new, but they're fast and serve the purpose well.</p>
-<h3 id="tocnearest-neighbor">Nearest neighbor</h3>
-<p>You can just pick the center of the NxN block and use its value for the output.<br />
-Of course it is fast (possibly the fastest approach), but wouldn't be very accurate. One pixel out of NxN wouldn't be representative of the overall region and will heavily suffer from noise.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Nearest-diagram.png" alt="Nearest diagram" /></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/nn.jpg" alt="Nearest neighbor block averaging" /></p>
-<h3 id="tocfull-block-average">Full block average</h3>
-<p>This is the most intuitive alternative: use the average of all the pixels in the block as the ouput value. This is arguabily the &quot;proper&quot; way to do it, since you're using all the pixels in the source image to compute the new one.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Full-diagram.png" alt="Full diagram" /><br />
-<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/full.jpg" alt="Full block averaging" /></p>
-<h3 id="toccore-block-average">Core block average</h3>
-<p>As a faster alternative, I thought that averaging only the &quot;core&quot; (the most internal part) of the block would have been a good-enough solution. It has no theoretical proof that this yields true, but our task here is to create a smaller <em>representation</em> of the original image, not producing an accurate smaller version.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Core-diagram.png" alt="Core diagram" /><br />
-<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/core.jpg" alt="Core block averaging" /></p>
-<p><em>I'll stress this point: the only reason we do downsampling is to compare two sequential frame and detect if they differ above a certain threshold. This downsampling doesn't have to mimic the actual image: it can transform the source in any fancy way, as long as it stays consistent and captures the variations over time.</em></p>
-<h3 id="toccross-block-average">Cross block average</h3>
-<p>This time we consider all the pixels along the vertical and horizontal central axes. The idea is that you will capture a good portion of the variation along both the axis, given quite accurate results.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Cross-diagram.png" alt="Cross diagram" /><br />
-<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/cross.jpg" alt="Cross block averaging" /></p>
-<h3 id="tocdiagonal-block-average">Diagonal block average</h3>
-<p>This alternative too came to my mind from nowhere, really. I just think it is a good alternative to capture all the block's variation, probably even better than vertical and horizontal directions.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Diagonal-diagram.png" alt="Diagonal diagram" /><br />
-<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/diagonal.jpg" alt="Diagonal block averaging" /></p>
-<h3 id="tocimplement-your-own">Implement your own</h3>
-<p>Not satisfied from the methods above? No problem, you can still implement your own.</p>
-<p>The ones presented above are just some algorithms that came to my mind: I'm not telling you they're the best.</p>
-<p>They worked for me, that's it.</p>
-<p>If you think you found a better solution, I encourage you implement it and even share it with me and the other readers, so we can all make progress on this together.</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<h2 id="tocbenchmarks">Benchmarks</h2>
-<p>So, at the very beginning I said this new implementation is blazingly fast. </p>
-<p>How much fast?</p>
-<p>As fast as it can be, arguably.</p>
-<p>I mean, so fast it won't alter your fps.</p>
-<p>Look at the results I got on my M5Stack camera.</p>
-<table>
-<thead>
-<tr>
-<th>Algorithm</th>
-<th style="text-align: center;">Time to execute (micros)</th>
-<th style="text-align: right;">FPS</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>None</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Nearest neighbor</td>
-<td style="text-align: center;">160</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Cross block</td>
-<td style="text-align: center;">700</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Core block</td>
-<td style="text-align: center;">800</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Diagonal block</td>
-<td style="text-align: center;">950</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Full block</td>
-<td style="text-align: center;">4900</td>
-<td style="text-align: right;">12</td>
-</tr>
-</tbody>
-</table>
-<p>As you can see, only the full block creates a delay in the process (quite a bit of delay even): the other  methods  won't slow down your program in any noticeable way.</p>
-<p>If you test Nearest neighbor and it works for you, then you'll be extremely light on computation resources with only <strong>160 microseconds</strong> of delay.</p>
-<p>This is what I mean by <em>blazing fast</em>.</p>
-<h2 id="tocmotion-detection">Motion detection</h2>
-<p>The motion detection part hasn't changed, so I point you to <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version#tocblocks-difference-threshold">the original post</a> to read more about the Block difference threshold and the Image difference threshold.</p>
-<h2 id="tocfull-code">Full code</h2>
-<pre><code class="language-cpp">#define CAMERA_MODEL_M5STACK_WIDE
-#include &quot;EloquentVision.h&quot;
-
-#define FRAME_SIZE FRAMESIZE_QVGA
-#define SOURCE_WIDTH 320
-#define SOURCE_HEIGHT 240
-#define BLOCK_SIZE 10
-#define DEST_WIDTH (SOURCE_WIDTH / BLOCK_SIZE)
-#define DEST_HEIGHT (SOURCE_HEIGHT / BLOCK_SIZE)
-#define BLOCK_DIFF_THRESHOLD 0.2
-#define IMAGE_DIFF_THRESHOLD 0.1
-#define DEBUG 0
-
-using namespace Eloquent::Vision;
-
-ESP32Camera camera;
-uint8_t prevFrame[DEST_WIDTH * DEST_HEIGHT] = { 0 };
-uint8_t currentFrame[DEST_WIDTH * DEST_HEIGHT] = { 0 };
-
-// function prototypes
-bool motionDetect();
-void updateFrame();
-
-/**
- *
- */
-void setup() {
-    Serial.begin(115200);
-    camera.begin(FRAME_SIZE, PIXFORMAT_GRAYSCALE);
-}
-
-/**
- *
- */
-void loop() {
-    /**
-     * Algorithm:
-     *  1. grab frame
-     *  2. compare with previous to detect motion
-     *  3. update previous frame
-     */
-
-    time_t start = millis();
-    camera_fb_t *frame = camera.capture();
-
-    downscaleImage(frame-&gt;buf, currentFrame, nearest, SOURCE_WIDTH, SOURCE_HEIGHT, BLOCK_SIZE);
-
-    if (motionDetect()) {
-        Serial.print(&quot;Motion detected @ &quot;);
-        Serial.print(floor(1000.0f / (millis() - start)));
-        Serial.println(&quot; FPS&quot;);
-    }
-
-    updateFrame();
-}
-
-/**
- * Compute the number of different blocks
- * If there are enough, then motion happened
- */
-bool motionDetect() {
-    uint16_t changes = 0;
-    const uint16_t blocks = DEST_WIDTH * DEST_HEIGHT;
-
-    for (int y = 0; y &lt; DEST_HEIGHT; y++) {
-        for (int x = 0; x &lt; DEST_WIDTH; x++) {
-            float current = currentFrame[y * DEST_WIDTH + x];
-            float prev = prevFrame[y * DEST_WIDTH + x];
-            float delta = abs(current - prev) / prev;
-
-            if (delta &gt;= BLOCK_DIFF_THRESHOLD)
-                changes += 1;
-        }
-    }
-
-    return (1.0 * changes / blocks) &gt; IMAGE_DIFF_THRESHOLD;
-}
-
-/**
- * Copy current frame to previous
- */
-void updateFrame() {
-    memcpy(prevFrame, currentFrame, DEST_WIDTH * DEST_HEIGHT);
-}</code></pre>
-<hr />
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentVision/blob/master/examples/FasterMotionDetection/FasterMotionDetection.ino">Github</a> and remember to star!</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">Easier, faster pure video ESP32 cam motion detection</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		
