@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Tue, 10 Nov 2020 18:10:06 +0000</lastBuildDate>
+	<lastBuildDate>Thu, 03 Dec 2020 18:48:56 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,132 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.6</generator>
 	<item>
+		<title>Esp32-cam motion detection WITH PHOTO CAPTURE! (grayscale version)</title>
+		<link>https://eloquentarduino.github.io/2020/12/esp32-cam-motion-detection-with-photo-capture-grayscale-version/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Thu, 03 Dec 2020 17:50:59 +0000</pubDate>
+				<category><![CDATA[Computer vision]]></category>
+		<category><![CDATA[Eloquent library]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1390</guid>
+
+					<description><![CDATA[<p>Do you want to transform your cheap esp32-cam in a DIY surveillance camera with moton detection AND photo capture? Look no further: this post explains STEP-BY-STEP all you need to know to build one yourself! As I told you in the Easier, faster pure video Esp32-cam motion detection post, motion detection on the esp32-cam seems [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/12/esp32-cam-motion-detection-with-photo-capture-grayscale-version/">Esp32-cam motion detection WITH PHOTO CAPTURE! (grayscale version)</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Do you want to transform your cheap esp32-cam in a DIY surveillance camera with <strong>moton detection AND photo capture</strong>?</p>
+<p>Look no further: this post explains STEP-BY-STEP all you need to know to build one yourself!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/esp32-cam-motion-detection.png" alt="Esp32-cam motion detection" /></p>
+<p><span id="more-1390"></span></p>
+<p>As I told you in the <a href="/2020/05/easier-faster-pure-video-esp32-cam-motion-detection">Easier, faster pure video Esp32-cam motion detection post</a>, motion detection on the esp32-cam seems to be the hottest topic on my blog, so I thought it deserved some more tutorials.</p>
+<p>Without question, to #1 request you made me in the comments was</p>
+<blockquote>
+<p>How can I save the image that triggered the motion detection to the disk?</p>
+</blockquote>
+<p>Well, in this post I will show you <strong>how to save the image to the SPIFFS</strong> filesystem your esp32-cam comes equipped with!</p>
+<h2>Motion detection, refactored</h2>
+<p><strong>Please read the post on <a href="/2020/05/easier-faster-pure-video-esp32-cam-motion-detection">easier, faster esp32-cam motion detection</a> first if you want to understand the following code.</strong></p>
+<p>It took me quite some time to write this post because I was struggling to design a clear, easy to use API for the motion detection feature and the image storage.</p>
+<p>And I have to admit that, even after so long, I'm still not satisfied with the results.</p>
+<p>Nonetheless, it works, and it works well in my opinion, so I will publish this and maybe get feedback from you to help me improve (so please leave a comment if you have any suggestion).</p>
+<p>I won't bother you with the design considerations I took since this is an hands-on tutorial, so let's take a look at the code to implement motion detection on the esp32-cam or any other esp32 with a camera attached (I'm using the M5Stick camera).</p>
+<p>First of all, you need the <code>EloquentVision</code> library: you can install it either from <a href="https://github.com/eloquentarduino/EloquentVision">Github</a> or using the Arduino IDE's Library Manager.</p>
+<p>Next, the code.</p>
+<pre><code class="language-cpp">// Change according to your model
+// The models available are
+//   - CAMERA_MODEL_WROVER_KIT
+//   - CAMERA_MODEL_ESP_EYE
+//   - CAMERA_MODEL_M5STACK_PSRAM
+//   - CAMERA_MODEL_M5STACK_WIDE
+//   - CAMERA_MODEL_AI_THINKER
+#define CAMERA_MODEL_M5STACK_WIDE
+
+#include &lt;FS.h&gt;
+#include &lt;SPIFFS.h&gt;
+#include &quot;EloquentVision.h&quot;
+
+// set the resolution of the source image and the resolution of the downscaled image for the motion detection
+#define FRAME_SIZE FRAMESIZE_QVGA
+#define SOURCE_WIDTH 320
+#define SOURCE_HEIGHT 240
+#define CHANNELS 1
+#define DEST_WIDTH 32
+#define DEST_HEIGHT 24
+#define BLOCK_VARIATION_THRESHOLD 0.3
+#define MOTION_THRESHOLD 0.2
+
+// we&#039;re using the Eloquent::Vision namespace a lot!
+using namespace Eloquent::Vision;
+using namespace Eloquent::Vision::IO;
+using namespace Eloquent::Vision::ImageProcessing;
+using namespace Eloquent::Vision::ImageProcessing::Downscale;
+using namespace Eloquent::Vision::ImageProcessing::DownscaleStrategies;
+
+// an easy interface to capture images from the camera
+ESP32Camera camera;
+// the buffer to store the downscaled version of the image
+uint8_t resized[DEST_HEIGHT][DEST_WIDTH];
+// the downscaler algorithm
+// for more details see https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection
+Cross&lt;SOURCE_WIDTH, SOURCE_HEIGHT, DEST_WIDTH, DEST_HEIGHT&gt; crossStrategy;
+// the downscaler container
+Downscaler&lt;SOURCE_WIDTH, SOURCE_HEIGHT, CHANNELS, DEST_WIDTH, DEST_HEIGHT&gt; downscaler(&amp;crossStrategy);
+// the motion detection algorithm
+MotionDetection&lt;DEST_WIDTH, DEST_HEIGHT&gt; motion;
+
+void setup() {
+    Serial.begin(115200);
+    SPIFFS.begin(true);
+    camera.begin(FRAME_SIZE, PIXFORMAT_GRAYSCALE);
+    motion.setBlockVariationThreshold(BLOCK_VARIATION_THRESHOLD);
+}
+
+void loop() {
+    camera_fb_t *frame = camera.capture();
+
+    // resize image and detect motion
+    downscaler.downscale(frame-&gt;buf, resized);
+    motion.update(resized);
+    motion.detect();
+
+    if (motion.ratio() &gt; MOTION_THRESHOLD) {
+        Serial.println(&quot;Motion detected&quot;);
+
+        // here we want to save the image to disk
+    }
+}</code></pre>
+<h2>Save image to disk</h2>
+<p>Fine, we can detect motion!</p>
+<p>Now we want to save the triggering image to disk in a format that we can decode without any custom software. It would be cool if we could see the image using the native <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/WebServer/examples/FSBrowser/FSBrowser.ino">Esp32 Filesystem Browser sketch</a>.</p>
+<p>We'll use the <a href="https://en.wikipedia.org/wiki/Bitmap">Bitmap</a> file format: it is easy to write and works across any computer on earth.</p>
+<p>It's really easy thanks to the <a href="https://github.com/eloquentarduino/EloquentVision">EloquentVision</a> library.</p>
+<pre><code class="language-cpp">if (motion.ratio() &gt; MOTION_THRESHOLD) {
+        Serial.println(&quot;Motion detected&quot;);
+
+        BitmapWriter&lt;SOURCE_WIDTH, SOURCE_HEIGHT&gt; bitmapWriter;
+        File imageFile = SPIFFS.open(&quot;/capture.bmp&quot;, &quot;wb&quot;);
+
+        // it will take ~20 seconds for a 320x240 image and take 225 Kb of space
+        bitmapWriter.writeGrayscale(imageFile, frame-&gt;buf);
+        imageFile.close();
+}</code></pre>
+<p>Well done! Now your image is on the disk and can be downloaded with the FSBrowser sketch.</p>
+<p>Now you have all the tools you need to create your own DIY surveillance camera with motion detection feature!</p>
+<p>You can use it to catch thieves (I discourage you to rely on such a rudimentary setup however!), to capture images of <em>wild</em> animals in your garden (birds, sqirrels or the like), or any other application you see fit.</p>
+<h3>Further improvements</h3>
+<p>Of course you may well understand that a proper motion detection setup should be more complex than the one presented here. Nevertheless, a couple of quick fixes can greatly improve the usability of this project with little effort. Here I suggest you a couple.</p>
+<p><strong>#1: Debouncing successive frames</strong>: the code presented in this post is a stripped down version of a <a href="https://github.com/eloquentarduino/EloquentVision/blob/master/examples/EasyMotionDetectionGrayscale/EasyMotionDetectionGrayscale.ino">more complete esp32-cam motion detection example sketch</a>.</p>
+<p>That sketch implements a debouncing function to prevent writing &quot;ghost images&quot; (see the <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">original post on motion detection</a> for a clear evidence of this effect).</p>
+<p><strong>#2: Proper file naming</strong>: the example sketch uses a fixed filename for the image. This means any new image will overwrite the older, which may be undesiderable based on your requirements. A proper way to handle this would be to attach an RTC and name the image after the time it occurred (something like &quot;motion_2020-12-03_08:09:10.bmp&quot;)</p>
+<p><strong>#3: RGB images</strong>: this is something I'm working on. I mean, the Bitmap writer is there (so you could actually use it to store images on your esp32), but the multi-channel motion detection is driving me crazy, I need some more time to design it the way I want, so stay tuned!</p>
+<hr />
+<p>I hope you enjoyed this tutorial on esp32-cam motion detection with photo capture: it was born as a response to your asking, so don't be afraid and ask me anything: I will do my best to help you!</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/12/esp32-cam-motion-detection-with-photo-capture-grayscale-version/">Esp32-cam motion detection WITH PHOTO CAPTURE! (grayscale version)</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</title>
 		<link>https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/</link>
 		
@@ -2352,87 +2478,6 @@ void setup() {
 <p>There's a little example sketch on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/PCAExample/PCAExample.ino">Github</a> that applies PCA to the IRIS dataset.</p>
 <p>Tell me what you think may be a clever application of dimensionality reduction in the world of microcontrollers and see if we can build something great together.</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/06/arduino-dimensionality-reduction-pca-for-machine-learning-projects/">Arduino dimensionality reduction (PCA) for Machine Learning projects</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
-			</item>
-		<item>
-		<title>Anomaly detection on your Arduino microcontroller via One Class SVM</title>
-		<link>https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sun, 31 May 2020 16:44:36 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1156</guid>
-
-					<description><![CDATA[<p>Support Vector Machines are very often used for classification tasks: but you may not know that they're so flexible they can be used for anomaly detection and novelty detection. Thanks to the micromlgen package, you can run One Class SVM on your Arduino microcontorller. What is anomaly / novelty detection useful for? Detect noise or [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/">Anomaly detection on your Arduino microcontroller via One Class SVM</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p><a href="/tag/svm/">Support Vector Machines</a> are very often used for classification tasks: but you may not know that they're so flexible they can be used for <a href="https://scikit-learn.org/stable/modules/outlier_detection.html" target="_blank" rel="noopener noreferrer"><strong>anomaly detection and novelty detection</strong></a>. Thanks to the <a href="https://github.com/eloquentarduino/micromlgen">micromlgen</a> package, you can run One Class SVM on your Arduino microcontorller.</p>
-<p><img src="https://scikit-learn.org/stable/_images/sphx_glr_plot_oneclass_001.png" alt="Novelty detection from sklearn documentation" title="Novelty detection from sklearn documentation" /><br />
-<span id="more-1156"></span></p>
-<h2>What is anomaly / novelty detection useful for?</h2>
-<h3>Detect noise or anomalies</h3>
-<p>As the name implies, anomaly detection can be used to monitor a stream of data and alert you when something unexpected happens.<br />
-Think of an Industrial IoT setup where you have a bunch of sensors monitoring the working state of a production plant: you want to know as soon as possible if something bad is gonna happen.</p>
-<p>In this case, anomaly detection tells you if your machinery is acting in a different way from the normal state so you can take action.</p>
-<h3>Ignore irrelevant data</h3>
-<p><em>(This application was suggested from two of my readers)</em><br />
-Say you're developing a super simple word classification project: you want to distinguish door bell from fire alarm (as per one of the two readers).<br />
-So you train your SVM classifier and use <a href="https://github.com/eloquentarduino/micromlgen">micromlgen</a> to run it on your Arduino microcontroller.</p>
-<p>It works well, but we have a problem: you live in a noisy environment with many sounds, so not all of them will either be door bells or fire alarms. Since your classifier is binary, it <em>has to classify all of the sounds</em> as either A or B.</p>
-<p>The solution will be <strong>novelty detection</strong>: before running the binary SVM, you run the <strong>OneClassSVM</strong> to filter known sounds (bell and alarm) from unknown ones (eg. dog barking).<br />
-If OneClassSVM predicts the sound as a novelty, you discard it since it's of no interest for you. If it predicts the sound as known, you run the binary SVM.</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<h2>How to run anomaly / novelty detection on Arduino microcontroller via OneClassSVM</h2>
-<p>Porting a <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html">OneClassSVM</a> from Python to plain C++ is as easy as a single command in the <strong>micromlgen</strong> package:</p>
-<pre><code class="language-python">from sklearn.svm import OneClassSVM
-from micromlgen import port
-
-clf = OneClassSVM(kernel=&quot;rbf&quot;, nu=0.5, gamma=0.1)
-clf.fit(X, y)
-print(port(clf))</code></pre>
-<div class="watchout">
-You will need micromlgen version 1.0.2 to port OneClassSVM. If you have an outdated version, please run <code>pip install --upgrade micromlgen</code>
-</div>
-<p>If you read <a href="/tag/svm/">my previous posts</a> about <strong>micromlgen</strong> and SVM the above snippet should be familiar: with the latest release, <code>port</code> is able to export either SVC, LinearSVC, OneClassSVC and <a href="/2020/02/even-smaller-machine-learning-models-for-your-mcu/">RVC (Relevant Vector Machines)</a> to object oriented C++.</p>
-<p>Now you can embed the generated code in your Arduino sketch.</p>
-<pre><code class="language-cpp">#include &quot;OneClassSVM.h&quot;
-
-Eloquent::ML::Port::OneClassSVM clf;
-
-void setup() {
-  Serial.begin(115200);
-  delay(2000);
-
-  for (int i = 0; i &lt; DATASET_SIZE; i++)
-    clf.predict(X[i]);
-}
-
-void loop() {}</code></pre>
-<hr />
-<p>I created an example sketch from a synthetic dataset for anomaly detection (copied from a <a href="https://scikit-learn.org/stable/auto_examples/svm/plot_oneclass.html#sphx-glr-auto-examples-svm-plot-oneclass-py">scikit-learn example</a>) you can run to get a feel of how it performs.</p>
-<p>Go checkout the <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/OneClassSVMExample/OneClassSVMExample.ino">Github repo</a></p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/">Anomaly detection on your Arduino microcontroller via One Class SVM</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		

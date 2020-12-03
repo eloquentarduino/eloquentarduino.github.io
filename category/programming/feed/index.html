@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Wed, 21 Oct 2020 11:59:20 +0000</lastBuildDate>
+	<lastBuildDate>Thu, 03 Dec 2020 18:48:56 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,132 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.6</generator>
 	<item>
+		<title>Esp32-cam motion detection WITH PHOTO CAPTURE! (grayscale version)</title>
+		<link>https://eloquentarduino.github.io/2020/12/esp32-cam-motion-detection-with-photo-capture-grayscale-version/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Thu, 03 Dec 2020 17:50:59 +0000</pubDate>
+				<category><![CDATA[Computer vision]]></category>
+		<category><![CDATA[Eloquent library]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1390</guid>
+
+					<description><![CDATA[<p>Do you want to transform your cheap esp32-cam in a DIY surveillance camera with moton detection AND photo capture? Look no further: this post explains STEP-BY-STEP all you need to know to build one yourself! As I told you in the Easier, faster pure video Esp32-cam motion detection post, motion detection on the esp32-cam seems [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/12/esp32-cam-motion-detection-with-photo-capture-grayscale-version/">Esp32-cam motion detection WITH PHOTO CAPTURE! (grayscale version)</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Do you want to transform your cheap esp32-cam in a DIY surveillance camera with <strong>moton detection AND photo capture</strong>?</p>
+<p>Look no further: this post explains STEP-BY-STEP all you need to know to build one yourself!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/esp32-cam-motion-detection.png" alt="Esp32-cam motion detection" /></p>
+<p><span id="more-1390"></span></p>
+<p>As I told you in the <a href="/2020/05/easier-faster-pure-video-esp32-cam-motion-detection">Easier, faster pure video Esp32-cam motion detection post</a>, motion detection on the esp32-cam seems to be the hottest topic on my blog, so I thought it deserved some more tutorials.</p>
+<p>Without question, to #1 request you made me in the comments was</p>
+<blockquote>
+<p>How can I save the image that triggered the motion detection to the disk?</p>
+</blockquote>
+<p>Well, in this post I will show you <strong>how to save the image to the SPIFFS</strong> filesystem your esp32-cam comes equipped with!</p>
+<h2>Motion detection, refactored</h2>
+<p><strong>Please read the post on <a href="/2020/05/easier-faster-pure-video-esp32-cam-motion-detection">easier, faster esp32-cam motion detection</a> first if you want to understand the following code.</strong></p>
+<p>It took me quite some time to write this post because I was struggling to design a clear, easy to use API for the motion detection feature and the image storage.</p>
+<p>And I have to admit that, even after so long, I'm still not satisfied with the results.</p>
+<p>Nonetheless, it works, and it works well in my opinion, so I will publish this and maybe get feedback from you to help me improve (so please leave a comment if you have any suggestion).</p>
+<p>I won't bother you with the design considerations I took since this is an hands-on tutorial, so let's take a look at the code to implement motion detection on the esp32-cam or any other esp32 with a camera attached (I'm using the M5Stick camera).</p>
+<p>First of all, you need the <code>EloquentVision</code> library: you can install it either from <a href="https://github.com/eloquentarduino/EloquentVision">Github</a> or using the Arduino IDE's Library Manager.</p>
+<p>Next, the code.</p>
+<pre><code class="language-cpp">// Change according to your model
+// The models available are
+//   - CAMERA_MODEL_WROVER_KIT
+//   - CAMERA_MODEL_ESP_EYE
+//   - CAMERA_MODEL_M5STACK_PSRAM
+//   - CAMERA_MODEL_M5STACK_WIDE
+//   - CAMERA_MODEL_AI_THINKER
+#define CAMERA_MODEL_M5STACK_WIDE
+
+#include &lt;FS.h&gt;
+#include &lt;SPIFFS.h&gt;
+#include &quot;EloquentVision.h&quot;
+
+// set the resolution of the source image and the resolution of the downscaled image for the motion detection
+#define FRAME_SIZE FRAMESIZE_QVGA
+#define SOURCE_WIDTH 320
+#define SOURCE_HEIGHT 240
+#define CHANNELS 1
+#define DEST_WIDTH 32
+#define DEST_HEIGHT 24
+#define BLOCK_VARIATION_THRESHOLD 0.3
+#define MOTION_THRESHOLD 0.2
+
+// we&#039;re using the Eloquent::Vision namespace a lot!
+using namespace Eloquent::Vision;
+using namespace Eloquent::Vision::IO;
+using namespace Eloquent::Vision::ImageProcessing;
+using namespace Eloquent::Vision::ImageProcessing::Downscale;
+using namespace Eloquent::Vision::ImageProcessing::DownscaleStrategies;
+
+// an easy interface to capture images from the camera
+ESP32Camera camera;
+// the buffer to store the downscaled version of the image
+uint8_t resized[DEST_HEIGHT][DEST_WIDTH];
+// the downscaler algorithm
+// for more details see https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection
+Cross&lt;SOURCE_WIDTH, SOURCE_HEIGHT, DEST_WIDTH, DEST_HEIGHT&gt; crossStrategy;
+// the downscaler container
+Downscaler&lt;SOURCE_WIDTH, SOURCE_HEIGHT, CHANNELS, DEST_WIDTH, DEST_HEIGHT&gt; downscaler(&amp;crossStrategy);
+// the motion detection algorithm
+MotionDetection&lt;DEST_WIDTH, DEST_HEIGHT&gt; motion;
+
+void setup() {
+    Serial.begin(115200);
+    SPIFFS.begin(true);
+    camera.begin(FRAME_SIZE, PIXFORMAT_GRAYSCALE);
+    motion.setBlockVariationThreshold(BLOCK_VARIATION_THRESHOLD);
+}
+
+void loop() {
+    camera_fb_t *frame = camera.capture();
+
+    // resize image and detect motion
+    downscaler.downscale(frame-&gt;buf, resized);
+    motion.update(resized);
+    motion.detect();
+
+    if (motion.ratio() &gt; MOTION_THRESHOLD) {
+        Serial.println(&quot;Motion detected&quot;);
+
+        // here we want to save the image to disk
+    }
+}</code></pre>
+<h2>Save image to disk</h2>
+<p>Fine, we can detect motion!</p>
+<p>Now we want to save the triggering image to disk in a format that we can decode without any custom software. It would be cool if we could see the image using the native <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/WebServer/examples/FSBrowser/FSBrowser.ino">Esp32 Filesystem Browser sketch</a>.</p>
+<p>We'll use the <a href="https://en.wikipedia.org/wiki/Bitmap">Bitmap</a> file format: it is easy to write and works across any computer on earth.</p>
+<p>It's really easy thanks to the <a href="https://github.com/eloquentarduino/EloquentVision">EloquentVision</a> library.</p>
+<pre><code class="language-cpp">if (motion.ratio() &gt; MOTION_THRESHOLD) {
+        Serial.println(&quot;Motion detected&quot;);
+
+        BitmapWriter&lt;SOURCE_WIDTH, SOURCE_HEIGHT&gt; bitmapWriter;
+        File imageFile = SPIFFS.open(&quot;/capture.bmp&quot;, &quot;wb&quot;);
+
+        // it will take ~20 seconds for a 320x240 image and take 225 Kb of space
+        bitmapWriter.writeGrayscale(imageFile, frame-&gt;buf);
+        imageFile.close();
+}</code></pre>
+<p>Well done! Now your image is on the disk and can be downloaded with the FSBrowser sketch.</p>
+<p>Now you have all the tools you need to create your own DIY surveillance camera with motion detection feature!</p>
+<p>You can use it to catch thieves (I discourage you to rely on such a rudimentary setup however!), to capture images of <em>wild</em> animals in your garden (birds, sqirrels or the like), or any other application you see fit.</p>
+<h3>Further improvements</h3>
+<p>Of course you may well understand that a proper motion detection setup should be more complex than the one presented here. Nevertheless, a couple of quick fixes can greatly improve the usability of this project with little effort. Here I suggest you a couple.</p>
+<p><strong>#1: Debouncing successive frames</strong>: the code presented in this post is a stripped down version of a <a href="https://github.com/eloquentarduino/EloquentVision/blob/master/examples/EasyMotionDetectionGrayscale/EasyMotionDetectionGrayscale.ino">more complete esp32-cam motion detection example sketch</a>.</p>
+<p>That sketch implements a debouncing function to prevent writing &quot;ghost images&quot; (see the <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">original post on motion detection</a> for a clear evidence of this effect).</p>
+<p><strong>#2: Proper file naming</strong>: the example sketch uses a fixed filename for the image. This means any new image will overwrite the older, which may be undesiderable based on your requirements. A proper way to handle this would be to attach an RTC and name the image after the time it occurred (something like &quot;motion_2020-12-03_08:09:10.bmp&quot;)</p>
+<p><strong>#3: RGB images</strong>: this is something I'm working on. I mean, the Bitmap writer is there (so you could actually use it to store images on your esp32), but the multi-channel motion detection is driving me crazy, I need some more time to design it the way I want, so stay tuned!</p>
+<hr />
+<p>I hope you enjoyed this tutorial on esp32-cam motion detection with photo capture: it was born as a response to your asking, so don't be afraid and ask me anything: I will do my best to help you!</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/12/esp32-cam-motion-detection-with-photo-capture-grayscale-version/">Esp32-cam motion detection WITH PHOTO CAPTURE! (grayscale version)</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Decision Tree, Random Forest and XGBoost on Arduino</title>
 		<link>https://eloquentarduino.github.io/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/</link>
 		
@@ -2041,123 +2167,6 @@ void updateFrame() {
 
 <!--End mc_embed_signup-->
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">Easier, faster pure video ESP32 cam motion detection</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
-			</item>
-		<item>
-		<title>Incremental multiclass classification on microcontrollers: One vs One</title>
-		<link>https://eloquentarduino.github.io/2020/04/incremental-multiclass-classification-on-microcontrollers-one-vs-one/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sun, 26 Apr 2020 08:01:14 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[incremental-learning]]></category>
-		<category><![CDATA[microml]]></category>
-		<category><![CDATA[ml]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1079</guid>
-
-					<description><![CDATA[<p>In earlier posts I showed you can run incremental binary classification on your microcontroller with Stochastic Gradient Descent or Passive-Aggressive classifier. Now it is time to upgrade your toolbelt with a new item: One-vs-One multiclass classifier. One vs One Many classifiers are, by nature, binary: they can only distinguish the positive class from the negative [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/incremental-multiclass-classification-on-microcontrollers-one-vs-one/">Incremental multiclass classification on microcontrollers: One vs One</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>In earlier posts I showed you can run incremental binary classification on your microcontroller with Stochastic Gradient Descent or Passive-Aggressive classifier. Now it is time to upgrade your toolbelt with a new item: One-vs-One multiclass classifier.</p>
-<p><span id="more-1079"></span></p>
-<h2>One vs One</h2>
-<p>Many classifiers are, by nature, binary: they can only distinguish the positive class from the negative one. Many of real-world problems, however, are multiclass: you have 3 or more possible outcomes to distinguish from.</p>
-<p>There are a couple of ways to achieve this:</p>
-<ol>
-<li><strong>One vs All</strong>: if your classifier is able to output a confidence score of its prediction, for N classes you train N classifiers, each able to recognize a single class. During inference, you pick the &quot;most confident&quot; one.</li>
-<li><strong>One vs One</strong>: for N classes, you train N * (N-1) / 2 classifiers, one for each couple of classes. During inference, each classifier makes a prediction and you pick the class with the highest number of votes.</li>
-</ol>
-<p>Since SGD and Passive-Aggressive don't output a confidence score, I implemented the One vs One algorithm to tackle the multiclass classification problem on microcontrollers.</p>
-<p>Actually, One vs One is not a new type of classifier: it is really a &quot;coordinator&quot; class that sorts which samples go to which classifier. You can still choose your own classifier type to use.</p>
-<p>As SGD and Passive-Aggressive, OneVsOne implements the classifier interface, so you will use the well known <code>fitOne</code> and <code>predict</code> methods.</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<h2>Example code</h2>
-<pre><code class="language-cpp">// Esp32 has some problems with min/max
-#define min(a, b) (a) &lt; (b) ? (a) : (b)
-#define max(a, b) (a) &gt; (b) ? (a) : (b)
-// you will actually need only one of SGD or PassiveAggressive
-#include &quot;EloquentSGD.h&quot;
-#include &quot;EloquentPassiveAggressive.h&quot;
-#include &quot;EloquentOneVsOne.h&quot;
-#include &quot;EloquentAccuracyScorer.h&quot;
-// this file defines NUM_FEATURES, NUM_CLASSES, TRAIN_SAMPLES and TEST_SAMPLES
-#include &quot;dataset.h&quot;
-
-using namespace Eloquent::ML;
-
-void setup() {
-  Serial.begin(115200);
-  delay(3000);
-}
-
-void loop() {
-  AccuracyScorer scorer;
-  // OneVsOne needs the actual classifier class, the number of features and the number of classes
-  OneVsOne&lt;SGD&lt;FEATURES_DIM&gt;, FEATURES_DIM, NUM_CLASSES&gt; clf;
-
-  // clf.set() propagates the configuration to the actual classifiers
-  // if a parameter does not exists on the classifier, it does nothing
-  // in this example, alpha and momentum refer to SGD, C to Passive-Aggressive
-  clf.set(&quot;alpha&quot;, 1);
-  clf.set(&quot;momentum&quot;, 0.7);
-  clf.set(&quot;C&quot;, 0.1);
-
-  // fit
-  // I noticed that repeating the training a few times over the same dataset increases performance  to a certain extent: if you re-train it too much, performance will decay
-  for (unsigned int i = 0; i &lt; TRAIN_SAMPLES * 5; i++) {
-      clf.fitOne(X_train[i % TRAIN_SAMPLES], y_train[i % TRAIN_SAMPLES]);
-  }
-
-  // predict
-  for (int i = 0; i &lt; TEST_SAMPLES; i++) {
-      int y_true = y_test[i];
-      int y_pred = clf.predict(X_test[i]);
-
-      Serial.print(&quot;Predicted &quot;);
-      Serial.print(y_pred);
-      Serial.print(&quot; vs &quot;);
-      Serial.println(y_true);
-      scorer.scoreOne(y_true, y_pred);
-  }
-
-  Serial.print(&quot;Accuracy = &quot;);
-  Serial.print(scorer.accuracy() * 100);
-  Serial.print(&quot; out of &quot;);
-  Serial.print(scorer.support());
-  Serial.println(&quot; samples&quot;);
-  delay(30000);
-}</code></pre>
-<p>If you refer to the previous posts on <a href="/2020/04/stochastic-gradient-descent-on-your-microcontroller/">SGD</a> and <a href="/2020/04/passive-aggressive-classifier-for-embedded-devices/">Passive-Aggressive</a>, you'll notice that you would be able to replace one with the other and your code will change by <strong>1 single line only</strong>. This let's you experiment to find the best configuration for your project without hassle.</p>
-<h2>Accuracy</h2>
-<p>Well, accuracy vary.</p>
-<p>In my tests, I couldn't get predictable accuracy on all datasets. I couldn't even get acceptable accuracy on the Iris dataset (60% max). But I got 90% accuracy on the Digits dataset from scikit-learn with 6 classes.</p>
-<p>You have to experiment. Try Passive-Aggressive with many <code>C</code> values. If it doesn't work, try SGD with varying <code>momentum</code> and <code>alpha</code>. Try to repeat the training over the dataset 5, 10 times.</p>
-<p>In a next post I'll report my benchmarks so you can see what works for you and what not.<br />
-This is an emerging field for me, so I will need time to master it.</p>
-<hr />
-<p>As always, you can find the examle on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/OvOExample/OvOExample.ino">Github</a> with a the dataset to experiment with.</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/incremental-multiclass-classification-on-microcontrollers-one-vs-one/">Incremental multiclass classification on microcontrollers: One vs One</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		
