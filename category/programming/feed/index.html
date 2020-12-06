@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Sun, 06 Dec 2020 08:27:18 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 06 Dec 2020 08:31:20 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -117,6 +117,7 @@ void loop() {
 <p>Fine, we can detect motion!</p>
 <p>Now we want to save the triggering image to disk in a format that we can decode without any custom software. It would be cool if we could see the image using the native <a href="https://github.com/espressif/arduino-esp32/blob/master/libraries/WebServer/examples/FSBrowser/FSBrowser.ino">Esp32 Filesystem Browser sketch</a>.</p>
 <p>Thankfully to the guys at espressif, the esp32 is able to encode a raw image to JPEG format: it is convenient to use (any PC on earth can read a jpeg) and it is also <em>fast</em>.</p>
+<p><em>and thanks to the reader ankaiser for pointing it out</em></p>
 <p>It's really easy to do thanks to the <a href="https://github.com/eloquentarduino/EloquentVision">EloquentVision</a> library.</p>
 <pre><code class="language-cpp">if (motion.ratio() &gt; MOTION_THRESHOLD) {
         Serial.println(&quot;Motion detected&quot;);
