@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/arduino-machine-learning/arduino-machine-learning-tutorial/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Wed, 21 Oct 2020 11:59:20 +0000</lastBuildDate>
+	<lastBuildDate>Thu, 10 Dec 2020 11:26:23 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -74,7 +74,7 @@
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.datasets import load_iris
 
-clf = DecisionTreeClassifier
+clf = DecisionTreeClassifier()
 X, y = load_iris(return_X_y=True)
 clf.fit(X, y)
 print(port(clf))</code></pre>

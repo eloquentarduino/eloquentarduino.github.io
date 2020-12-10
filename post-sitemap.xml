@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2020-12-06T08:31:20+00:00</lastmod>
+		<lastmod>2020-12-10T11:26:23+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</loc>
@@ -375,14 +375,6 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://eloquentarduino.github.io/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/</loc>
-		<lastmod>2020-10-21T11:59:20+00:00</lastmod>
-		<image:image>
-			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/08/DecisionTree.png</image:loc>
-			<image:caption><![CDATA[DecisionTree]]></image:caption>
-		</image:image>
-	</url>
-	<url>
 		<loc>https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/</loc>
 		<lastmod>2020-11-10T18:10:06+00:00</lastmod>
 		<image:image>
@@ -400,6 +392,14 @@
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/esp32-cam-motion-detection.png</image:loc>
 			<image:caption><![CDATA[Esp32-cam motion detection]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/</loc>
+		<lastmod>2020-12-10T11:26:23+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/08/DecisionTree.png</image:loc>
+			<image:caption><![CDATA[DecisionTree]]></image:caption>
 		</image:image>
 	</url>
 </urlset>
