@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Thu, 10 Dec 2020 11:26:23 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 20 Dec 2020 16:13:28 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,174 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.6</generator>
 	<item>
+		<title>The Grand Benchmark Table of Embedded Machine Learning</title>
+		<link>https://eloquentarduino.github.io/2020/12/tinyml-benchmark-table/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Wed, 16 Dec 2020 20:31:10 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1416</guid>
+
+					<description><![CDATA[<p>How tiny is TinyML? How fast is TinyML? Do you want to get some REAL numbers on embedded machine learning on Arduino, STM32, ESP32, Seeedstudio boards (and more coming)? This page will answer all your questions! Background If you're new to this blog, you need to know that (almost one year ago) I settled on [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/12/tinyml-benchmark-table/">The Grand Benchmark Table of Embedded Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>How tiny is TinyML? How <em>fast</em> is TinyML?</p>
+<p>Do you want to get some <em>REAL</em> numbers on embedded machine learning on Arduino, STM32, ESP32, Seeedstudio boards (and more coming)? </p>
+<p>This page will answer all your questions!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png" alt="Inference time vs Accuracy scatter plot" /></p>
+<p><span id="more-1416"></span></p>
+<h3>Background</h3>
+<p>If you're new to this blog, you need to know that (almost one year ago) I settled on a mission to <strong>bring machine learning to embedded microcontrollers of all sizes</strong> (<a href="/2019/12/machine-learning-on-attiny85/">even the Attiny85</a>!).</p>
+<p>To me, it is just insane to deploy heavyweight Neural Networks to such small devices, if you don't need their expressiveness (mainly image and audio analysis). The vast majority of embedded ML tasks is, in fact, related to sensors' readings, which can easily be solved with &quot;traditional&quot; ML algorithms.</p>
+<p>Today's industry seems to be more leaned toward Neural Networks, though, so I thought it would be beneficial for you readers to get an actual grasp on the potential of traditional Machine learning algorithms in the embedded context.</p>
+<p>On this blog you can find posts about:</p>
+<ul>
+<li><a href="/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/">Decision Tree, Random Forest and XGBoost</a></li>
+<li><a href="/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/">Gaussian Naive Bayes</a></li>
+<li><a href="/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/">SEFR - a binary classifier</a></li>
+<li><a href="/2020/06/arduino-dimensionality-reduction-pca-for-machine-learning-projects/">PCA for dimensionality reduction</a></li>
+<li><a href="/2020/02/even-smaller-machine-learning-models-for-your-mcu/">Relevant Vector Machines</a></li>
+<li><a href="/2019/12/how-to-do-gesture-identification-on-arduino/">SVM for gesture detection</a></li>
+<li><a href="/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/">One Class SVM for anomaly detection</a></li>
+</ul>
+<p>All these algorithms go a long way in both accuracy and resource comsumption, so (in my opinion) they should be your first choice when developing a new project.</p>
+<p>To support my claimings I made a huge effort to collect real world data, and now I want to share this data with you.</p>
+<p>Before you ask:</p>
+<p>&quot;Are Neural Networks models benchmarked here?&quot;. No.</p>
+<p>&quot;Will Neural Networks model be benchmarked in the future?&quot;. Yes, as soon as I'm comfortable with them: I want to create a fair comparison between NN and traditional algorithms.</p>
+<p>So now let's move to the contents.</p>
+<h3>The boards</h3>
+<p>I run the benchmarks on the boards I have at hand: they were all purchased by me, except for the Arduino Nano BLE Sense (given to me by the Arduino team).</p>
+<ul>
+<li><a href="https://ae01.alicdn.com/kf/H81a3be13b25244f09d8c538e2bea36e23/4-MB-Flash-Per-WeMos-D1-ESP32-ESP-32-ESP-32S-ESP32S-Wifi-Senza-Fili-di.jpg_Q90.jpg_.webp">Espressif ESP32</a></li>
+<li><a href="https://www.mechatronicslab.net/my_uploads/2020/06/NodeMCU-ESP8266-Pinout-1.jpg">Espressif ESP8266 NodeMCU v1.0</a></li>
+<li><a href="https://www.st.com/en/evaluation-tools/nucleo-l432kc.html">STM32 Nucleo L432KC</a> (Cortex M4)</li>
+<li><a href="https://www.seeedstudio.com/Seeeduino-XIAO-Arduino-Microcontroller-SAMD21-Cortex-M0+-p-4426.html">Seeedstudio XIAO</a> (SAMD21 Cortex M0)</li>
+<li><a href="https://store.arduino.cc/arduino-nano-33-ble-sense">Arduino Nano 33 BLE Sense</a> (Cortex M4F)</li>
+</ul>
+<h3>The datasets</h3>
+<p>I picked a small selection of toy and real world datasets to benchmark the classifiers against (the real world ones were picked from a <a href="https://scholar.harvard.edu/files/vijay-janapa-reddi/files/tinymlsummit2020-4-4-janapareddi.pdf">TinyML Talks presentation</a> when easily available, plus some more from the <a href="https://archive.ics.uci.edu/ml//datasets.php">UCI database</a> almost at random).</p>
+<p>Here's the list of the benchmarked datasets, with the <em>shape</em> of the dataset (in the format <code>number of samples</code> x <code>number of features</code> x <code>number of classes</code>).</p>
+<ul>
+<li>Iris <code>(150 x 4 x 3)</code>: from the sklearn package</li>
+<li>Wine <code>(178 x 13 x 3)</code>: from the sklearn package</li>
+<li>Digits <code>(1797 x 64 x 10)</code>: from the sklearn package</li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones">Human Activity</a> <code>(10299 x 561 x 6)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/Daily+and+Sports+Activities">Sport Activity</a> <code>(4800 x 180 x 10)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/Gas+Sensor+Array+Drift+Dataset">Gas Sensor Array Drift</a> <code>(1000 x 128 x 6)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/EMG+data+for+gestures">EMG</a> <code>(1648 x 63 x 5 )</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/gesture+phase+segmentation">Gesture Phase Segmentaion</a> <code>(1000 x 19 x 5)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/Statlog+%28Vehicle+Silhouettes%29">Statlog (Vehicle Silhouettes)</a> <code>(846 x 18 x 4)</code></li>
+<li><a href="http://archive.ics.uci.edu/ml/datasets/mammographic+mass">Mammographic Mass</a> <code>(830 x 4 x 2)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/dataset+for+sensorless+drive+diagnosis">Sensorless Drive Diagnosis</a> <code>(1000 x 48 x 11)</code></li>
+</ul>
+<p>The datasets are chosen to be representative of different domains and the list will grow in the next weeks.</p>
+<p>Some datasets are used <em>as-is</em>, others were pre-processed with very light feature extraction. In detail:</p>
+<ul>
+<li><code>Human Activity</code> features were extracted with a rolling window, and for each window min/max/avg/std/skew/kurtosis were calculated</li>
+<li><code>Sport Activity</code> got the same pre-processing, and the number of actvities was reduced from 19 to 10</li>
+<li><code>EMG</code> features were extracted with a rolling window, and for each window the Root Mean Square value was calculated</li>
+</ul>
+<p>The reported benchmarks <strong>only consider the inference process</strong>: any feature extraction is not included! Nevertheless, only features with linear time complexity were used, so any MCU will have no problem in computing them.</p>
+<h3>The classifiers</h3>
+<p>The following classifiers are benchmarked:</p>
+<ul>
+<li>Decision Tree</li>
+<li>Random Forest</li>
+<li>XGBoost</li>
+<li>Logistic Regression</li>
+<li>Gaussian Naive Bayes</li>
+</ul>
+<p>Why these classifiers?</p>
+<p>Because they're all supported by the <a href="https://github.com/eloquentarduino/micromlgen">micromlgen</a> package, so they can easily be ported to plain C.</p>
+<p>* <em>XGBoost porting failed on some datasets, so you will see holes in the data. I will correct this in the next weeks</em></p>
+<p><code>micromlgen</code> actually supports Support Vector Machines, too: it is not included because on real world datasets the number of support vector is so high (hundreds or even thousands) that no single board could handle that.</p>
+<p>If you want to stay up to date with the new numbers, subscribe to the newsletter: I promise you won't receive more than 1 mail per month.</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<h2>The Results</h2>
+<p>This section reports (a selection of) the charts generated from the benchmark results to give you a quick glance of the capabilities of the aforementioned boards and algorithms in terms of performance and accuracy.</p>
+<p>If you like an interactive view of the data, there's a <a href="https://colab.research.google.com/drive/1sl755xwwNyrFUVK1WtcqiOISpO2h8cMF?usp=sharing">Colab Notebook</a> that reproduces the charts reported here, where you can interact with the data as you like.</p>
+<p>At the very end of the article, you can also find a link to the raw CSV file I generated (as you can see, it required A LOT of work to create).</p>
+<h3>Accuracy</h3>
+<p>The overall accuracy of each classifier on each dataset (this plot is not bounded to any particular board, it is computed &quot;offline&quot;).</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Accuracy.png" alt="TinyML Accuracy" /></p>
+<p><strong>Comment</strong>:  many classifiers (Random Forest, XGBoost, Logistic Regression) can easily achieve up to 95+ % accuracy on some datasets with minimal pre-processing, while still scoring 85+ % on more difficult datasets.</p>
+<h3>Flash percent</h3>
+<p>These charts plot, for each dataset, how much flash (in percent on the total available) it takes for the classifier to compile (visit the <a href="https://colab.research.google.com/drive/1sl755xwwNyrFUVK1WtcqiOISpO2h8cMF?usp=sharing">Colab Notebook</a> to see all the charts).</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Human-Activity-Flash-percent.png" alt="Human Activity Flash percent plot" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Gesture-Phase-Flash-Percent.png" alt="Gesture Phase Flash Percent plot" /></p>
+<p><strong>Comment</strong>: DecisionTree, GaussianNB and Logistic Regression require the least amount of flash. XGBoost is very &quot;flash-intensive&quot;; RandomForest sits in the middle.</p>
+<h5>How tiny can TinyML be?</h5>
+<p>As low as 6% of flash size for a fully functional DecisionTree with 85+% accuracy.</p>
+<h3>Inference time</h3>
+<p>These charts plot, for each dataset, how long it takes for the classifier to run (only the classification, no feature extraction!).</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/EMG-Inference-time-plot.png" alt="EMG Inference time plot" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Sport-Activity-Inference-time-plot.png" alt="Sport Activity Inference time plot" /></p>
+<p><strong>Comment</strong>: DecisionTree is the clear winner here, with minimal inference time  (from 0.4 to 30 microseconds), followed by Random Forest. Logistic Regression, XGBoost and GaussianNB are the slowest.</p>
+<h5>How fast can TinyML be?</h5>
+<p>As fast as sub-millisecond inference time for a fully functional DecisionTree with 85+% accuracy.</p>
+<h3>Inference time vs Accuracy</h3>
+<p>This plot correlates the inference time vs the classification accuracy. The more upper-left a point is, the better (fast inference time, high accuracy).</p>
+<p><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png">Click here to open the image at full size</a></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png" alt="Inference time vs Accuracy scatter plot" /></p>
+<p><strong>Comment</strong>: as already stated, you will see a lot of blue markers (Decision Tree) in the top left, since it is very fast and quite accurate. Moving to the right you can see purple (Logistic Regression) and orange (Random Forest).  GaussianNB (red) exhibits quite low accuracy instead.</p>
+<h3>Inference time vs Flash percent</h3>
+<p>This plot correlates the inference time vs the the (relative) flash requirement. The more lower-left a point is, the better (fast inference time, low flash requirements).</p>
+<p><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Flash-percent-scatter-plot.png">Click here to open the image at full size</a></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Flash-percent-scatter-plot.png" alt="Inference time vs Flash percent scatter plot" /></p>
+<p><strong>Comment</strong>: Again, we see blue (Decision Tree) is both fast and small, followed by Logistic Regression and Random Forest. Now it is clear that XGBoost (green), while not being the slowest, is the more demanding in terms of flash.</p>
+<h2>Conclusions</h2>
+<p>I hope this post helped you broaden your view on TinyML, on how tiny it can be, how fast it can be (sub-millisecond inference!), how wide it is.</p>
+<p>Please don't hesitate to comment with your opinion on the subject, suggestions of new boards or datasets I should benchmark, or any other idea you have in mind that can contribute to the purpose of this page.</p>
+<p>And don't forget to stay tuned for the updates: I already have <strong>2 more boards</strong> I will benchmark in the next days!</p>
+<hr />
+<p>As promised, here's <a href="https://github.com/eloquentarduino/eloquentarduino.github.io/blob/master/UCI%20datasets.csv">the link to the raw benchmarks in CSV format</a>.</p>
+<p>You can run your own analysis and visualization on it: if you use it in your own work, please add a link to this post.</p>
+<p>In future posts I will share how I collected all those numbers, so subscribe to the newsletter to stay up to date!</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/12/tinyml-benchmark-table/">The Grand Benchmark Table of Embedded Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Esp32-cam motion detection WITH PHOTO CAPTURE! (grayscale version)</title>
 		<link>https://eloquentarduino.github.io/2020/12/esp32-cam-motion-detection-with-photo-capture-grayscale-version/</link>
 		
@@ -697,7 +865,7 @@ port(fft, lookup_cos=True, lookup_sin=True)</code></pre>
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1180,7 +1348,7 @@ namespace Eloquent {
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1370,7 +1538,7 @@ if __name__ == &#039;__main__&#039;:
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1500,7 +1668,7 @@ void loop() {
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1517,25 +1685,40 @@ void loop() {
 <p>The main reason I wrote this piece of library is because one of you reader commented on the <a href="/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">motion detection post</a> asking if it would be possible to start the video streaming once motion is detected.</p>
 <p>Of course it is.</p>
 <p>It's just a matter of composing the Eloquent pieces.</p>
-<pre><code class="language-cpp">#define CAMERA_MODEL_M5STACK_WIDE
+<pre><code class="language-cpp">// not workings AS-IS, needs refactoring
+
+#define CAMERA_MODEL_M5STACK_WIDE
 #include &quot;WiFi.h&quot;
 #include &quot;EloquentVision.h&quot;
 #include &quot;ESP32CameraHTTPVideoStreamingServer.h&quot;
 
+#define FRAME_SIZE FRAMESIZE_QVGA
 #define SOURCE_WIDTH 320
 #define SOURCE_HEIGHT 240
-#define BLOCK_SIZE 10
-#define BLOCK_DIFF_THRESHOLD 0.2
-#define IMAGE_DIFF_THRESHOLD 0.1
+#define CHANNELS 1
+#define DEST_WIDTH 32
+#define DEST_HEIGHT 24
+#define BLOCK_VARIATION_THRESHOLD 0.3
+#define MOTION_THRESHOLD 0.2
 
+// we&#039;re using the Eloquent::Vision namespace a lot!
 using namespace Eloquent::Vision;
 using namespace Eloquent::Vision::Camera;
 using namespace Eloquent::Vision::ImageProcessing;
 using namespace Eloquent::Vision::ImageProcessing::Downscale;
+using namespace Eloquent::Vision::ImageProcessing::DownscaleStrategies;
 
 ESP32Camera camera;
 HTTPVideoStreamingServer server(81);
-MotionDetection&lt; SOURCE_WIDTH, SOURCE_HEIGHT, BLOCK_SIZE&gt; motion(nearest);
+// the buffer to store the downscaled version of the image
+uint8_t resized[DEST_HEIGHT][DEST_WIDTH];
+// the downscaler algorithm
+// for more details see https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection
+Cross&lt;SOURCE_WIDTH, SOURCE_HEIGHT, DEST_WIDTH, DEST_HEIGHT&gt; crossStrategy;
+// the downscaler container
+Downscaler&lt;SOURCE_WIDTH, SOURCE_HEIGHT, CHANNELS, DEST_WIDTH, DEST_HEIGHT&gt; downscaler(&amp;crossStrategy);
+// the motion detection algorithm
+MotionDetection&lt;DEST_WIDTH, DEST_HEIGHT&gt; motion;
 
 /**
  *
@@ -1544,7 +1727,8 @@ void setup() {
     Serial.begin(115200);
     WiFi.softAP(&quot;ESP32&quot;, &quot;12345678&quot;);
 
-    camera.begin(FRAMESIZE_QVGA, PIXFORMAT_JPEG);
+    camera.begin(FRAMESIZE_QVGA, PIXFORMAT_GRAYSCALE);
+    motion.setBlockVariationThreshold(BLOCK_VARIATION_THRESHOLD);
 
     Serial.print(&quot;Camera Ready! Use &#039;http://&quot;);
     Serial.print(WiFi.softAPIP());
@@ -1552,15 +1736,27 @@ void setup() {
 }
 
 void loop() {
-    motion.update(camera.capture()-&gt;buf);
+    camera_fb_t *frame = camera.capture();
 
-    if (motion.detectRatio() &gt; IMAGE_DIFF_THRESHOLD) {
+    // resize image and detect motion
+    downscaler.downscale(frame-&gt;buf, resized);
+    motion.update(resized);
+    motion.detect();
+
+    if (motion.ratio() &gt; MOTION_THRESHOLD) {
         Serial.print(&quot;Motion detected&quot;);
         // start the streaming server when motion is detected
         // shutdown after 20 seconds if no one connects
+        camera.begin(FRAMESIZE_QVGA, PIXFORMAT_JPEG);
+        delay(2000);
+        Serial.print(&quot;Camera Server ready! Use &#039;http://&quot;);
+        Serial.print(WiFi.softAPIP());
+        Serial.println(&quot;:81&#039; to stream&quot;);
         server.start();
         delay(20000);
         server.stop();
+        camera.begin(FRAMESIZE_QVGA, PIXFORMAT_GRAYSCALE);
+        delay(2000);
     }
 
     // probably we don&#039;t need 30 fps, save some power
@@ -1651,7 +1847,7 @@ void setup() {
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1885,7 +2081,7 @@ If OneClassSVM predicts the sound as a novelty, you discard it since it's of no 
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1928,248 +2124,6 @@ void loop() {}</code></pre>
 <p>I created an example sketch from a synthetic dataset for anomaly detection (copied from a <a href="https://scikit-learn.org/stable/auto_examples/svm/plot_oneclass.html#sphx-glr-auto-examples-svm-plot-oneclass-py">scikit-learn example</a>) you can run to get a feel of how it performs.</p>
 <p>Go checkout the <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/OneClassSVMExample/OneClassSVMExample.ino">Github repo</a></p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/">Anomaly detection on your Arduino microcontroller via One Class SVM</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
-			</item>
-		<item>
-		<title>Easier, faster pure video ESP32 cam motion detection</title>
-		<link>https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sun, 10 May 2020 19:26:08 +0000</pubDate>
-				<category><![CDATA[Computer vision]]></category>
-		<category><![CDATA[camera]]></category>
-		<category><![CDATA[esp32]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1110</guid>
-
-					<description><![CDATA[<p>If you liked my post about ESP32 cam motion detection, you'll love this updated version: it's easier to use and blazing fast! The post about pure video ESP32 cam motion detection without an external PIR is my most successful post at the moment. Many of you are interested about this topic. One of my readers, [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">Easier, faster pure video ESP32 cam motion detection</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>If you liked my post about <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">ESP32 cam motion detection</a>, you'll love this updated version: it's easier to use and blazing fast!</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Faster-motion-detection.gif" alt="Faster motion detection" /></p>
-<p><span id="more-1110"></span></p>
-<p>The post about <strong>pure video ESP32 cam motion detection</strong> without an external PIR is my most successful post at the moment. Many of you are interested about this topic.</p>
-<p>One of my readers, though, pointed out my implementation was quite slow and he only achieved bare 5 fps in his project. So he asked for a better alternative.</p>
-<p>Since the post was of great interest for many people, I took the time to revisit the code and make improvements.</p>
-<p>I came up with a 100% re-writing that is both easier to use and faster. Actually, it is <strong>blazing fast!</strong>.</p>
-<p>Let's see how it works.</p>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocdownsampling">Downsampling</a><ol><li><a href="#tocnearest-neighbor">Nearest neighbor</a><li><a href="#tocfull-block-average">Full block average</a><li><a href="#toccore-block-average">Core block average</a><li><a href="#toccross-block-average">Cross block average</a><li><a href="#tocdiagonal-block-average">Diagonal block average</a><li><a href="#tocimplement-your-own">Implement your own</a></li></ol><li><a href="#tocbenchmarks">Benchmarks</a><li><a href="#tocmotion-detection">Motion detection</a><li><a href="#tocfull-code">Full code</a></ol></div></p>
-<h2 id="tocdownsampling">Downsampling</h2>
-<p>In the original post I introduced the idea of downsampling the image from the camera for a faster and more robust motion detection. I wrote the code in the main sketch to keep it self-contained.</p>
-<p>Looking back now it was a poor choice, since it cluttered the project and distracted from the main purpose, which is motion detection.</p>
-<p>Moreover, I thought that scanning the image buffer in sequential order would be the fastest approach.</p>
-<p>It turns out I was wrong.</p>
-<p>This time I scan the image buffer following the blocks that will compose the resulting image and the results are... much faster.</p>
-<p>Also, I decided to inject some more efficiency that will further speedup the computation: using different strategies for downsampling.</p>
-<p>The idea of downsampling is that you have to &quot;collapse&quot; a block of NxN from the original image to just one pixel of the resulting image.</p>
-<p>Now, there are a variety of ways you can accomplish this. The first two I present here are the most obvious, the other two are of my &quot;invention&quot;: nothing fancy nor new, but they're fast and serve the purpose well.</p>
-<h3 id="tocnearest-neighbor">Nearest neighbor</h3>
-<p>You can just pick the center of the NxN block and use its value for the output.<br />
-Of course it is fast (possibly the fastest approach), but wouldn't be very accurate. One pixel out of NxN wouldn't be representative of the overall region and will heavily suffer from noise.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Nearest-diagram.png" alt="Nearest diagram" /></p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/nn.jpg" alt="Nearest neighbor block averaging" /></p>
-<h3 id="tocfull-block-average">Full block average</h3>
-<p>This is the most intuitive alternative: use the average of all the pixels in the block as the ouput value. This is arguabily the &quot;proper&quot; way to do it, since you're using all the pixels in the source image to compute the new one.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Full-diagram.png" alt="Full diagram" /><br />
-<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/full.jpg" alt="Full block averaging" /></p>
-<h3 id="toccore-block-average">Core block average</h3>
-<p>As a faster alternative, I thought that averaging only the &quot;core&quot; (the most internal part) of the block would have been a good-enough solution. It has no theoretical proof that this yields true, but our task here is to create a smaller <em>representation</em> of the original image, not producing an accurate smaller version.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Core-diagram.png" alt="Core diagram" /><br />
-<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/core.jpg" alt="Core block averaging" /></p>
-<p><em>I'll stress this point: the only reason we do downsampling is to compare two sequential frame and detect if they differ above a certain threshold. This downsampling doesn't have to mimic the actual image: it can transform the source in any fancy way, as long as it stays consistent and captures the variations over time.</em></p>
-<h3 id="toccross-block-average">Cross block average</h3>
-<p>This time we consider all the pixels along the vertical and horizontal central axes. The idea is that you will capture a good portion of the variation along both the axis, given quite accurate results.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Cross-diagram.png" alt="Cross diagram" /><br />
-<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/cross.jpg" alt="Cross block averaging" /></p>
-<h3 id="tocdiagonal-block-average">Diagonal block average</h3>
-<p>This alternative too came to my mind from nowhere, really. I just think it is a good alternative to capture all the block's variation, probably even better than vertical and horizontal directions.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/Diagonal-diagram.png" alt="Diagonal diagram" /><br />
-<img src="https://eloquentarduino.github.io/wp-content/uploads/2020/05/diagonal.jpg" alt="Diagonal block averaging" /></p>
-<h3 id="tocimplement-your-own">Implement your own</h3>
-<p>Not satisfied from the methods above? No problem, you can still implement your own.</p>
-<p>The ones presented above are just some algorithms that came to my mind: I'm not telling you they're the best.</p>
-<p>They worked for me, that's it.</p>
-<p>If you think you found a better solution, I encourage you implement it and even share it with me and the other readers, so we can all make progress on this together.</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<h2 id="tocbenchmarks">Benchmarks</h2>
-<p>So, at the very beginning I said this new implementation is blazingly fast. </p>
-<p>How much fast?</p>
-<p>As fast as it can be, arguably.</p>
-<p>I mean, so fast it won't alter your fps.</p>
-<p>Look at the results I got on my M5Stack camera.</p>
-<table>
-<thead>
-<tr>
-<th>Algorithm</th>
-<th style="text-align: center;">Time to execute (micros)</th>
-<th style="text-align: right;">FPS</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>None</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Nearest neighbor</td>
-<td style="text-align: center;">160</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Cross block</td>
-<td style="text-align: center;">700</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Core block</td>
-<td style="text-align: center;">800</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Diagonal block</td>
-<td style="text-align: center;">950</td>
-<td style="text-align: right;">25</td>
-</tr>
-<tr>
-<td>Full block</td>
-<td style="text-align: center;">4900</td>
-<td style="text-align: right;">12</td>
-</tr>
-</tbody>
-</table>
-<p>As you can see, only the full block creates a delay in the process (quite a bit of delay even): the other  methods  won't slow down your program in any noticeable way.</p>
-<p>If you test Nearest neighbor and it works for you, then you'll be extremely light on computation resources with only <strong>160 microseconds</strong> of delay.</p>
-<p>This is what I mean by <em>blazing fast</em>.</p>
-<h2 id="tocmotion-detection">Motion detection</h2>
-<p>The motion detection part hasn't changed, so I point you to <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version#tocblocks-difference-threshold">the original post</a> to read more about the Block difference threshold and the Image difference threshold.</p>
-<h2 id="tocfull-code">Full code</h2>
-<pre><code class="language-cpp">#define CAMERA_MODEL_M5STACK_WIDE
-#include &quot;EloquentVision.h&quot;
-
-#define FRAME_SIZE FRAMESIZE_QVGA
-#define SOURCE_WIDTH 320
-#define SOURCE_HEIGHT 240
-#define BLOCK_SIZE 10
-#define DEST_WIDTH (SOURCE_WIDTH / BLOCK_SIZE)
-#define DEST_HEIGHT (SOURCE_HEIGHT / BLOCK_SIZE)
-#define BLOCK_DIFF_THRESHOLD 0.2
-#define IMAGE_DIFF_THRESHOLD 0.1
-#define DEBUG 0
-
-using namespace Eloquent::Vision;
-
-ESP32Camera camera;
-uint8_t prevFrame[DEST_WIDTH * DEST_HEIGHT] = { 0 };
-uint8_t currentFrame[DEST_WIDTH * DEST_HEIGHT] = { 0 };
-
-// function prototypes
-bool motionDetect();
-void updateFrame();
-
-/**
- *
- */
-void setup() {
-    Serial.begin(115200);
-    camera.begin(FRAME_SIZE, PIXFORMAT_GRAYSCALE);
-}
-
-/**
- *
- */
-void loop() {
-    /**
-     * Algorithm:
-     *  1. grab frame
-     *  2. compare with previous to detect motion
-     *  3. update previous frame
-     */
-
-    time_t start = millis();
-    camera_fb_t *frame = camera.capture();
-
-    downscaleImage(frame-&gt;buf, currentFrame, nearest, SOURCE_WIDTH, SOURCE_HEIGHT, BLOCK_SIZE);
-
-    if (motionDetect()) {
-        Serial.print(&quot;Motion detected @ &quot;);
-        Serial.print(floor(1000.0f / (millis() - start)));
-        Serial.println(&quot; FPS&quot;);
-    }
-
-    updateFrame();
-}
-
-/**
- * Compute the number of different blocks
- * If there are enough, then motion happened
- */
-bool motionDetect() {
-    uint16_t changes = 0;
-    const uint16_t blocks = DEST_WIDTH * DEST_HEIGHT;
-
-    for (int y = 0; y &lt; DEST_HEIGHT; y++) {
-        for (int x = 0; x &lt; DEST_WIDTH; x++) {
-            float current = currentFrame[y * DEST_WIDTH + x];
-            float prev = prevFrame[y * DEST_WIDTH + x];
-            float delta = abs(current - prev) / prev;
-
-            if (delta &gt;= BLOCK_DIFF_THRESHOLD)
-                changes += 1;
-        }
-    }
-
-    return (1.0 * changes / blocks) &gt; IMAGE_DIFF_THRESHOLD;
-}
-
-/**
- * Copy current frame to previous
- */
-void updateFrame() {
-    memcpy(prevFrame, currentFrame, DEST_WIDTH * DEST_HEIGHT);
-}</code></pre>
-<hr />
-<p>Check the full project code on <a href="https://github.com/eloquentarduino/EloquentVision/blob/master/examples/FasterMotionDetection/FasterMotionDetection.ino">Github</a> and remember to star!</p>
-<!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup">
-<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
-<div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
-</div>
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
-    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
-</div>
-
-<!--End mc_embed_signup-->
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/">Easier, faster pure video ESP32 cam motion detection</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		

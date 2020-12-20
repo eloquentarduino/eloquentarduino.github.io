@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://eloquentarduino.github.io/</loc>
-		<lastmod>2020-12-10T11:26:23+00:00</lastmod>
+		<lastmod>2020-12-20T16:13:28+00:00</lastmod>
 	</url>
 	<url>
 		<loc>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</loc>
@@ -313,10 +313,6 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://eloquentarduino.github.io/2020/06/easy-esp32-camera-http-video-streaming-server/</loc>
-		<lastmod>2020-06-24T18:26:23+00:00</lastmod>
-	</url>
-	<url>
 		<loc>https://eloquentarduino.github.io/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/</loc>
 		<lastmod>2020-07-12T15:04:14+00:00</lastmod>
 		<image:image>
@@ -400,6 +396,46 @@
 		<image:image>
 			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/08/DecisionTree.png</image:loc>
 			<image:caption><![CDATA[DecisionTree]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/06/easy-esp32-camera-http-video-streaming-server/</loc>
+		<lastmod>2020-12-16T20:29:52+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/12/tinyml-benchmark-table/</loc>
+		<lastmod>2020-12-20T16:13:28+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png</image:loc>
+			<image:caption><![CDATA[Inference time vs Accuracy scatter plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Accuracy.png</image:loc>
+			<image:caption><![CDATA[TinyML Accuracy]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Human-Activity-Flash-percent.png</image:loc>
+			<image:caption><![CDATA[Human Activity Flash percent plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Gesture-Phase-Flash-Percent.png</image:loc>
+			<image:caption><![CDATA[Gesture Phase Flash Percent plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/EMG-Inference-time-plot.png</image:loc>
+			<image:caption><![CDATA[EMG Inference time plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Sport-Activity-Inference-time-plot.png</image:loc>
+			<image:caption><![CDATA[Sport Activity Inference time plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png</image:loc>
+			<image:caption><![CDATA[Inference time vs Accuracy scatter plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Flash-percent-scatter-plot.png</image:loc>
+			<image:caption><![CDATA[Inference time vs Flash percent scatter plot]]></image:caption>
 		</image:image>
 	</url>
 </urlset>

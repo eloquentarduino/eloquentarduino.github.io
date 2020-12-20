@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/category/programming/arduino-machine-learning/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Thu, 10 Dec 2020 11:26:23 +0000</lastBuildDate>
+	<lastBuildDate>Sun, 20 Dec 2020 16:13:28 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -20,6 +20,174 @@
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=5.3.6</generator>
 	<item>
+		<title>The Grand Benchmark Table of Embedded Machine Learning</title>
+		<link>https://eloquentarduino.github.io/2020/12/tinyml-benchmark-table/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Wed, 16 Dec 2020 20:31:10 +0000</pubDate>
+				<category><![CDATA[Arduino Machine learning]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1416</guid>
+
+					<description><![CDATA[<p>How tiny is TinyML? How fast is TinyML? Do you want to get some REAL numbers on embedded machine learning on Arduino, STM32, ESP32, Seeedstudio boards (and more coming)? This page will answer all your questions! Background If you're new to this blog, you need to know that (almost one year ago) I settled on [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/12/tinyml-benchmark-table/">The Grand Benchmark Table of Embedded Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>How tiny is TinyML? How <em>fast</em> is TinyML?</p>
+<p>Do you want to get some <em>REAL</em> numbers on embedded machine learning on Arduino, STM32, ESP32, Seeedstudio boards (and more coming)? </p>
+<p>This page will answer all your questions!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png" alt="Inference time vs Accuracy scatter plot" /></p>
+<p><span id="more-1416"></span></p>
+<h3>Background</h3>
+<p>If you're new to this blog, you need to know that (almost one year ago) I settled on a mission to <strong>bring machine learning to embedded microcontrollers of all sizes</strong> (<a href="/2019/12/machine-learning-on-attiny85/">even the Attiny85</a>!).</p>
+<p>To me, it is just insane to deploy heavyweight Neural Networks to such small devices, if you don't need their expressiveness (mainly image and audio analysis). The vast majority of embedded ML tasks is, in fact, related to sensors' readings, which can easily be solved with &quot;traditional&quot; ML algorithms.</p>
+<p>Today's industry seems to be more leaned toward Neural Networks, though, so I thought it would be beneficial for you readers to get an actual grasp on the potential of traditional Machine learning algorithms in the embedded context.</p>
+<p>On this blog you can find posts about:</p>
+<ul>
+<li><a href="/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/">Decision Tree, Random Forest and XGBoost</a></li>
+<li><a href="/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/">Gaussian Naive Bayes</a></li>
+<li><a href="/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/">SEFR - a binary classifier</a></li>
+<li><a href="/2020/06/arduino-dimensionality-reduction-pca-for-machine-learning-projects/">PCA for dimensionality reduction</a></li>
+<li><a href="/2020/02/even-smaller-machine-learning-models-for-your-mcu/">Relevant Vector Machines</a></li>
+<li><a href="/2019/12/how-to-do-gesture-identification-on-arduino/">SVM for gesture detection</a></li>
+<li><a href="/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/">One Class SVM for anomaly detection</a></li>
+</ul>
+<p>All these algorithms go a long way in both accuracy and resource comsumption, so (in my opinion) they should be your first choice when developing a new project.</p>
+<p>To support my claimings I made a huge effort to collect real world data, and now I want to share this data with you.</p>
+<p>Before you ask:</p>
+<p>&quot;Are Neural Networks models benchmarked here?&quot;. No.</p>
+<p>&quot;Will Neural Networks model be benchmarked in the future?&quot;. Yes, as soon as I'm comfortable with them: I want to create a fair comparison between NN and traditional algorithms.</p>
+<p>So now let's move to the contents.</p>
+<h3>The boards</h3>
+<p>I run the benchmarks on the boards I have at hand: they were all purchased by me, except for the Arduino Nano BLE Sense (given to me by the Arduino team).</p>
+<ul>
+<li><a href="https://ae01.alicdn.com/kf/H81a3be13b25244f09d8c538e2bea36e23/4-MB-Flash-Per-WeMos-D1-ESP32-ESP-32-ESP-32S-ESP32S-Wifi-Senza-Fili-di.jpg_Q90.jpg_.webp">Espressif ESP32</a></li>
+<li><a href="https://www.mechatronicslab.net/my_uploads/2020/06/NodeMCU-ESP8266-Pinout-1.jpg">Espressif ESP8266 NodeMCU v1.0</a></li>
+<li><a href="https://www.st.com/en/evaluation-tools/nucleo-l432kc.html">STM32 Nucleo L432KC</a> (Cortex M4)</li>
+<li><a href="https://www.seeedstudio.com/Seeeduino-XIAO-Arduino-Microcontroller-SAMD21-Cortex-M0+-p-4426.html">Seeedstudio XIAO</a> (SAMD21 Cortex M0)</li>
+<li><a href="https://store.arduino.cc/arduino-nano-33-ble-sense">Arduino Nano 33 BLE Sense</a> (Cortex M4F)</li>
+</ul>
+<h3>The datasets</h3>
+<p>I picked a small selection of toy and real world datasets to benchmark the classifiers against (the real world ones were picked from a <a href="https://scholar.harvard.edu/files/vijay-janapa-reddi/files/tinymlsummit2020-4-4-janapareddi.pdf">TinyML Talks presentation</a> when easily available, plus some more from the <a href="https://archive.ics.uci.edu/ml//datasets.php">UCI database</a> almost at random).</p>
+<p>Here's the list of the benchmarked datasets, with the <em>shape</em> of the dataset (in the format <code>number of samples</code> x <code>number of features</code> x <code>number of classes</code>).</p>
+<ul>
+<li>Iris <code>(150 x 4 x 3)</code>: from the sklearn package</li>
+<li>Wine <code>(178 x 13 x 3)</code>: from the sklearn package</li>
+<li>Digits <code>(1797 x 64 x 10)</code>: from the sklearn package</li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/human+activity+recognition+using+smartphones">Human Activity</a> <code>(10299 x 561 x 6)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/Daily+and+Sports+Activities">Sport Activity</a> <code>(4800 x 180 x 10)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/Gas+Sensor+Array+Drift+Dataset">Gas Sensor Array Drift</a> <code>(1000 x 128 x 6)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/EMG+data+for+gestures">EMG</a> <code>(1648 x 63 x 5 )</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/gesture+phase+segmentation">Gesture Phase Segmentaion</a> <code>(1000 x 19 x 5)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/Statlog+%28Vehicle+Silhouettes%29">Statlog (Vehicle Silhouettes)</a> <code>(846 x 18 x 4)</code></li>
+<li><a href="http://archive.ics.uci.edu/ml/datasets/mammographic+mass">Mammographic Mass</a> <code>(830 x 4 x 2)</code></li>
+<li><a href="https://archive.ics.uci.edu/ml/datasets/dataset+for+sensorless+drive+diagnosis">Sensorless Drive Diagnosis</a> <code>(1000 x 48 x 11)</code></li>
+</ul>
+<p>The datasets are chosen to be representative of different domains and the list will grow in the next weeks.</p>
+<p>Some datasets are used <em>as-is</em>, others were pre-processed with very light feature extraction. In detail:</p>
+<ul>
+<li><code>Human Activity</code> features were extracted with a rolling window, and for each window min/max/avg/std/skew/kurtosis were calculated</li>
+<li><code>Sport Activity</code> got the same pre-processing, and the number of actvities was reduced from 19 to 10</li>
+<li><code>EMG</code> features were extracted with a rolling window, and for each window the Root Mean Square value was calculated</li>
+</ul>
+<p>The reported benchmarks <strong>only consider the inference process</strong>: any feature extraction is not included! Nevertheless, only features with linear time complexity were used, so any MCU will have no problem in computing them.</p>
+<h3>The classifiers</h3>
+<p>The following classifiers are benchmarked:</p>
+<ul>
+<li>Decision Tree</li>
+<li>Random Forest</li>
+<li>XGBoost</li>
+<li>Logistic Regression</li>
+<li>Gaussian Naive Bayes</li>
+</ul>
+<p>Why these classifiers?</p>
+<p>Because they're all supported by the <a href="https://github.com/eloquentarduino/micromlgen">micromlgen</a> package, so they can easily be ported to plain C.</p>
+<p>* <em>XGBoost porting failed on some datasets, so you will see holes in the data. I will correct this in the next weeks</em></p>
+<p><code>micromlgen</code> actually supports Support Vector Machines, too: it is not included because on real world datasets the number of support vector is so high (hundreds or even thousands) that no single board could handle that.</p>
+<p>If you want to stay up to date with the new numbers, subscribe to the newsletter: I promise you won't receive more than 1 mail per month.</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<h2>The Results</h2>
+<p>This section reports (a selection of) the charts generated from the benchmark results to give you a quick glance of the capabilities of the aforementioned boards and algorithms in terms of performance and accuracy.</p>
+<p>If you like an interactive view of the data, there's a <a href="https://colab.research.google.com/drive/1sl755xwwNyrFUVK1WtcqiOISpO2h8cMF?usp=sharing">Colab Notebook</a> that reproduces the charts reported here, where you can interact with the data as you like.</p>
+<p>At the very end of the article, you can also find a link to the raw CSV file I generated (as you can see, it required A LOT of work to create).</p>
+<h3>Accuracy</h3>
+<p>The overall accuracy of each classifier on each dataset (this plot is not bounded to any particular board, it is computed &quot;offline&quot;).</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Accuracy.png" alt="TinyML Accuracy" /></p>
+<p><strong>Comment</strong>:  many classifiers (Random Forest, XGBoost, Logistic Regression) can easily achieve up to 95+ % accuracy on some datasets with minimal pre-processing, while still scoring 85+ % on more difficult datasets.</p>
+<h3>Flash percent</h3>
+<p>These charts plot, for each dataset, how much flash (in percent on the total available) it takes for the classifier to compile (visit the <a href="https://colab.research.google.com/drive/1sl755xwwNyrFUVK1WtcqiOISpO2h8cMF?usp=sharing">Colab Notebook</a> to see all the charts).</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Human-Activity-Flash-percent.png" alt="Human Activity Flash percent plot" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Gesture-Phase-Flash-Percent.png" alt="Gesture Phase Flash Percent plot" /></p>
+<p><strong>Comment</strong>: DecisionTree, GaussianNB and Logistic Regression require the least amount of flash. XGBoost is very &quot;flash-intensive&quot;; RandomForest sits in the middle.</p>
+<h5>How tiny can TinyML be?</h5>
+<p>As low as 6% of flash size for a fully functional DecisionTree with 85+% accuracy.</p>
+<h3>Inference time</h3>
+<p>These charts plot, for each dataset, how long it takes for the classifier to run (only the classification, no feature extraction!).</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/EMG-Inference-time-plot.png" alt="EMG Inference time plot" /></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Sport-Activity-Inference-time-plot.png" alt="Sport Activity Inference time plot" /></p>
+<p><strong>Comment</strong>: DecisionTree is the clear winner here, with minimal inference time  (from 0.4 to 30 microseconds), followed by Random Forest. Logistic Regression, XGBoost and GaussianNB are the slowest.</p>
+<h5>How fast can TinyML be?</h5>
+<p>As fast as sub-millisecond inference time for a fully functional DecisionTree with 85+% accuracy.</p>
+<h3>Inference time vs Accuracy</h3>
+<p>This plot correlates the inference time vs the classification accuracy. The more upper-left a point is, the better (fast inference time, high accuracy).</p>
+<p><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png">Click here to open the image at full size</a></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png" alt="Inference time vs Accuracy scatter plot" /></p>
+<p><strong>Comment</strong>: as already stated, you will see a lot of blue markers (Decision Tree) in the top left, since it is very fast and quite accurate. Moving to the right you can see purple (Logistic Regression) and orange (Random Forest).  GaussianNB (red) exhibits quite low accuracy instead.</p>
+<h3>Inference time vs Flash percent</h3>
+<p>This plot correlates the inference time vs the the (relative) flash requirement. The more lower-left a point is, the better (fast inference time, low flash requirements).</p>
+<p><a href="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Flash-percent-scatter-plot.png">Click here to open the image at full size</a></p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Flash-percent-scatter-plot.png" alt="Inference time vs Flash percent scatter plot" /></p>
+<p><strong>Comment</strong>: Again, we see blue (Decision Tree) is both fast and small, followed by Logistic Regression and Random Forest. Now it is clear that XGBoost (green), while not being the slowest, is the more demanding in terms of flash.</p>
+<h2>Conclusions</h2>
+<p>I hope this post helped you broaden your view on TinyML, on how tiny it can be, how fast it can be (sub-millisecond inference!), how wide it is.</p>
+<p>Please don't hesitate to comment with your opinion on the subject, suggestions of new boards or datasets I should benchmark, or any other idea you have in mind that can contribute to the purpose of this page.</p>
+<p>And don't forget to stay tuned for the updates: I already have <strong>2 more boards</strong> I will benchmark in the next days!</p>
+<hr />
+<p>As promised, here's <a href="https://github.com/eloquentarduino/eloquentarduino.github.io/blob/master/UCI%20datasets.csv">the link to the raw benchmarks in CSV format</a>.</p>
+<p>You can run your own analysis and visualization on it: if you use it in your own work, please add a link to this post.</p>
+<p>In future posts I will share how I collected all those numbers, so subscribe to the newsletter to stay up to date!</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/12/tinyml-benchmark-table/">The Grand Benchmark Table of Embedded Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
 		<title>Decision Tree, Random Forest and XGBoost on Arduino</title>
 		<link>https://eloquentarduino.github.io/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/</link>
 		
@@ -568,7 +736,7 @@ port(fft, lookup_cos=True, lookup_sin=True)</code></pre>
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1051,7 +1219,7 @@ namespace Eloquent {
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1241,7 +1409,7 @@ if __name__ == &#039;__main__&#039;:
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1386,7 +1554,7 @@ void setup() {
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1620,7 +1788,7 @@ If OneClassSVM predicts the sound as a novelty, you discard it since it's of no 
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1701,7 +1869,7 @@ void loop() {}</code></pre>
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1878,7 +2046,7 @@ clf.momentum(0.5);</code></pre>
     <div id="mc_embed_signup_scroll">
 	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
 <div class="mc-field-group">
-	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the monthly newsletter">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
 </div>
 	<div id="mce-responses" class="clear">
 		<div class="response" id="mce-error-response" style="display:none"></div>
@@ -1896,277 +2064,6 @@ clf.momentum(0.5);</code></pre>
 <p>This happens because the algorithm needs some time to converge and if it doesn't receive enough samples it won't learn properly.</p>
 <p>Of course, if you re-use the same samples over and over again, you're likely to overfit.</p>
 <p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/stochastic-gradient-descent-on-your-microcontroller/">Stochastic Gradient Descent on your microcontroller</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></content:encoded>
-					
-		
-		
-			</item>
-		<item>
-		<title>Passive-aggressive classifier for embedded devices</title>
-		<link>https://eloquentarduino.github.io/2020/04/passive-aggressive-classifier-for-embedded-devices/</link>
-		
-		<dc:creator><![CDATA[simone]]></dc:creator>
-		<pubDate>Sun, 05 Apr 2020 17:04:10 +0000</pubDate>
-				<category><![CDATA[Arduino Machine learning]]></category>
-		<category><![CDATA[microml]]></category>
-		<category><![CDATA[online-learning]]></category>
-		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1050</guid>
-
-					<description><![CDATA[<p>When working with memory constrained devices you may not able to keep all the training data in memory: passive-aggressive classifiers may help solve your memory problems. Batch learning A couple weeks ago I started exploring the possibility to train a machine learning classifier directly on a microcontroller. Since I like SVM, I ported the simplified [&#8230;]</p>
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/passive-aggressive-classifier-for-embedded-devices/">Passive-aggressive classifier for embedded devices</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
-]]></description>
-										<content:encoded><![CDATA[<p>When working with memory constrained devices you may not able to keep all the training data in memory: passive-aggressive classifiers may help solve your memory problems.</p>
-<p><span id="more-1050"></span></p>
-<h2>Batch learning</h2>
-<p>A couple weeks ago I started exploring the possibility to train a machine learning classifier directly on a microcontroller. Since I like SVM, <a href="/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board">I ported the simplified SVM SMO (Sequential Minimal Optimization) algorithm</a> to plain C, ready to be deployed to embedded devices.</p>
-<p>Now, that kind of algorithm works in the so-called &quot;batch-mode&quot;: it needs all the training data to be available in memory to learn.</p>
-<p>This may be a limiting factor on resource-constrained devices, since it poses an upper bound to the number of samples you can train on. And when working with high-dimensional datasets, the number of samples could be not enough to achieve good accuracy.</p>
-<h2>Enter incremental learning</h2>
-<p>To solve this limitation, you need a totally different kind of learning algorithms: you need incremental (a.k.a online a.k.a out of core) learning.</p>
-<p>Incremental learning works by inspecting one training sample at a time, instead of all at once.</p>
-<p>The clear advantage is that you have a tiny memory footprint. And this is a <strong>huge</strong> advantage.</p>
-<p>The clear disadvantage is that you don't have the &quot;big picture&quot; of your data, so:</p>
-<ul>
-<li>the end result will probably be affected by the order of presentation of the samples</li>
-<li>you may not be able to achieve top accuracy</li>
-</ul>
-<h2>Passive-aggressive classifier</h2>
-<p>Passive-aggressive classification is one of the available incremental learning algorithms and it is very simple to implement, since it has a closed-form update rule.</p>
-<p>Please refer to this <a href="https://www.bonaccorso.eu/2017/10/06/ml-algorithms-addendum-passive-aggressive-algorithms/">short explanation on Passive-aggressive classifiers</a> for a nice description with images.</p>
-<p>The core concept is that the classifier adjusts it weight vector for each mis-classified training sample it receives, trying to get it correct.</p>
-<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/04/passive-aggressive-classifier.png" alt="Passive aggressive classifier" /></p>
-<h2>Benchmarks</h2>
-<p>I run a couple benchmark on my Esp32 to assess both accuracy and training time.</p>
-<p>First of all: <strong>it is fast!</strong>. When I say it is fast I mean it takes ~1ms to train on 400 samples x 30 features each.</p>
-<p>Talking about accuracy instead... Uhm...</p>
-<p>Accuracy vary. <strong>Greatly</strong>. </p>
-<p>You can achieve 100% on some datasets. </p>
-<p>And 40% on others. But on those same datasets you can achieve &gt;85% if training on a different number of samples. Or in a different order.</p>
-<p>I guess this is the tradeoff for such a simple and space-efficient algorithm.</p>
-<p>I report my results in the following table. It is not meant to be an exhaustive benchmark of the classifier, since those number will vary based on the order of presentation, but still you can get an idea of what it is able to achieve.</p>
-<table>
-<thead>
-<tr>
-<th>Dataset size</th>
-<th style="text-align: center;">Train samples</th>
-<th style="text-align: right;">Accuracy</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>BREAST CANCER</td>
-<td style="text-align: center;"></td>
-<td style="text-align: right;"></td>
-</tr>
-<tr>
-<td>567 samples</td>
-<td style="text-align: center;">20</td>
-<td style="text-align: right;">62</td>
-</tr>
-<tr>
-<td>30 features</td>
-<td style="text-align: center;">40</td>
-<td style="text-align: right;">37</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">60</td>
-<td style="text-align: right;">63</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">100</td>
-<td style="text-align: right;">39</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">150</td>
-<td style="text-align: right;">38</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">200</td>
-<td style="text-align: right;">64</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">250</td>
-<td style="text-align: right;">61</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">300</td>
-<td style="text-align: right;">69</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">350</td>
-<td style="text-align: right;">73</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">400</td>
-<td style="text-align: right;">85</td>
-</tr>
-<tr>
-<td>IRIS</td>
-<td style="text-align: center;"></td>
-<td style="text-align: right;"></td>
-</tr>
-<tr>
-<td>100 samples</td>
-<td style="text-align: center;">10</td>
-<td style="text-align: right;">50</td>
-</tr>
-<tr>
-<td>4 features</td>
-<td style="text-align: center;">20</td>
-<td style="text-align: right;">51</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">40</td>
-<td style="text-align: right;">100</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">60</td>
-<td style="text-align: right;">100</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">80</td>
-<td style="text-align: right;">100</td>
-</tr>
-<tr>
-<td>DIGITS</td>
-<td style="text-align: center;"></td>
-<td style="text-align: right;"></td>
-</tr>
-<tr>
-<td>358 samples</td>
-<td style="text-align: center;">20</td>
-<td style="text-align: right;">98</td>
-</tr>
-<tr>
-<td>64 features</td>
-<td style="text-align: center;">40</td>
-<td style="text-align: right;">98</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">60</td>
-<td style="text-align: right;">99</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">100</td>
-<td style="text-align: right;">100</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">150</td>
-<td style="text-align: right;">100</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">200</td>
-<td style="text-align: right;">99</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">250</td>
-<td style="text-align: right;">98</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">300</td>
-<td style="text-align: right;">95</td>
-</tr>
-<tr>
-<td>CLEVELAND HEART DISEASE</td>
-<td style="text-align: center;"></td>
-<td style="text-align: right;"></td>
-</tr>
-<tr>
-<td>212 samples</td>
-<td style="text-align: center;">20</td>
-<td style="text-align: right;">76</td>
-</tr>
-<tr>
-<td>13 features</td>
-<td style="text-align: center;">40</td>
-<td style="text-align: right;">24</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">60</td>
-<td style="text-align: right;">77</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">100</td>
-<td style="text-align: right;">19</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">120</td>
-<td style="text-align: right;">82</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">140</td>
-<td style="text-align: right;">78</td>
-</tr>
-<tr>
-<td></td>
-<td style="text-align: center;">180</td>
-<td style="text-align: right;">88</td>
-</tr>
-</tbody>
-</table>
-<h2>Time to code</h2>
-<p>Here I'll report an extract of the example code you can find on <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/PassiveAggressiveExample/PassiveAggressiveExample.ino">Github</a> for this classifier.</p>
-<pre><code class="language-c">#include &quot;EloquentPassiveAggressiveClassifier.h&quot;
-#include &quot;EloquentAccuracyScorer.h&quot;
-#include &quot;iris.h&quot;
-
-using namespace Eloquent::ML;
-
-void loop() {
-    int trainSamples;
-    PassiveAggressiveClassifier&lt;FEATURES_DIM&gt; clf;
-    AccuracyScorer scorer;
-
-    trainSamples = readSerialNumber(&quot;How many samples will you use as training?&quot;, DATASET_SIZE - 2);
-
-    if (trainSamples == 0)
-        return;
-
-    clf.setC(1);
-
-    // train
-    for (uint16_t i = 0; i &lt; trainSamples; i++)
-        clf.fitOne(X[i], y[i]);
-
-    // predict
-    for (uint16_t i = trainSamples; i &lt; DATASET_SIZE; i++) {
-        int predicted = clf.predict(X[i]);
-        int actual = y[i] &gt; 0 ? 1 : -1;
-
-        scorer.scoreOne(actual, predicted);
-    }
-
-    Serial.print(&quot;Accuracy: &quot;);
-    Serial.print(round(100 * scorer.accuracy()));
-    Serial.print(&quot;% out of &quot;);
-    Serial.print(scorer.support());
-    Serial.println(&quot; predictions&quot;);
-}</code></pre>
-<hr />
-<p>On the <a href="https://github.com/eloquentarduino/EloquentMicroML/blob/master/examples/PassiveAggressiveExample/PassiveAggressiveExample.ino">project page</a> you will find the code to reproduce these numbers.</p>
-<hr />
-<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/04/passive-aggressive-classifier-for-embedded-devices/">Passive-aggressive classifier for embedded devices</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
 ]]></content:encoded>
 					
 		
