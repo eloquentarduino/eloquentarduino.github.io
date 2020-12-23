@@ -408,12 +408,12 @@ void print_features() {
 <p>As in the <a href="/2020/01/image-recognition-with-esp32-and-arduino/">apple vs orange</a>, keep in mind that you should be consistent during both the training phase and the inference phase.</p>
 <p>This is why I used tape to fix my ESP32 camera to the desk and kept the tablet in the exact same position.</p>
 <p>If you desire, you could experiment varying slightly the capturing setup during the training and see if your classifier still achieves good accuracy: this is a test I didn't make.</p>
-<h2>3. Train and export the SVM classifier</h2>
+<h2>3. Train and export the classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
 
 <p>
-<pre><code class="language-python">from sklearn.svm import SVC
+<pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
 from micromlgen import port
 
 # put your samples in the dataset folder
@@ -421,7 +421,7 @@ from micromlgen import port
 # one feature vector per line, in CSV format
 features, classmap = load_features('dataset/')
 X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
+classifier = RandomForestClassifier(n_estimators=30, max_depth=10).fit(X, y)
 c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 
@@ -1005,7 +1005,7 @@ This is going to run on an Arduino Nano (old generation), equipped with 32 kb of
 <div class="watchout">
 This tutorial is not about "Wake word" detection: it can't distinguish a known word from any other word. It can classify the word you speak among the ones you trained it to recognize!!!
 </div>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#toctranslate-the-raw-values">Translate the raw values</a><li><a href="#tocdetect-sound">Detect sound</a><li><a href="#tocrecord-the-words">Record the words</a><li><a href="#tocfast-fourier-transform">Fast Fourier Transform</a></li></ol><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><ol><li><a href="#tocselect-a-suitable-model">Select a suitable model</a></li></ol><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#toctranslate-the-raw-values">Translate the raw values</a><li><a href="#tocdetect-sound">Detect sound</a><li><a href="#tocrecord-the-words">Record the words</a><li><a href="#tocfast-fourier-transform">Fast Fourier Transform</a></li></ol><li><a href="#toctrain-and-export-the-classifier">Train and export the classifier</a><ol><li><a href="#tocselect-a-suitable-model">Select a suitable model</a></li></ol><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
 <h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>The microphone we're going to use is a super simple device: it produces an analog signal (0-1024) based on the sound it detects. </p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord-Sensor.jpg" alt="from http://arduinolearning.com/code/ky038-microphone-module-and-arduino-example.php" /></p>
@@ -1126,12 +1126,12 @@ void captureWord() {
 <div class="watchout">
 After you have recorded the samples for a word, I suggest you to manually check them. It is sufficient to look at the first 3 values: if one of them seems to be clearly out of range, I suggest you to delete it. You will lose some accuracy, but your model will be smaller.
 </div>
-<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
+<h2 id="toctrain-and-export-the-classifier">3. Train and export the classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
 
 <p>
-<pre><code class="language-python">from sklearn.svm import SVC
+<pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
 from micromlgen import port
 
 # put your samples in the dataset folder
@@ -1139,7 +1139,7 @@ from micromlgen import port
 # one feature vector per line, in CSV format
 features, classmap = load_features('dataset/')
 X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
+classifier = RandomForestClassifier(n_estimators=30, max_depth=10).fit(X, y)
 c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 
@@ -1229,7 +1229,7 @@ As you can hear from the video, you should be quite accurate when pronouncing th
 <p><span id="more-224"></span></p>
 <div class="watchout">
 I published an upgraded version of this project, with all the code and tools you need: <a href="/2020/08/the-ultimate-guide-to-wifi-indoor-positioning-using-arduino-and-machine-learning/"><b>check it out</b></a></div>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocwhat-is-wifi-indoor-positioning">What is Wifi indoor positioning?</a><ol><li><a href="#tocwhat-will-we-use-it-for">What will we use it for?</a><li><a href="#tocwhat-you-need">What you need</a><li><a href="#tochow-it-works">How it works</a></li></ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#tocenumerate-the-access-points">Enumerate the access points</a><li><a href="#toccreate-an-access-point-array">Create an access point array</a><li><a href="#tocconvert-to-features-vector">Convert to features vector</a></li></ol><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocwhat-is-wifi-indoor-positioning">What is Wifi indoor positioning?</a><ol><li><a href="#tocwhat-will-we-use-it-for">What will we use it for?</a><li><a href="#tocwhat-you-need">What you need</a><li><a href="#tochow-it-works">How it works</a></li></ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#tocenumerate-the-access-points">Enumerate the access points</a><li><a href="#toccreate-an-access-point-array">Create an access point array</a><li><a href="#tocconvert-to-features-vector">Convert to features vector</a></li></ol><li><a href="#toctrain-and-export-the-classifier">Train and export the classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
 <h2 id="tocwhat-is-wifi-indoor-positioning">What is Wifi indoor positioning?</h2>
 <p>We all are used to GPS positioning: our device will use satellites to track our position on Earth. GPS works very well and with a very high accuracy (you can expect only a few meters of error).</p>
 <p>But it suffers a problem: it needs <em>Line of Sight</em> (a clear path from your device to the satellites). If you're not in an open place, like inside a building, you're out of luck.</p>
@@ -1367,12 +1367,12 @@ features[networkIndex] = WiFi.RSSI(i);
 features[networkIndex] = WiFi.RSSI(i) > MIN_RSSI ? WiFi.RSSI(i) : 0;
 </code></pre>
 </div>
-<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
+<h2 id="toctrain-and-export-the-classifier">3. Train and export the classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
 
 <p>
-<pre><code class="language-python">from sklearn.svm import SVC
+<pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
 from micromlgen import port
 
 # put your samples in the dataset folder
@@ -1380,7 +1380,7 @@ from micromlgen import port
 # one feature vector per line, in CSV format
 features, classmap = load_features('dataset/')
 X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
+classifier = RandomForestClassifier(n_estimators=30, max_depth=10).fit(X, y)
 c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 
@@ -1426,7 +1426,7 @@ void classify() {
 This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html">Tensorflow blog</a>. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png" alt="Decision boundaries, 99% accuracy" /></p>
 <p><span id="more-35"></span></p>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#tocread-the-imu-sensor">Read the IMU sensor</a><li><a href="#toccalibration">Calibration</a><li><a href="#tocdetect-first-motion">Detect first motion</a><li><a href="#tocrecord-features">Record features</a></li></ol><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><ol><li><a href="#tocselect-a-suitable-model">Select a suitable model</a></li></ol><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><ol><li><a href="#tocread-the-imu-sensor">Read the IMU sensor</a><li><a href="#toccalibration">Calibration</a><li><a href="#tocdetect-first-motion">Detect first motion</a><li><a href="#tocrecord-features">Record features</a></li></ol><li><a href="#toctrain-and-export-the-classifier">Train and export the classifier</a><ol><li><a href="#tocselect-a-suitable-model">Select a suitable model</a></li></ol><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
 <h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>We're going to use the accelerations along the 3 axis (X, Y, Z) coming from an <a href="https://en.wikipedia.org/wiki/Inertial_measurement_unit">IMU</a> to infer which gesture we're playing. We'll use a fixed number of recordings (<code>NUM_SAMPLES</code>) starting from the first detection of movement. </p>
 <p>This means our feature vectors are going to be of dimension <code>3 * NUM_SAMPLES</code>, which can become too large to fit in the memory of the Arduino Nano. We'll start with a low value for <code>NUM_SAMPLES</code> to keep it as leaner as possible: if your classifications suffer from poor accuracy, you can increase this number.</p>
@@ -1615,12 +1615,12 @@ void printFeatures() {
 }
 </code></pre>
 <p>Record 15-20 samples for each geasture and save them to a file, one for each gesture. Since we're dealing with highly dimensional data, you should collect as much samples as possible, to average out the noise.</p>
-<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
+<h2 id="toctrain-and-export-the-classifier">3. Train and export the classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
 
 <p>
-<pre><code class="language-python">from sklearn.svm import SVC
+<pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
 from micromlgen import port
 
 # put your samples in the dataset folder
@@ -1628,7 +1628,7 @@ from micromlgen import port
 # one feature vector per line, in CSV format
 features, classmap = load_features('dataset/')
 X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
+classifier = RandomForestClassifier(n_estimators=30, max_depth=10).fit(X, y)
 c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 
@@ -1774,7 +1774,7 @@ In practice, we'll translate dots (•) and dashes (‒)  &quot;typed&quot; with
 In this tutorial we're going to target an Arduino Nano board (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-194"></span></p>
 <p><img src="https://i.ytimg.com/vi/L6gxfX4GrbI/maxresdefault.jpg" alt="credits to https://www.youtube.com/watch?v=L6gxfX4GrbI" /></p>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-classifier">Train and export the classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
 <h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>For our task we'll use a simple push button as input and a fixed number of samples taken at a fixed interval (100 ms), starting from the first detection of the button press. I chose to record 30 samples for each letter, but you can easily customize the value as per your needs. </p>
 <p>With 30 samples at 100 ms frequency, we'll have 3 seconds to &quot;type&quot; the letter and on the Serial monitor will appear a sequence of 0s and 1s, representing if the button was pressed or not; the inference procedure will translate this sequence into a letter.<br />
@@ -1872,12 +1872,12 @@ void printFeatures() {
 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1</code></pre>
 <p>If you do a good job, you should end with quite distinguible features, as show in the plot below.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg" alt="Decision boundaries of 2 PCA components from Morse alphabet identification features" /></p>
-<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
+<h2 id="toctrain-and-export-the-classifier">3. Train and export the classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
 
 <p>
-<pre><code class="language-python">from sklearn.svm import SVC
+<pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
 from micromlgen import port
 
 # put your samples in the dataset folder
@@ -1885,7 +1885,7 @@ from micromlgen import port
 # one feature vector per line, in CSV format
 features, classmap = load_features('dataset/')
 X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
+classifier = RandomForestClassifier(n_estimators=30, max_depth=10).fit(X, y)
 c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 
@@ -1933,7 +1933,7 @@ void loop() {
 										<content:encoded><![CDATA[<p>In this Arduno Machine learning project we're going to use an RGB sensor to identify objects based on their color.<br />
 This is a remake of the project found on the <a href="https://blog.tensorflow.org/2019/11/fruit-identification-using-arduino-and-tensorflow.html">Tensorflow blog</a>. We're going to use a lot less powerful chip in this tutorial, tough: an Arduino Nano (old generation), equipped with 32 kb of flash and only 2 kb of RAM.</p>
 <p><span id="more-6"></span></p>
-<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-svm-classifier">Train and export the SVM classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocrecord-sample-data">Record sample data</a><li><a href="#toctrain-and-export-the-classifier">Train and export the classifier</a><li><a href="#tocrun-the-inference">Run the inference</a></ol></div></p>
 <h2 id="tocfeatures-definition">1. Features definition</h2>
 <p>We're going to use the RGB components of a color sensor (TCS3200 in my case) to infer which object we're pointing it at. This means our features are going to be of 3-dimensional, which leads to a really simple model with very high accuracy.</p>
 <hr /><p><em>You can do color identification on Arduino using Machine learning without Neural Networks #Arduino #microml #ml #tinyml #MachineLearning #ai #svm</em><br /><a href='https://twitter.com/intent/tweet?url=http%3A%2F%2Feloquent.blog%2F2019%2F12%2Fcolor-identification-on-arduino%2F&#038;text=You%20can%20do%20color%20identification%20on%20Arduino%20using%20Machine%20learning%20without%20Neural%20Networks%20%23Arduino%20%23microml%20%23ml%20%23tinyml%20%23MachineLearning%20%23ai%20%23svm&#038;via=EloquentArduino&#038;related=EloquentArduino' target='_blank' rel="noopener noreferrer" >Click To Tweet</a><br /><hr />
@@ -1988,12 +1988,12 @@ Don’t forget to sample the “empty color” too: don’t put anything in fron
 </div>
 <p>If you do a good job, you should end with distinguible features, as show in the contour plot below.</p>
 <p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-the-colors-features.png" alt="Decision boundaries of 2 PCA components from the colors features" /></p>
-<h2 id="toctrain-and-export-the-svm-classifier">3. Train and export the SVM classifier</h2>
+<h2 id="toctrain-and-export-the-classifier">3. Train and export the classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
 
 <p>
-<pre><code class="language-python">from sklearn.svm import SVC
+<pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
 from micromlgen import port
 
 # put your samples in the dataset folder
@@ -2001,7 +2001,7 @@ from micromlgen import port
 # one feature vector per line, in CSV format
 features, classmap = load_features('dataset/')
 X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
+classifier = RandomForestClassifier(n_estimators=30, max_depth=10).fit(X, y)
 c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 

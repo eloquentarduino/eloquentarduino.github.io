@@ -598,12 +598,12 @@ void print_features() {
 <p>As in the <a href="/2020/01/image-recognition-with-esp32-and-arduino/">apple vs orange</a>, keep in mind that you should be consistent during both the training phase and the inference phase.</p>
 <p>This is why I used tape to fix my ESP32 camera to the desk and kept the tablet in the exact same position.</p>
 <p>If you desire, you could experiment varying slightly the capturing setup during the training and see if your classifier still achieves good accuracy: this is a test I didn't make.</p>
-<h2>3. Train and export the SVM classifier</h2>
+<h2>3. Train and export the classifier</h2>
 
 <p>For a detailed guide refer to the <a href="/2019/11/how-to-train-a-classifier-in-scikit-learn/" target="_blank" rel="noopener noreferrer">tutorial</a></p>
 
 <p>
-<pre><code class="language-python">from sklearn.svm import SVC
+<pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
 from micromlgen import port
 
 # put your samples in the dataset folder
@@ -611,7 +611,7 @@ from micromlgen import port
 # one feature vector per line, in CSV format
 features, classmap = load_features('dataset/')
 X, y = features[:, :-1], features[:, -1]
-classifier = SVC(kernel='linear').fit(X, y)
+classifier = RandomForestClassifier(n_estimators=30, max_depth=10).fit(X, y)
 c_code = port(classifier, classmap=classmap)
 print(c_code)</code></pre>
 
