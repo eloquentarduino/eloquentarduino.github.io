@@ -12,7 +12,7 @@
 	<atom:link href="https://eloquentarduino.github.io/tag/svm/feed/" rel="self" type="application/rss+xml" />
 	<link>http://eloquentarduino.github.io/</link>
 	<description>Machine learning on Arduino, programming &#38; electronics</description>
-	<lastBuildDate>Wed, 23 Dec 2020 13:37:27 +0000</lastBuildDate>
+	<lastBuildDate>Thu, 24 Dec 2020 07:16:24 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -1077,6 +1077,7 @@ The dilemma here is that the Fourier Transform to work needs a number of samples
 #define INTERVAL 5
 
 float features[NUM_SAMPLES];
+double featuresForFFT[NUM_SAMPLES];
 
 void loop() {
     if (!soundDetected()) {
@@ -1115,11 +1116,14 @@ arduinoFFT fft;
 
 void captureWord() {
     for (uint16_t i = 0; i &lt; NUM_SAMPLES; i++) {
-        features[i] = readMic();
+        featuresForFFT[i] = readMic();
         delay(INTERVAL);
     }
 
-    fft.Windowing(features, NUM_SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+    fft.Windowing(featuresForFFT, NUM_SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+
+    for (int i = 0; i &lt; NUM_SAMPLES; i++)
+        features[i] = featuresForFFT[i];
 }</code></pre>
 <p>You don't need to know what the <code>Windowing</code> function actually does (I don't either): what matters is that it extracts meaningful informations from our signal. Since it overwrites the features array, after calling that line we have what we need to input to our classifier.</p>
 <p>At this point, record 10-15 samples for each word and save them to a file, one for each word.</p>
