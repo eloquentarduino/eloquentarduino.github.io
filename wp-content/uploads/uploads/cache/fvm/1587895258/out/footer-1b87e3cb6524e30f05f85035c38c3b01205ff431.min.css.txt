@@ -1,3 +1,0 @@
-PROCESSED on Sun, 26 Apr 2020 10:01:16 +0000
-/wp-includes/js/mediaelement/wp-mediaelement.min.css
-PROCESSED from http://eloquent.blog/2019/12/how-to-do-gesture-identification-on-arduino/
