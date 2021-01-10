@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="//eloquentarduino.github.io/wp-content/plugins/wordpress-seo/css/main-sitemap.xsl"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<url>
+		<loc>https://eloquentarduino.github.io/</loc>
+		<lastmod>2020-12-24T07:16:24+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/non-blocking-arduino-code/</loc>
+		<lastmod>2019-12-16T21:59:36+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/arduino-bounded-waiting/</loc>
+		<lastmod>2019-12-16T22:03:25+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/11/how-to-write-clean-arduino-code/</loc>
+		<lastmod>2019-12-22T13:40:10+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/11/CleanCode.jpg</image:loc>
+			<image:caption><![CDATA[from https://www.wlion.com/blog/5-reasons-you-should-be-writing-clean-code/]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/how-to-install-the-eloquent-library/</loc>
+		<lastmod>2020-01-25T16:15:38+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Repo.png</image:loc>
+			<image:caption><![CDATA[Download zip from Github repository]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/arduino-pin-class/</loc>
+		<lastmod>2020-01-25T16:15:54+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/02/easy-arduino-thermal-camera-with-ascii-video-streaming/</loc>
+		<lastmod>2020-03-02T19:19:00+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/thermal-image-rgb-vs-ascii.jpg</image:loc>
+			<image:caption><![CDATA[Arduino thermal image rgb vs ascii]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/03/how-to-train-a-color-classification-machine-learning-classifier-directly-on-your-arduino-board/</loc>
+		<lastmod>2020-04-05T17:01:49+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/03/how-to-train-a-iris-classification-machine-learning-classifier-directly-on-your-arduino-board/</loc>
+		<lastmod>2020-04-05T17:02:20+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/04/stochastic-gradient-descent-on-your-microcontroller/</loc>
+		<lastmod>2020-04-12T17:31:52+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/04/incremental-multiclass-classification-on-microcontrollers-one-vs-one/</loc>
+		<lastmod>2020-04-26T09:52:29+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/04/passive-aggressive-classifier-for-embedded-devices/</loc>
+		<lastmod>2020-05-01T08:34:15+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/04/passive-aggressive-classifier.png</image:loc>
+			<image:caption><![CDATA[Passive aggressive classifier]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/03/so-you-want-to-train-an-ml-classifier-directly-on-an-arduino-board/</loc>
+		<lastmod>2020-05-01T09:06:05+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png</image:loc>
+			<image:caption><![CDATA[Onboard IRIS dataset training time]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-IRIS-dataset-training-time.png</image:loc>
+			<image:caption><![CDATA[Onboard IRIS dataset training time. Features dim = 4]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/03/Onboard-Breast-cancer-dataset-training-time.png</image:loc>
+			<image:caption><![CDATA[Onboard Breast cancer dataset training time. Features dim = 30]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/11/you-can-run-machine-learning-on-arduino/</loc>
+		<lastmod>2020-05-02T05:50:53+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/05/easier-faster-pure-video-esp32-cam-motion-detection/</loc>
+		<lastmod>2020-05-13T19:19:35+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Faster-motion-detection.gif</image:loc>
+			<image:caption><![CDATA[Faster motion detection]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Nearest-diagram.png</image:loc>
+			<image:caption><![CDATA[Nearest diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/nn.jpg</image:loc>
+			<image:caption><![CDATA[Nearest neighbor block averaging]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Full-diagram.png</image:loc>
+			<image:caption><![CDATA[Full diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/full.jpg</image:loc>
+			<image:caption><![CDATA[Full block averaging]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Core-diagram.png</image:loc>
+			<image:caption><![CDATA[Core diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/core.jpg</image:loc>
+			<image:caption><![CDATA[Core block averaging]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Cross-diagram.png</image:loc>
+			<image:caption><![CDATA[Cross diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/cross.jpg</image:loc>
+			<image:caption><![CDATA[Cross block averaging]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/Diagonal-diagram.png</image:loc>
+			<image:caption><![CDATA[Diagonal diagram]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/05/diagonal.jpg</image:loc>
+			<image:caption><![CDATA[Diagonal block averaging]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/02/handwritten-digit-classification-with-arduino-and-microml/</loc>
+		<lastmod>2020-05-31T16:50:44+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/MNIST.gif</image:loc>
+			<image:caption><![CDATA[Arduino handwritten digit classification]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-examples.jpg</image:loc>
+			<image:caption><![CDATA[Handwritten digits example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/mnist-feature-extraction.jpg</image:loc>
+			<image:caption><![CDATA[Handwritten digit feature extraction]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/02/even-smaller-machine-learning-models-for-your-mcu/</loc>
+		<lastmod>2020-05-31T16:50:57+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/rvm.jpg</image:loc>
+			<image:caption><![CDATA[RVM vs SVM support vectors]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/02/rvm.jpg</image:loc>
+			<image:caption><![CDATA[RVM vs SVM support vectors]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/01/image-recognition-with-esp32-and-arduino/</loc>
+		<lastmod>2020-05-31T16:51:27+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange.gif</image:loc>
+			<image:caption><![CDATA[Apple vs Orange]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Orange-and-Apple-pixelated.jpg</image:loc>
+			<image:caption><![CDATA[You actually need very few pixels to do image classification]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Image-downsampling-example.jpg</image:loc>
+			<image:caption><![CDATA[Image downsampling example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Apple-vs-Orange-decision-boundaries.png</image:loc>
+			<image:caption><![CDATA[Apple vs Orange decision boundaries]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/machine-learning-on-attiny85/</loc>
+		<lastmod>2020-05-31T16:51:39+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/attiny85_ml.png</image:loc>
+			<image:caption><![CDATA[ri-elaborated from https://cyaninfinite.com/miniaturize-projects-with-attiny85/]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/morse-identification-on-arduino/</loc>
+		<lastmod>2020-05-31T16:52:15+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Morse-alphabet-identification-features.svg</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components from Morse alphabet identification features]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/color-identification-on-arduino/</loc>
+		<lastmod>2020-05-31T16:52:23+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-the-colors-features.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components from the colors features]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/iris-classification-on-arduino/</loc>
+		<lastmod>2020-05-31T16:52:31+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/iris-278x300.png</image:loc>
+			<image:caption><![CDATA[Iris features illustrated @ credits to https://gallery.azure.ai/Experiment/Classify-Iris-Dataset-using-Decision-Forest-1]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Iris-features.svg</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Iris features]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Iris-serial.png</image:loc>
+			<image:caption><![CDATA[Iris classification serial output]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/05/anomaly-detection-on-your-arduino-microcontroller-via-one-class-svm/</loc>
+		<lastmod>2020-05-31T17:44:50+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/01/motion-detection-with-esp32-cam-only-arduino-version/</loc>
+		<lastmod>2020-06-03T11:17:09+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-detection-example.gif</image:loc>
+			<image:caption><![CDATA[ESP32 camera motion detection example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-models.jpg</image:loc>
+			<image:caption><![CDATA[ESP32 camera models]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/Image-downsampling-example.jpg</image:loc>
+			<image:caption><![CDATA[Image downsampling example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/ESP32-camera-motion-example.jpg</image:loc>
+			<image:caption><![CDATA[ESP32 camera motion example]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/01/easy-tinyml-on-esp32-and-arduino/</loc>
+		<lastmod>2020-06-03T17:10:18+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/01/tf-arduino-esp.png</image:loc>
+			<image:caption><![CDATA[tf arduino esp]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/06/arduino-dimensionality-reduction-pca-for-machine-learning-projects/</loc>
+		<lastmod>2020-06-07T09:26:25+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/how-to-do-gesture-identification-on-arduino/</loc>
+		<lastmod>2020-06-11T11:31:17+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries, 99% accuracy]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Calibrated-gestures.gif</image:loc>
+			<image:caption><![CDATA[Calibrated IMU readings for the gestures identification project]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Linear-kernel.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Linear kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-Polynomial-kernel.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, Polynomial kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.01-gamma.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.01 gamma]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Gestures-features-RBF-kernel-0.001-gamma.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Gestures features, RBF kernel, 0.001 gamma]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/</loc>
+		<lastmod>2020-07-12T15:04:14+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/07/Binary-classification.png</image:loc>
+			<image:caption><![CDATA[Binary classification - from https://towardsdatascience.com]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/</loc>
+		<lastmod>2020-08-02T09:36:42+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/08/GaussianNB.png</image:loc>
+			<image:caption><![CDATA[GaussianNB]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/wifi-indoor-positioning-on-arduino/</loc>
+		<lastmod>2020-08-09T14:16:51+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg</image:loc>
+			<image:caption><![CDATA[Wifi indoor positioning @ ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Wifi1.png</image:loc>
+			<image:caption><![CDATA[Wifi indoor positioning example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-from-Wifi-indoor-positioning-features.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components from Wifi indoor positioning features]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/08/the-ultimate-guide-to-wifi-indoor-positioning-using-arduino-and-machine-learning/</loc>
+		<lastmod>2020-08-09T14:19:32+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg</image:loc>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/09/principal-fft-components-as-efficient-features-extrator/</loc>
+		<lastmod>2020-09-05T15:14:34+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/09/FFT-spectrum.png</image:loc>
+			<image:caption><![CDATA[FFT spectrum example]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/09/FFT-vs-PCA.png</image:loc>
+			<image:caption><![CDATA[FFT vs PCA accuracy comparison on various datasets]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/08/better-word-classification-with-arduino-33-ble-sense-and-machine-learning/</loc>
+		<lastmod>2020-10-17T15:50:13+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg</image:loc>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/</loc>
+		<lastmod>2020-11-10T18:10:06+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/11/CNN-topology.png</image:loc>
+			<image:caption><![CDATA[CNN topology]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/11/how-to-train-a-classifier-in-scikit-learn/</loc>
+		<lastmod>2020-11-11T16:28:54+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/12/esp32-cam-motion-detection-with-photo-capture-grayscale-version/</loc>
+		<lastmod>2020-12-06T08:31:20+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/esp32-cam-motion-detection.png</image:loc>
+			<image:caption><![CDATA[Esp32-cam motion detection]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/</loc>
+		<lastmod>2020-12-10T11:26:23+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/08/DecisionTree.png</image:loc>
+			<image:caption><![CDATA[DecisionTree]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/06/easy-esp32-camera-http-video-streaming-server/</loc>
+		<lastmod>2020-12-16T20:29:52+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2020/12/tinyml-benchmark-table/</loc>
+		<lastmod>2020-12-20T16:13:28+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png</image:loc>
+			<image:caption><![CDATA[Inference time vs Accuracy scatter plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Accuracy.png</image:loc>
+			<image:caption><![CDATA[TinyML Accuracy]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Human-Activity-Flash-percent.png</image:loc>
+			<image:caption><![CDATA[Human Activity Flash percent plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Gesture-Phase-Flash-Percent.png</image:loc>
+			<image:caption><![CDATA[Gesture Phase Flash Percent plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/EMG-Inference-time-plot.png</image:loc>
+			<image:caption><![CDATA[EMG Inference time plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Sport-Activity-Inference-time-plot.png</image:loc>
+			<image:caption><![CDATA[Sport Activity Inference time plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Accuracy-scatter-plot.png</image:loc>
+			<image:caption><![CDATA[Inference time vs Accuracy scatter plot]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2020/12/Inference-time-vs-Flash-percent-scatter-plot.png</image:loc>
+			<image:caption><![CDATA[Inference time vs Flash percent scatter plot]]></image:caption>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://eloquentarduino.github.io/2019/12/word-classification-using-arduino/</loc>
+		<lastmod>2020-12-24T07:16:24+00:00</lastmod>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord.jpg</image:loc>
+			<image:caption><![CDATA[from https://www.udemy.com/course/learn-audio-processing-complete-engineers-course/]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/WakeWord-Sensor.jpg</image:loc>
+			<image:caption><![CDATA[from http://arduinolearning.com/code/ky038-microphone-module-and-arduino-example.php]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Raw-audio.gif</image:loc>
+			<image:caption><![CDATA[Raw audio stream]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-linear-kernel-87-accuracy.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, linear kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-poly-3-kernel-91-accuracy.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, poly-3 kernel]]></image:caption>
+		</image:image>
+		<image:image>
+			<image:loc>https://eloquentarduino.github.io/wp-content/uploads/2019/12/Decision-boundaries-of-2-PCA-components-of-Word-classification-rbf-kernel-94-accuracy.png</image:loc>
+			<image:caption><![CDATA[Decision boundaries of 2 PCA components of Word classification, rbf kernel]]></image:caption>
+		</image:image>
+	</url>
+</urlset>
+<!-- XML Sitemap generated by Yoast SEO -->

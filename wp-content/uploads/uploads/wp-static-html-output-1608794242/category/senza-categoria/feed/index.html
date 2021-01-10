@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>Senza categoria &#8211; Eloquent Arduino Blog</title>
+	<atom:link href="https://eloquentarduino.github.io/category/senza-categoria/feed/" rel="self" type="application/rss+xml" />
+	<link>http://eloquentarduino.github.io/</link>
+	<description>Machine learning on Arduino, programming &#38; electronics</description>
+	<lastBuildDate>Tue, 10 Nov 2020 18:10:06 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=5.3.6</generator>
+	<item>
+		<title>TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</title>
+		<link>https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Tue, 10 Nov 2020 16:37:13 +0000</pubDate>
+				<category><![CDATA[Senza categoria]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1365</guid>
+
+					<description><![CDATA[<p>Painless TinyML Convolutional Neural Network on your Arduino and STM32 boards: the MNIST dataset example! Are you fascinated by TinyML and Tensorflow for microcontrollers? Do you want to run a CNN (Convolutional Neural Network) on your Arduino and STM32 boards? Do you want to do it without pain? EloquentTinyML is the library for you! EloquentTinyML, [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/">TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Painless TinyML Convolutional Neural Network on your Arduino and STM32 boards: the MNIST dataset example!</p>
+<p>Are you fascinated by TinyML and Tensorflow for microcontrollers? </p>
+<p>Do you want to run a CNN (Convolutional Neural Network) on your Arduino and STM32 boards? </p>
+<p>Do you want to do it without pain? </p>
+<p>EloquentTinyML is the library for you!</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2020/11/CNN-topology.png" alt="CNN topology" /></p>
+<p><span id="more-1365"></span></p>
+<p><a href="https://github.com/eloquentarduino/EloquentTinyML">EloquentTinyML</a>, my library to easily run Tensorflow Lite neural networks on Arduino microcontrollers, is gaining some popularity so I think it's time for a good tutorial on the topic.</p>
+<p>If you're a seasoned follower of my blog, you may know that I don't really like Tensorflow on microcontrollers, because it is often <em>&quot;over-sized&quot;</em> for the project at hand and there are <a href="/2020/08/eloquentml-grows-its-family-of-classifiers-gaussian-naive-bayes-on-arduino/">leaner</a>, <a href="/2020/07/sefr-a-fast-linear-time-classifier-for-ultra-low-power-devices/">faster</a> <a href="/2020/10/decision-tree-random-forest-and-xgboost-on-arduino/">alternatives</a>.</p>
+<p>Nonetheless, Tensorflow is gaining much popularity in the embedded world so I'll try to give my contribute too.</p>
+<p>In this tutorial, I'm going to show you <strong>step by step</strong> how to train a CNN in Tensorflow and deploy it to you board: I tested the code both on the <strong>Arduino Nano 33 BLE Sense</strong> and the <strong>STM32 Nucleus L432KC</strong>.</p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tochow-to-train-a-cnn-in-tensorflow">How to train a CNN in Tensorflow</a><ol><li><a href="#tocstep-1-import-the-libraries">Step 1. Import the libraries</a><li><a href="#tocstep-2-generate-train-validation-and-test-data">Step 2. Generate train, validation and test data</a><li><a href="#tocstep-3-create-and-train-the-model">Step 3. Create and train the model</a><li><a href="#tocstep-4-testing-the-model-accuracy">Step 4. Testing the model accuracy</a><li><a href="#tocstep-5-exporting-the-model">Step 5. Exporting the model</a></li></ol><li><a href="#tochow-to-run-a-cnn-on-arduino-and-stm32-boards-with-eloquenttinyml">How to run a CNN on Arduino and STM32 boards with EloquentTinyML</a><ol><li><a href="#toccnn-on-arduino-and-stm32-figures">CNN on Arduino and STM32 figures</a></li></ol><li><a href="#tocand-you">And you?</a></ol></div></p>
+<h2 id="tochow-to-train-a-cnn-in-tensorflow">How to train a CNN in Tensorflow</h2>
+<p>I'm not an expert either in Tensorflow nor Convolutional Neural Networks, so I kept the project as simple as possible. I used an <em>image-like</em> dataset to create a setup where CNN should perform well: the dataset is the <a href="http://yann.lecun.com/exdb/mnist/">MNIST handwritten digits</a> one.</p>
+<p><img src="https://miro.medium.com/max/800/1*LyRlX__08q40UJohhJG9Ow.png" alt="MNIST dataset example" /></p>
+<p>It is composed by <strong>8x8</strong> images of handwritten digits, from 0 to 9 and can be easily imported via the <code>scikit-learn</code> Python package.</p>
+<p>Regarding the CNN topology, I wanted to stay as lean as possible: the goal of this tutorial is to teach you how to deploy your own network, not about achieving 100% accuracy.</p>
+<p>Let's see step by step how to produce a usable model.</p>
+<h3 id="tocstep-1-import-the-libraries">Step 1. Import the libraries</h3>
+<p>We will need <code>numpy</code> and <code>Tensorflow</code>, of course, plus <code>scikit-learn</code> to load the dataset and <a href="https://github.com/eloquentarduino/tinymlgen">tinymlgen</a> to port the CNN to plain C.</p>
+<pre><code class="language-python">import numpy as np
+from sklearn.datasets import load_digits
+import tensorflow as tf
+from tensorflow.keras import layers
+from tinymlgen import port</code></pre>
+<h3 id="tocstep-2-generate-train-validation-and-test-data">Step 2. Generate train, validation and test data</h3>
+<p>To train the network, we need:</p>
+<ul>
+<li><code>training data</code>: this is the data the network uses to learn its weights</li>
+<li><code>validation data</code>: this is the data the network uses to understand if it's doing well during learning</li>
+<li><code>test data</code>: this is the data we use to test the network accuracy once it's done learning</li>
+</ul>
+<pre><code class="language-python">def get_data():
+    np.random.seed(1337)
+    x_values, y_values = load_digits(return_X_y=True)
+    x_values /= x_values.max()
+    # reshape to (8 x 8 x 1)
+    x_values = x_values.reshape((len(x_values), 8, 8, 1))
+
+    # split into train, validation, test
+    TRAIN_SPLIT = int(0.6 * len(x_values))
+    TEST_SPLIT = int(0.2 * len(x_values) + TRAIN_SPLIT)
+    x_train, x_test, x_validate = np.split(x_values, [TRAIN_SPLIT, TEST_SPLIT])
+    y_train, y_test, y_validate = np.split(y_values, [TRAIN_SPLIT, TEST_SPLIT])
+
+    return x_train, x_test, x_validate, y_train, y_test, y_validate</code></pre>
+<h3 id="tocstep-3-create-and-train-the-model">Step 3. Create and train the model</h3>
+<p>Now we have to create our network topology.</p>
+<p>As I stated earlier, I wanted to keep this as simple as possible (also considering that we're using a toy dataset): I added a single convolution layer (without even max pooling) followed by the output layer.</p>
+<pre><code class="language-python">def get_model():
+    x_train, x_test, x_validate, y_train, y_test, y_validate = get_data()
+
+    # create a CNN
+    model = tf.keras.Sequential()
+    model.add(layers.Conv2D(8, (3, 3), activation=&#039;relu&#039;, input_shape=(8, 8, 1)))
+    # model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(len(np.unique(y_train))))
+
+    model.compile(optimizer=&#039;adam&#039;, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=[&#039;accuracy&#039;])
+    model.fit(x_train, y_train, epochs=50, batch_size=16,
+                        validation_data=(x_validate, y_validate))
+    return model, x_test, y_test</code></pre>
+<h3 id="tocstep-4-testing-the-model-accuracy">Step 4. Testing the model accuracy</h3>
+<p>Do you think this topology is too simple to learn something useful in so few epochs?</p>
+<p>Think again: it achieved <strong>97%</strong> accuracy!</p>
+<p>Not bad.</p>
+<pre><code class="language-python">def test_model(model, x_test, y_test):
+    x_test = (x_test / x_test.max()).reshape((len(x_test), 8, 8, 1))
+    y_pred = model.predict(x_test).argmax(axis=1)
+
+    print(&#039;ACCURACY&#039;, (y_pred == y_test).sum() / len(y_test))</code></pre>
+<h3 id="tocstep-5-exporting-the-model">Step 5. Exporting the model</h3>
+<p>Once we have a trained model that performs well, we want to deploy it to our microcontroller. Thanks to the <code>tinymlgen</code> packages, is as easy as a one-liner.</p>
+<pre><code class="language-python">if __name__ == &#039;__main__&#039;:
+    model, x_test, y_test = get_model()
+    test_model(model, x_test, y_test)
+    c_code = port(model, variable_name=&#039;digits_model&#039;, pretty_print=True)
+    print(c_code)</code></pre>
+<h2 id="tochow-to-run-a-cnn-on-arduino-and-stm32-boards-with-eloquenttinyml">How to run a CNN on Arduino and STM32 boards with EloquentTinyML</h2>
+<p>Ok, now we have the content we need to create an Arduino sketch to run the CNN on our microcontroller.</p>
+<p>We will use the <code>EloquentTinyML</code> library to do this without pain.</p>
+<p>This is a library to run TinyML models on your microcontroller without messing around with complex compilation procedures and esoteric errors.</p>
+<p>You must first install the library at its latest version (0.0.5 or 0.0.4 if not available), either via the Library Manager or directly from Github.</p>
+<pre><code class="language-cpp">#include &lt;EloquentTinyML.h&gt;
+
+// copy the printed code from tinymlgen into this file
+#include &quot;digits_model.h&quot;
+
+#define NUMBER_OF_INPUTS 64
+#define NUMBER_OF_OUTPUTS 10
+#define TENSOR_ARENA_SIZE 8*1024
+
+Eloquent::TinyML::TfLite&lt;NUMBER_OF_INPUTS, NUMBER_OF_OUTPUTS, TENSOR_ARENA_SIZE&gt; ml;
+
+void setup() {
+    Serial.begin(115200);
+    ml.begin(digits_model);
+}
+
+void loop() {
+    // a random sample from the MNIST dataset (precisely the last one)
+    float x_test[64] = { 0., 0. , 0.625 , 0.875 , 0.5   , 0.0625, 0. , 0. ,
+                    0. , 0.125 , 1. , 0.875 , 0.375 , 0.0625, 0. , 0. ,
+                    0. , 0. , 0.9375, 0.9375, 0.5   , 0.9375, 0. , 0. ,
+                    0. , 0. , 0.3125, 1. , 1. , 0.625 , 0. , 0. ,
+                    0. , 0. , 0.75  , 0.9375, 0.9375, 0.75  , 0. , 0. ,
+                    0. , 0.25  , 1. , 0.375 , 0.25  , 1. , 0.375 , 0. ,
+                    0. , 0.5   , 1. , 0.625 , 0.5   , 1. , 0.5   , 0. ,
+                    0. , 0.0625, 0.5   , 0.75  , 0.875 , 0.75  , 0.0625, 0. };
+    // the output vector for the model predictions
+    float y_pred[10] = {0};
+    // the actual class of the sample
+    int y_test = 8;
+
+    // let&#039;s see how long it takes to classify the sample
+    uint32_t start = micros();
+
+    ml.predict(x_test, y_pred);
+
+    uint32_t timeit = micros() - start;
+
+    Serial.print(&quot;It took &quot;);
+    Serial.print(timeit);
+    Serial.println(&quot; micros to run inference&quot;);
+
+    // let&#039;s print the raw predictions for all the classes
+    // these values are not directly interpretable as probabilities!
+    Serial.print(&quot;Test output is: &quot;);
+    Serial.println(y_test);
+    Serial.print(&quot;Predicted proba are: &quot;);
+
+    for (int i = 0; i &lt; 10; i++) {
+        Serial.print(y_pred[i]);
+        Serial.print(i == 9 ? &#039;\n&#039; : &#039;,&#039;);
+    }
+
+    // let&#039;s print the &quot;most probable&quot; class
+    // you can either use probaToClass() if you also want to use all the probabilities
+    Serial.print(&quot;Predicted class is: &quot;);
+    Serial.println(ml.probaToClass(y_pred));
+    // or you can skip the predict() method and call directly predictClass()
+    Serial.print(&quot;Sanity check: &quot;);
+    Serial.println(ml.predictClass(x_test));
+
+    delay(1000);
+}</code></pre>
+<p>That's it: if everything went fine, you should see that the predicted class is <code>8</code>.</p>
+<h3 id="toccnn-on-arduino-and-stm32-figures">CNN on Arduino and STM32 figures</h3>
+<p>I'll report the figures I get for compiling and running this project on the two boards I used.</p>
+<table>
+<thead>
+<tr>
+<th>Board</th>
+<th style="text-align: right;">Flash</th>
+<th style="text-align: right;">RAM</th>
+<th style="text-align: right;">Inference time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nucleus  L432KC</td>
+<td style="text-align: right;">154560</td>
+<td style="text-align: right;">not available*</td>
+<td style="text-align: right;">7187</td>
+</tr>
+<tr>
+<td>Arduino Nano 33 BLE Sense</td>
+<td style="text-align: right;">197656</td>
+<td style="text-align: right;">56160</td>
+<td style="text-align: right;">9400</td>
+</tr>
+</tbody>
+</table>
+<p><em>I used the Grumpyoldpizza compiler for the Nucleus, which doesn't report back the RAM usage</em></p>
+<h2 id="tocand-you">And you?</h2>
+<p>Were you able to deploy a CNN to your microcontroller thanks to this tutorial? Or are you having troubles?</p>
+<p>Let me know in the comment and I will help you or share your experience with us.</p>
+<hr />
+<p>You can find the whole code on <a href="https://github.com/eloquentarduino/EloquentTinyML/tree/master/examples/DigitsExample">Github</a>.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/11/tinyml-on-arduino-and-stm32-cnn-convolutional-neural-network-example/">TinyML on Arduino and STM32: CNN (Convolutional Neural Network) example</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>The Ultimate Guide to Wifi Indoor Positioning using Arduino and Machine Learning</title>
+		<link>https://eloquentarduino.github.io/2020/08/the-ultimate-guide-to-wifi-indoor-positioning-using-arduino-and-machine-learning/</link>
+		
+		<dc:creator><![CDATA[simone]]></dc:creator>
+		<pubDate>Sat, 08 Aug 2020 13:21:25 +0000</pubDate>
+				<category><![CDATA[Senza categoria]]></category>
+		<guid isPermaLink="false">https://eloquentarduino.github.io/?p=1237</guid>
+
+					<description><![CDATA[<p>This will be the most detailed, easy to follow tutorial over the Web on how to implement Wifi indoor positioning using an Arduino microcontroller and Machine Learning. It contains all the steps, tools and code from the start to the end of the project. ri-elaborated from https://www.accuware.com/blog/ambient-signals-plus-video-images/ My original post abot Wifi indoor positioning is [&#8230;]</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/08/the-ultimate-guide-to-wifi-indoor-positioning-using-arduino-and-machine-learning/">The Ultimate Guide to Wifi Indoor Positioning using Arduino and Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>This will be the most detailed, easy to follow tutorial over the Web on how to implement Wifi indoor positioning using an Arduino microcontroller and Machine Learning. It contains all the steps, tools and code from the start to the end of the project.</p>
+<p><img src="https://eloquentarduino.github.io/wp-content/uploads/2019/12/illustrations_ambient-wifi-site-survey2.jpg" alt="" /><br />
+<em>ri-elaborated from <a href="https://www.accuware.com/blog/ambient-signals-plus-video-images/">https://www.accuware.com/blog/ambient-signals-plus-video-images/</a></em></p>
+<p><span id="more-1237"></span></p>
+<p><a href="/2019/12/wifi-indoor-positioning-on-arduino/">My original post</a> abot Wifi indoor positioning is one of my top-performing post of all time (after <a href="/2020/01/motion-detection-with-esp32-cam-only-arduino-version/">motion detection using ESP32 camera</a> and <a href="/2019/11/you-can-run-machine-learning-on-arduino/">the introductory post on Machine Learning for Arduino</a>). This is why I settled to revamp it and add some more details, tools and scripts to create <strong>the most complete free guide</strong> on how to implement such a system, from the beginning to the end.</p>
+<p>This post will cover all the necessary steps and provide all the code you need: for an introduction to the topic, I point you to <a href="/2019/12/wifi-indoor-positioning-on-arduino/">the original post</a>.</p>
+<p><div class="toc"><h6>Table of contents</h6><ol><li><a href="#tocfeatures-definition">Features definition</a><li><a href="#tocdata-gathering">Data gathering</a><li><a href="#tocgenerating-the-features-converter">Generating the features converter</a><li><a href="#tocgenerating-the-classifier">Generating the classifier</a><li><a href="#tocwrapping-it-all-together">Wrapping it all together</a><ol><li><a href="#tocdisclaimer">Disclaimer</a></ol></div></p>
+<h2 id="tocfeatures-definition">Features definition</h2>
+<p>This part stays the same as the original post: we will use the RSSIs (signal strength) of the nearby Wifi hotspots to classifiy which location we're in.</p>
+<p>Each location will &quot;see&quot; a certain number of networks, each with a RSSI that will stay <em>mostly</em> the same: the unique combination of these RSSIs will become a fingerprint to distinguish the locations from one another.</p>
+<p>Since not all networks will be visible all the time, the shape of our data will be more likely a sparse matrix.<br />
+A <a href="https://en.wikipedia.org/wiki/Sparse_matrix">sparse matrix</a> is a matrix where most of the elements will be zero, meaning the absence of the given feature. Only the relevant elements will be non-zero and will represent the RSSI of the nth network.</p>
+<p>The following example table should give you an idea of what our data will look like.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Location</th>
+<th style="text-align: right;">Net #1</th>
+<th style="text-align: right;">Net #2</th>
+<th style="text-align: right;">Net #3</th>
+<th style="text-align: right;">Net #4</th>
+<th style="text-align: right;">Net #5</th>
+<th style="text-align: right;">Net #6</th>
+<th style="text-align: right;">Net #7</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Kitchen/1</td>
+<td style="text-align: right;"><strong>50</strong></td>
+<td style="text-align: right;"><strong>30</strong></td>
+<td style="text-align: right;"><strong>60</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Kitchen/2</td>
+<td style="text-align: right;"><strong>55</strong></td>
+<td style="text-align: right;"><strong>30</strong></td>
+<td style="text-align: right;"><strong>55</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>5</strong></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Kitchen/3</td>
+<td style="text-align: right;"><strong>50</strong></td>
+<td style="text-align: right;"><strong>35</strong></td>
+<td style="text-align: right;"><strong>65</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>5</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">Bedroom/1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>80</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>80</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>40</strong></td>
+<td style="text-align: right;"><strong>40</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">Bedroom/2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>80</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>85</strong></td>
+<td style="text-align: right;"><strong>10</strong></td>
+<td style="text-align: right;"><strong>20</strong></td>
+<td style="text-align: right;"><strong>20</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">Bedroom/3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>70</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>85</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>30</strong></td>
+<td style="text-align: right;"><strong>40</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">Bathroom/1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>30</strong></td>
+<td style="text-align: right;"><strong>80</strong></td>
+<td style="text-align: right;"><strong>80</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Bathroom/2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>10</strong></td>
+<td style="text-align: right;"><strong>90</strong></td>
+<td style="text-align: right;"><strong>85</strong></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Bathroom/3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>30</strong></td>
+<td style="text-align: right;"><strong>90</strong></td>
+<td style="text-align: right;"><strong>90</strong></td>
+<td style="text-align: right;"><strong>5</strong></td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p>Even though the numbers in this table are fake, you should recognize a pattern:</p>
+<ul>
+<li>each location is characterized by a certain combination of always-visible networks</li>
+<li>some sample could be &quot;noised&quot; by weak networks (the <strong>5</strong> in the table)</li>
+</ul>
+<p>Our machine learning algorithm should be able to extract each location's fingerprint without being fooled by this inconsistent features.</p>
+<h2 id="tocdata-gathering">Data gathering</h2>
+<p>Now that we know what our data should look like, we need to first get it.</p>
+<p>In the original post, this point was the one I'm unhappy with since it's not as straight-forward as I would have liked. The method I present you in this post, instead, is by far way simpler to follow.</p>
+<p>First of all, you will need a Wifi equipped board. I will use an <a href="https://store.arduino.cc/arduino-mkr-wifi-1010">Arduino MKR WiFi 1010</a>, but any ESP8266 / ESP32 or the like will work.</p>
+<p>The following sketch will do the job: it scans the visible networks at a regular interval and prints their RSSIs encoded in JSON format.</p>
+<pre><code class="language-cpp">// file DataGathering.h
+
+#include &quot;WiFi.h&quot;
+
+#define print(string) Serial.print(string);
+#define quote(string) print(&#039;&quot;&#039;); print(string); print(&#039;&quot;&#039;);
+
+String location = &quot;&quot;;
+
+/**
+ * 
+ */
+void setup() {
+  Serial.begin(115200);
+  delay(3000);
+  WiFi.disconnect();
+}
+
+/**
+ * 
+ */
+void loop() {  
+  // if location is set, scan networks
+  if (location != &quot;&quot;) {
+    int numNetworks = WiFi.scanNetworks();
+
+    // print location
+    print(&#039;{&#039;);
+    quote(&quot;__location&quot;);
+    print(&quot;: &quot;);
+    quote(location);
+    print(&quot;, &quot;);
+
+    // print each network SSID and RSSI
+    for (int i = 0; i &lt; numNetworks; i++) {
+      quote(WiFi.SSID(i));
+      print(&quot;: &quot;);
+      print(WiFi.RSSI(i));
+      print(i == numNetworks - 1 ? &quot;}\n&quot; : &quot;, &quot;);
+    }
+
+    delay(1000);
+  }
+  // else wait for user to enter the location
+  else {
+    String input;
+
+    Serial.println(&quot;Enter &#039;scan {location}&#039; to start the scanning&quot;);
+
+    while (!Serial.available())
+      delay(200);
+
+    input = Serial.readStringUntil(&#039;\n&#039;);
+
+    if (input.indexOf(&quot;scan &quot;) == 0) {
+      input.replace(&quot;scan &quot;, &quot;&quot;);
+      location = input;
+    }
+    else {
+      location = &quot;&quot;;
+    }
+  }
+}</code></pre>
+<p>Upload the sketch to your board and start mapping your house / office: go to the target location and type <code>scan {location}</code> in the serial monitor, where <code>{location}</code>is the name you want to give to the current location (so, for example, if you're mapping the kitchen, type <code>scan kitchen</code>).</p>
+<p>Move around the room a bit so you capture a few variations of the visible hotspots: this will lead to a more robust classification later on.</p>
+<p>To stop the recording just type <code>stop</code> in the serial monitor.</p>
+<p>Now repeat this process for each location you want to classify. At this point you should have ended with something similar to the following:</p>
+<pre><code class="language-python">{&quot;__location&quot;: &quot;Kitchen&quot;, &quot;N1&quot;: 100, &quot;N2&quot;: 50}
+{&quot;__location&quot;: &quot;Bedroom&quot;, &quot;N3&quot;: 100, &quot;N2&quot;: 50}
+{&quot;__location&quot;: &quot;Bathroom&quot;, &quot;N1&quot;: 100, &quot;N4&quot;: 50}
+{&quot;__location&quot;: &quot;Bathroom&quot;, &quot;N5&quot;: 100, &quot;N4&quot;: 50}</code></pre>
+<p>In your case, &quot;N1&quot;, &quot;N2&quot;... will contain the name of the visible networks.</p>
+<p>When you're happy with your training data, it's time to convert it to something useful.</p>
+<h2 id="tocgenerating-the-features-converter">Generating the features converter</h2>
+<p>Given the data we have, we want to generate C code that can convert a Wifi scan result into a feature vector we can use for classification.</p>
+<p>Since I'm a fan of code-generators, I wrote one specifically for this very project. And since I already have a code-generator library I use for Machine Learning code written in Python, I updated it with this new functionality.</p>
+<div class="watchout">You must have Python installed on your system</div>
+<p>Start by installing the library.</p>
+<pre><code class="language-bash"># be sure it installs version &gt;= 1.1.8
+pip install --upgrade micromlgen</code></pre>
+<p>Now create a script with the following code:</p>
+<pre><code class="language-python">from micromlgen import port_wifi_indoor_positioning
+
+if __name__ == &#039;__main__&#039;:
+    samples = &#039;&#039;&#039;
+    {&quot;__location&quot;: &quot;Kitchen&quot;, &quot;N1&quot;: 100, &quot;N2&quot;: 50}
+    {&quot;__location&quot;: &quot;Bedroom&quot;, &quot;N3&quot;: 100, &quot;N2&quot;: 50}
+    {&quot;__location&quot;: &quot;Bathroom&quot;, &quot;N1&quot;: 100, &quot;N4&quot;: 50}
+    {&quot;__location&quot;: &quot;Bathroom&quot;, &quot;N5&quot;: 100, &quot;N4&quot;: 50}
+    &#039;&#039;&#039;
+    X, y, classmap, converter_code = port_wifi_indoor_positioning(samples)
+    print(converter_code)</code></pre>
+<p>Of course you have to replace the <code>samples</code> content with the output you got in the previous step. </p>
+<p>In the console you should see a C++ class we will use later in the Arduino sketch. The class should be similar to the following example code.</p>
+<pre><code class="language-cpp">// Save this code in your sketch as Converter.h
+
+#pragma once
+namespace Eloquent {
+    namespace Projects {
+        class WifiIndoorPositioning {
+            public:
+                /**
+                * Get feature vector
+                */
+                float* getFeatures() {
+                    static float features[5] = {0};
+                    uint8_t numNetworks = WiFi.scanNetworks();
+
+                    for (uint8_t i = 0; i &lt; 5; i++) {
+                        features[i] = 0;
+                    }
+
+                    for (uint8_t i = 0; i &lt; numNetworks; i++) {
+                        int featureIdx = ssidToFeatureIdx(WiFi.SSID(i));
+
+                        if (featureIdx &gt;= 0) {
+                            features[featureIdx] = WiFi.RSSI(i);
+                        }
+                    }
+
+                    return features;
+                }
+
+            protected:
+                /**
+                * Convert SSID to featureIdx
+                */
+                int ssidToFeatureIdx(String ssid) {
+                    if (ssid.equals(&quot;N1&quot;))
+                    return 0;
+
+                    if (ssid.equals(&quot;N2&quot;))
+                    return 1;
+
+                    if (ssid.equals(&quot;N3&quot;))
+                    return 2;
+
+                    if (ssid.equals(&quot;N4&quot;))
+                    return 3;
+
+                    if (ssid.equals(&quot;N5&quot;))
+                    return 4;
+
+                    return -1;
+                }
+            };
+        }
+    }</code></pre>
+<p>I will briefly explain what it does: when you call <code>getFeatures()</code>, it runs a Wifi scan and for each network it finds, it fills the corresponding element in the feature vector (if the network is a known one).</p>
+<p>At the end of the procedure, your feature vector will look something like <code>[0, 10, 0, 0, 50, 0, 0]</code>, each element representing the RSSI of a given network.</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<h2 id="tocgenerating-the-classifier">Generating the classifier</h2>
+<p>To close the loop of the project, we need to be able to classify the features vector into one of the recorded location. Since we already have <code>micromlgen</code> installed, it will be very easy to do so.</p>
+<p>Let's update the Python code we already have: this time, instead of printing the converter code, we will print the classifier code.</p>
+<pre><code class="language-bash"># install ml package first
+pip install scikit-learn</code></pre>
+<pre><code class="language-python">from sklearn.tree import DecisionTreeClassifier
+from micromlgen import port_wifi_indoor_positioning, port
+
+if __name__ == &#039;__main__&#039;:
+    samples = &#039;&#039;&#039;
+    {&quot;__location&quot;: &quot;Kitchen&quot;, &quot;N1&quot;: 100, &quot;N2&quot;: 50}
+    {&quot;__location&quot;: &quot;Bedroom&quot;, &quot;N3&quot;: 100, &quot;N2&quot;: 50}
+    {&quot;__location&quot;: &quot;Bathroom&quot;, &quot;N1&quot;: 100, &quot;N4&quot;: 50}
+    {&quot;__location&quot;: &quot;Bathroom&quot;, &quot;N5&quot;: 100, &quot;N4&quot;: 50}
+    &#039;&#039;&#039;
+    X, y, classmap, converter_code = port_wifi_indoor_positioning(samples)
+    clf = DecisionTreeClassifier()
+    clf.fit(X, y)
+    print(port(clf, classmap=classmap))</code></pre>
+<p>Here I chose <a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html">Decision tree</a> because it is a very lightweight algorithm and should work fine for the kind of features we're working with.<br />
+If you're not satisfied with the results, you can try to use <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html?highlight=svc#sklearn.svm.SVC">SVM</a> or <a href="https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html?highlight=gaussiannb#sklearn.naive_bayes.GaussianNB">Gaussian Naive Bayes</a>, which are both supported by <code>micromlgen</code>.</p>
+<p>In the console you will see the generated code for the classifier you trained. In the case of <code>DecisionTree</code> the code will look like the following.</p>
+<pre><code class="language-cpp">// Save this code in your sketch as Classifier.h
+
+#pragma once
+namespace Eloquent {
+    namespace ML {
+        namespace Port {
+            class DecisionTree {
+                public:
+                    /**
+                    * Predict class for features vector
+                    */
+                    int predict(float *x) {
+                        if (x[2] &lt;= 25.0) {
+                            if (x[4] &lt;= 50.0) {
+                                return 1;
+                            }
+
+                            else {
+                                return 2;
+                            }
+                        }
+
+                        else {
+                            return 0;
+                        }
+                    }
+
+                    /**
+                    * Convert class idx to readable name
+                    */
+                    const char* predictLabel(float *x) {
+                        switch (predict(x)) {
+                            case 0:
+                            return &quot;Bathroom&quot;;
+                            case 1:
+                            return &quot;Bedroom&quot;;
+                            case 2:
+                            return &quot;Kitchen&quot;;
+                            default:
+                            return &quot;Houston we have a problem&quot;;
+                        }
+                    }
+
+                protected:
+                };
+            }
+        }
+    }</code></pre>
+<h2 id="tocwrapping-it-all-together">Wrapping it all together</h2>
+<p>Now that we have all the pieces together, we only need to merge them to get a complete working example.</p>
+<pre><code class="language-cpp">// file WifiIndoorPositioning.h
+
+#include &quot;WiFi.h&quot;
+#include &quot;Converter.h&quot;
+#include &quot;Classifier.h&quot;
+
+Eloquent::Projects::WifiIndoorPositioning positioning;
+Eloquent::ML::Port::DecisionTree classifier;
+
+void setup() {
+  Serial.begin(115200);
+}
+
+void loop() {
+  Serial.print(&quot;You&#039;re in &quot;);
+  Serial.println(classifier.predictLabel(positioning.getFeatures()));
+  delay(3000);
+}</code></pre>
+<p>To the bare minimum, the above code runs the scan and tells you which location you're in. That's it.</p>
+<h3 id="tocdisclaimer">Disclaimer</h3>
+<p>This system should be pretty accurate and robust if you properly gather the data, though I can quantify how much accurate.</p>
+<p>This is not an <em>indoor navigation system</em>: it can't tell you &quot;the coordinates&quot; of where you are, it can only detect in which room you're in.</p>
+<p>If your location lack of nearby Wifi hotspots, an easy and cheap solution would be to spawn a bunch of ESP8266 / ESP32 boards around your house each acting as Access Point: with this simple trick you should be able to be as accurate as needed by just adding more boards.</p>
+<!-- Begin Mailchimp Signup Form -->
+<div id="mc_embed_signup">
+<form action="https://github.us4.list-manage.com/subscribe/post?u=f0eaedd94d554cf2ee781742a&id=37d3496031" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+	<h2 style="margin: 0; text-align: center">Finding this content useful?</h2>
+<div class="mc-field-group">
+	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="join the (more than) monthly newsletter">
+</div>
+	<div id="mce-responses" class="clear">
+		<div class="response" id="mce-error-response" style="display:none"></div>
+		<div class="response" id="mce-success-response" style="display:none"></div>
+	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_f0eaedd94d554cf2ee781742a_37d3496031" tabindex="-1" value=""></div>
+    <div class="clear" style="position: relative; top: 8px"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+
+<!--End mc_embed_signup-->
+<hr />
+<p>With this in-depth tutorial I hope I helped you going from start to end of setting up a Wifi indoor positioning system using cheap hardware as ESP8266 / ESP32 boards and the Arduino IDE. </p>
+<p>As you can see, Machine learning has not to be intimidating even for beginners: you just need the right tools to get the job done.</p>
+<p>If this guide excited you about Machine learning on microcontrollers, I invite you to read the many other posts I wrote on the topic and share them on the socials.</p>
+<p>You can find the whole project on <a href="https://github.com/eloquentarduino/EloquentMicroML/tree/master/examples/TheUltimateGuideToWifiIndoorPositioning">Github</a>. Don't forget to star the repo if you like it.</p>
+<p>L'articolo <a rel="nofollow" href="https://eloquentarduino.github.io/2020/08/the-ultimate-guide-to-wifi-indoor-positioning-using-arduino-and-machine-learning/">The Ultimate Guide to Wifi Indoor Positioning using Arduino and Machine Learning</a> proviene da <a rel="nofollow" href="http://eloquentarduino.github.io/">Eloquent Arduino Blog</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>
