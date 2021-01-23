@@ -43,7 +43,8 @@ body {
   text-decoration: underline;
 }
 
-.post-content p {
+.post-content p,
+.post-content li {
   font-size: 0.975rem;
 	text-align: justify;
 }
