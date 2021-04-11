@@ -57,6 +57,18 @@ NUCLEO H743ZI2 {opt=o3},Iris,FC 10 x 10,31.51
 NUCLEO H743ZI2 {opt=o3},Iris,FC 10+50,17.8
 NUCLEO H743ZI2 {opt=o3},Wine,FC 10 x 10,32.57
 NUCLEO H743ZI2 {opt=o3},Wine,FC 10+50,19.06
+Raspberry Pi Pico,Breast cancer,FC 1 x 10,872.85
+Raspberry Pi Pico,Breast cancer,FC 10 x 10,3369.54
+Raspberry Pi Pico,Breast cancer,FC 10+50,2413.44
+Raspberry Pi Pico,Digits,FC 1 x 10,1982.31
+Raspberry Pi Pico,Digits,FC 10 x 10,4503.25
+Raspberry Pi Pico,Digits,FC 10+50,4314.19
+Raspberry Pi Pico,Iris,FC 1 x 10,313.77
+Raspberry Pi Pico,Iris,FC 10 x 10,2801.82
+Raspberry Pi Pico,Iris,FC 10+50,1953.96
+Raspberry Pi Pico,Wine,FC 1 x 10,509.76
+Raspberry Pi Pico,Wine,FC 10 x 10,3021.03
+Raspberry Pi Pico,Wine,FC 10+50,2176.92
 Teensy 4.0,Breast cancer,FC 1 x 10,5.16
 Teensy 4.0,Breast cancer,FC 10 x 10,20.15
 Teensy 4.0,Breast cancer,FC 10+50,12.32
