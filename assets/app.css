@@ -465,3 +465,7 @@ a[href="/about-me"]:hover {
   color: #353E49;
   text-decoration: none;
 }
+
+#disqus_thread > iframe[sandbox] {
+  display: none;
+}
